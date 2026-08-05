@@ -1,0 +1,112 @@
+---
+// src/pages/team.astro — NEW page (no prototype existed).
+// Built in the established design system; copy grounded in v1's AboutUs section
+// ("Specialized Knowledge" + domain list). The typewriter effect is dropped per
+// CLAUDE.md animation non-goals — domains render as a static mono list.
+// TODO(team): replace placeholder member slots with real names/photos/roles.
+import Layout from '../layouts/Layout.astro';
+---
+<Layout
+  title="Team — Rockcruit"
+  description="The people behind Rockcruit — tech headhunters with years of experience identifying and attracting top technical talent across LATAM."
+>
+
+<div class="page-hero reveal">
+  <div class="page-hero-glow"></div>
+  <div class="page-hero-label">Who you'll work with</div>
+  <h1 class="page-hero-h">
+    <span>RECRUITERS WHO</span>
+    <span>ACTUALLY KNOW</span>
+    <span class="dim">TECH.</span>
+  </h1>
+  <p class="page-hero-sub">With years of experience in the tech industry, we have honed our expertise in identifying and attracting top technical talent across various domains. <strong>Small team, senior judgment, zero hand-offs to juniors.</strong></p>
+</div>
+
+<!-- Specialized knowledge — v1 AboutUs content, static -->
+<section class="domains">
+  <div class="domains-header reveal">
+    <div class="d-eyebrow">Specialized knowledge</div>
+    <h2 class="d-h2">We recruit across<br><em>every digital domain.</em></h2>
+  </div>
+  <div class="domains-list reveal">
+    <span class="domain-tag">Software Development</span>
+    <span class="domain-tag">Product &amp; Management</span>
+    <span class="domain-tag">Software Architecture</span>
+    <span class="domain-tag">Artificial Intelligence</span>
+    <span class="domain-tag">Infrastructure &amp; Support</span>
+    <span class="domain-tag">Data / ML</span>
+    <span class="domain-tag">DevOps / Cloud</span>
+    <span class="domain-tag">Tech Sales</span>
+  </div>
+</section>
+
+<!-- Members -->
+<section class="members">
+  <div class="members-header reveal">
+    <div class="d-eyebrow">The team</div>
+    <h2 class="d-h2">People, not <em>pipelines.</em></h2>
+  </div>
+  <div class="members-grid">
+    <div class="member-card reveal">
+      <div class="member-av"><span>JW</span></div>
+      <div class="member-name">Juli Wolf</div>
+      <div class="member-role">Co-founder</div>
+      <p class="member-bio">Leads client partnerships and search strategy. The person who tells you honestly which model fits — and pushes back when a profile doesn't.</p>
+    </div>
+    <!-- TODO(team): duplicate this card per real member. Photos: swap .member-av
+         span for <img src="/team/<name>.webp" alt="" /> once photos exist. -->
+    <div class="member-card member-placeholder reveal">
+      <div class="member-av"><span>+</span></div>
+      <div class="member-name">Your recruiter</div>
+      <div class="member-role">Embedded, dedicated</div>
+      <p class="member-bio">Every engagement gets a dedicated recruiter operating inside your Slack or Teams — backed by the full team's calibration every week.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="team-cta reveal">
+  <p class="team-cta-line">Want to know who'd run <strong>your</strong> search?</p>
+  <a href="/#contact" class="btn-primary">Start the conversation →</a>
+</section>
+
+</Layout>
+
+<style>
+.page-hero{padding:6.5rem 5% 4rem;border-bottom:1px solid var(--bdark);position:relative;overflow:hidden}
+.page-hero-glow{position:absolute;top:-60px;right:-60px;width:400px;height:400px;border-radius:50%;background:rgba(26,158,92,.05);filter:blur(80px);pointer-events:none}
+.page-hero-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:2rem}
+.page-hero-h{font-family:var(--bebas);font-size:clamp(4rem,10vw,11rem);line-height:.86;letter-spacing:.02em;color:var(--paper);margin-bottom:2.5rem}
+.page-hero-h span{display:block}
+.page-hero-h .dim{color:rgba(240,237,227,.2)}
+.page-hero-sub{font-size:.95rem;color:#a1a1aa;line-height:1.8;max-width:540px}
+.page-hero-sub strong{color:var(--paper);font-weight:400}
+
+.d-eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:1.2rem}
+.d-h2{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(2rem,4vw,3.5rem);line-height:.95;letter-spacing:-.02em;color:var(--paper)}
+.d-h2 em{font-style:normal;color:var(--green)}
+
+.domains{padding:5rem 5%;border-bottom:1px solid var(--bdark)}
+.domains-header{margin-bottom:2.5rem}
+.domains-list{display:flex;flex-wrap:wrap;gap:.8rem;max-width:760px}
+.domain-tag{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(240,237,227,.6);border:1px solid var(--bdark);border-radius:4px;padding:.6rem 1rem;transition:border-color .2s,color .2s}
+.domain-tag:hover{border-color:var(--green);color:var(--green)}
+
+.members{padding:5rem 5%;border-bottom:1px solid var(--bdark);background:rgba(255,255,255,.015)}
+.members-header{margin-bottom:3rem}
+.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+.member-card{border:1px solid var(--bdark);border-radius:12px;padding:2.2rem 1.8rem;transition:border-color .3s,transform .3s}
+.member-card:hover{border-color:rgba(26,158,92,.3);transform:translateY(-4px)}
+.member-av{width:64px;height:64px;border-radius:50%;background:rgba(26,158,92,.1);border:1px solid rgba(26,158,92,.25);display:flex;align-items:center;justify-content:center;margin-bottom:1.4rem}
+.member-av span{font-family:var(--mono);font-size:.85rem;color:var(--green)}
+.member-name{font-family:var(--bebas);font-size:1.5rem;letter-spacing:.03em;color:var(--paper)}
+.member-role{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin:.3rem 0 1rem}
+.member-bio{font-size:.84rem;color:rgba(240,237,227,.45);line-height:1.75}
+.member-placeholder{border-style:dashed}
+
+.team-cta{padding:5rem 5%;display:flex;flex-direction:column;align-items:flex-start;gap:1.8rem}
+.team-cta-line{font-family:var(--serif);font-style:italic;font-size:clamp(1.3rem,2.5vw,2rem);color:rgba(240,237,227,.5)}
+.team-cta-line strong{color:var(--paper);font-weight:400}
+.btn-primary{background:var(--green);color:var(--ink);font-size:.88rem;font-weight:500;padding:.85rem 2rem;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:background .2s,transform .2s}
+.btn-primary:hover{background:#15845e;transform:translateY(-2px)}
+</style>

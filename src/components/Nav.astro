@@ -1,0 +1,61 @@
+---
+// src/components/Nav.astro — one canonical nav (prototypes drifted; normalized here).
+// Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
+// "Open Positions" → /#contact until its real destination is decided (open ledger).
+const path = Astro.url.pathname;
+const isActive = (p: string) => (p === '/' ? path === '/' : path.startsWith(p));
+---
+<nav>
+  <a href="/" class="nav-logo">
+    <span class="logo-word">ROCKCRUIT</span>
+    <div class="nav-dot"></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/" class={isActive('/') ? 'active' : ''}>Home</a></li>
+    <li class="nav-dropdown">
+      <a href="/services" class={isActive('/services') ? 'active' : ''}>Services <span class="nav-dropdown-arrow">▾</span></a>
+      <div class="nav-dropdown-menu">
+        <a href="/services#raas"><span>01</span> Recruiting as a Service</a>
+        <div class="nav-dropdown-divider"></div>
+        <a href="/services#contingency"><span>02</span> Contingency Recruiting</a>
+      </div>
+    </li>
+    <li><a href="/team" class={isActive('/team') ? 'active' : ''}>Team</a></li>
+    <li><a href="/process" class={isActive('/process') ? 'active' : ''}>Process</a></li>
+    <li><a href="/faq" class={isActive('/faq') ? 'active' : ''}>FAQ</a></li>
+    <li><a href="/blog" class={isActive('/blog') ? 'active' : ''}>Blog</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="/#contact" class="nav-open">Open Positions</a>
+    <a href="/#contact" class="nav-cta">Hire With Us</a>
+  </div>
+</nav>
+
+<style>
+  nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:54px;background:rgba(20,18,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--bdark)}
+  .nav-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+  .logo-word{font-family:var(--bebas);font-size:1.6rem;letter-spacing:.05em;color:var(--paper);font-weight:normal}
+  .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2.5s ease infinite;flex-shrink:0}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:.4}}
+  .nav-links{display:flex;gap:2.5rem;list-style:none}
+  .nav-links a{font-size:.82rem;color:rgba(240,237,227,.4);text-decoration:none;transition:color .2s}
+  .nav-links a:hover,.nav-links a.active{color:var(--paper)}
+  .nav-links a.active{border-bottom:1px solid var(--paper);padding-bottom:1px}
+  .nav-dropdown{position:relative}
+  .nav-dropdown-menu{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:rgba(20,18,16,.98);border:1px solid var(--bdark);border-radius:8px;min-width:230px;padding:.4rem 0;z-index:600;backdrop-filter:blur(20px)}
+  .nav-dropdown:hover .nav-dropdown-menu{display:block}
+  .nav-dropdown-menu::before{content:'';position:absolute;top:-12px;left:0;right:0;height:12px;background:transparent}
+  .nav-dropdown-menu a{display:flex;align-items:center;gap:.6rem;padding:.65rem 1.1rem;font-size:.8rem;color:rgba(240,237,227,.5);text-decoration:none;transition:color .2s,background .2s;white-space:nowrap}
+  .nav-dropdown-menu a:hover{color:var(--paper);background:rgba(255,255,255,.04)}
+  .nav-dropdown-menu a span{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+  .nav-dropdown-divider{height:1px;background:var(--bdark);margin:.3rem 0}
+  .nav-dropdown-arrow{display:inline-block;margin-left:.25rem;font-size:.6rem;transition:transform .2s}
+  .nav-dropdown:hover .nav-dropdown-arrow{transform:rotate(180deg)}
+  .nav-actions{display:flex;align-items:center;gap:.75rem}
+  .nav-cta{background:var(--green);color:var(--ink);font-size:.82rem;font-weight:500;padding:.45rem 1.2rem;border-radius:4px;text-decoration:none;transition:background .2s}
+  .nav-cta:hover{background:#15845e}
+  .nav-open{font-size:.82rem;color:rgba(240,237,227,.5);text-decoration:none;border:1px solid var(--bdark);border-radius:4px;padding:.45rem 1.2rem;transition:border-color .2s,color .2s}
+  .nav-open:hover{border-color:rgba(240,237,227,.4);color:var(--paper)}
+  /* Mobile: keep it simple until a burger menu is a real requirement (AGENTS.md) */
+  @media(max-width:900px){.nav-links{display:none}}
+</style>

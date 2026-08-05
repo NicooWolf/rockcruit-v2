@@ -1,0 +1,282 @@
+---
+// src/pages/faq.astro — NEW page (no prototype existed).
+// Reuses the home page's accordion pattern with faq-* classes. Every answer is
+// grounded in facts already published on the prototypes — nothing invented.
+import Layout from "../layouts/Layout.astro";
+
+const faqs = [
+  {
+    q: "How fast will we see the first candidate?",
+    a: "In 85% of our searches, the first candidate is presented within the first 5 business days from kickoff — typically 3–5 days. Average time to fill a role is 3–4 weeks.",
+  },
+  {
+    q: "What's the difference between Contingency and RaaS?",
+    a: "Contingency is search-by-search: one critical hire, no monthly retainer, full focus on a single seat. RaaS is an embedded monthly engagement for companies hiring continuously — up to 3 searches running at the same time, no per-hire commissions, and context that compounds from search to search. The right model depends mostly on how often you hire.",
+  },
+  {
+    q: "Do you charge per hire on RaaS?",
+    a: "No. RaaS is a flexible monthly engagement without per-hire fees. Contingency works per search instead, with no long-term commitment.",
+  },
+  {
+    q: "What roles do you cover?",
+    a: "High-impact digital roles across LATAM: Software Development, Data / AI / ML, DevOps / Cloud, Product / UX, Software Architecture, Infrastructure, and Tech Sales.",
+  },
+  {
+    q: 'How embedded is "embedded"?',
+    a: "We operate inside your workflow — Slack, Teams, your interview process — with weekly hiring calibration and direct alignment with hiring managers. Like an internal recruiting function with external flexibility, not a vendor forwarding resumes.",
+  },
+  {
+    q: "How do you evaluate culture fit?",
+    a: "From the first conversation, not at the offer stage. Strong technical profiles fail all the time for cultural reasons, so both dimensions are vetted together — including technical skills and English proficiency.",
+  },
+  {
+    q: "Can we start small and switch models later?",
+    a: "Yes. Many clients start with a single Contingency search; if hiring picks up, moving into RaaS is a natural next step — not a new relationship. RaaS can also activate for as little as a single month during a hiring spike.",
+  },
+  {
+    q: "How do we start?",
+    a: "Use the form on the home page or the Hire With Us button. First consultation is free, we respond within 24 hours, and there's no commitment — most companies figure out which model fits in about 20 minutes.",
+  },
+];
+---
+
+<Layout
+  title="FAQ — Rockcruit"
+  description="Common questions about working with Rockcruit: speed to first candidate, Contingency vs RaaS, pricing model, roles covered, and how to start."
+>
+  <div class="page-hero reveal">
+    <div class="page-hero-glow"></div>
+    <div class="page-hero-label">Questions, answered straight</div>
+    <h1 class="page-hero-h">
+      <span>BEFORE YOU</span>
+      <span class="dim">ASK.</span>
+    </h1>
+    <p class="page-hero-sub">
+      The things every company asks in the first call — answered here so your
+      first call can go deeper. <strong
+        >Anything missing? The first conversation is free.</strong
+      >
+    </p>
+  </div>
+
+  <section class="faq">
+    {
+      faqs.map((item, i) => (
+        <div class={`faq-item reveal${i === 0 ? " open" : ""}`}>
+          <button class="faq-btn">
+            <span class="faq-num">{String(i + 1).padStart(2, "0")}</span>
+            <span class="faq-q">{item.q}</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-body">
+            <div class="faq-body-inner">{item.a}</div>
+          </div>
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="faq-cta reveal">
+    <p class="faq-cta-line">
+      Still deciding?<br /><strong>Twenty minutes usually settles it.</strong>
+    </p>
+    <a href="/#contact" class="btn-primary">Ask us directly →</a>
+  </section>
+</Layout>
+
+<style>
+  .page-hero {
+    padding: 6.5rem 5% 4rem;
+    border-bottom: 1px solid var(--bdark);
+    position: relative;
+    overflow: hidden;
+  }
+  .page-hero-glow {
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(26, 158, 92, 0.05);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .page-hero-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 2rem;
+  }
+  .page-hero-h {
+    font-family: var(--bebas);
+    font-size: clamp(4rem, 10vw, 11rem);
+    line-height: 0.86;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    margin-bottom: 2.5rem;
+  }
+  .page-hero-h span {
+    display: block;
+  }
+  .page-hero-h .dim {
+    color: rgba(240, 237, 227, 0.2);
+  }
+  .page-hero-sub {
+    font-size: 0.95rem;
+    color: #a1a1aa;
+    line-height: 1.8;
+    max-width: 540px;
+  }
+  .page-hero-sub strong {
+    color: var(--paper);
+    font-weight: 400;
+  }
+
+  .faq {
+    border-bottom: 1px solid var(--bdark);
+  }
+  .faq-item {
+    border-bottom: 1px solid var(--bdark);
+    overflow: hidden;
+  }
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+  .faq-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 80px 1fr 36px;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 5%;
+    text-align: left;
+    transition: background 0.2s;
+  }
+  .faq-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .faq-item.open .faq-btn {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .faq-num {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .faq-q {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+  }
+  .faq-item.open .faq-q {
+    color: var(--green);
+  }
+  .faq-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--bdark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(240, 237, 227, 0.3);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition:
+      border-color 0.2s,
+      color 0.2s,
+      transform 0.35s;
+  }
+  .faq-item.open .faq-icon {
+    border-color: var(--green);
+    color: var(--green);
+    transform: rotate(45deg);
+  }
+  .faq-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s ease;
+  }
+  .faq-body-inner {
+    padding: 0.5rem 5% 2rem calc(5% + 80px + 2rem);
+    font-size: 0.88rem;
+    color: rgba(240, 237, 227, 0.45);
+    line-height: 1.85;
+    max-width: 640px;
+  }
+  .faq-item.open .faq-body {
+    max-height: 300px;
+  }
+
+  .faq-cta {
+    padding: 5rem 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    align-items: flex-start;
+  }
+  .faq-cta-line {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    color: rgba(240, 237, 227, 0.5);
+    line-height: 1.4;
+  }
+  .faq-cta-line strong {
+    color: var(--paper);
+    font-weight: 400;
+  }
+  .btn-primary {
+    background: var(--green);
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 0.85rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition:
+      background 0.2s,
+      transform 0.2s;
+  }
+  .btn-primary:hover {
+    background: #15845e;
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    .faq-btn {
+      grid-template-columns: 50px 1fr 34px;
+      gap: 1rem;
+      padding: 1.5rem 5%;
+    }
+    .faq-body-inner {
+      padding: 0.5rem 5% 1.5rem calc(5% + 50px + 1rem);
+    }
+  }
+</style>
+
+<script>
+  // FAQ accordion — same delegation pattern as the home page (ClientRouter-safe).
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as Element).closest?.(".faq-btn");
+    if (!btn) return;
+    const item = btn.closest(".faq-item");
+    const wasOpen = item?.classList.contains("open");
+    document
+      .querySelectorAll(".faq-item")
+      .forEach((i) => i.classList.remove("open"));
+    if (!wasOpen) item?.classList.add("open");
+  });
+</script>

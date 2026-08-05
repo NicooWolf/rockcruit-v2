@@ -1,0 +1,324 @@
+---
+// src/components/HireForm.astro — the one contact form, used on / and /services.
+// Design = prototype's boxed fcta-form. Brain = v1: zod rules/messages, EmailJS
+// send with blockHeadless + 10s throttle. Input name attrs match v1's EmailJS
+// template variables (name, email, companyName, hiringRoles) so the existing
+// template works untouched. Keys: PUBLIC_EMAILJS_* env vars (never committed).
+---
+
+<form class="fcta-form" id="hire-form" novalidate>
+  <div class="f-row">
+    <div class="f-field">
+      <label class="f-label" for="fc-name">Your name</label>
+      <input
+        class="fi"
+        id="fc-name"
+        name="name"
+        type="text"
+        placeholder="Jane Smith"
+        autocomplete="name"
+      />
+      <span class="f-error" data-for="name"></span>
+    </div>
+    <div class="f-field">
+      <label class="f-label" for="fc-email">Work email</label>
+      <input
+        class="fi"
+        id="fc-email"
+        name="email"
+        type="email"
+        placeholder="jane@company.com"
+        autocomplete="email"
+      />
+      <span class="f-error" data-for="email"></span>
+    </div>
+  </div>
+
+  <div class="f-field">
+    <label class="f-label" for="fc-company">Company name</label>
+    <input
+      class="fi"
+      id="fc-company"
+      name="companyName"
+      type="text"
+      placeholder="Acme Corp"
+      autocomplete="organization"
+    />
+    <span class="f-error" data-for="companyName"></span>
+  </div>
+
+  <div class="f-field">
+    <label class="f-label" for="fc-role">Type of role</label>
+    <div class="f-select-wrap">
+      <select class="fi-sel" id="fc-role" name="hiringRoles">
+        <option value="" disabled selected>Select a category</option>
+        <option>Software Development</option>
+        <option>Data / AI / ML</option>
+        <option>DevOps / Cloud</option>
+        <option>Product / UX</option>
+        <option>Tech Sales</option>
+        <option>Multiple roles</option>
+      </select>
+      <span class="f-chevron">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><polyline points="6 9 12 15 18 9"></polyline></svg
+        >
+      </span>
+    </div>
+    <span class="f-error" data-for="hiringRoles"></span>
+  </div>
+
+  <button class="f-submit" type="submit">Let's find your hire →</button>
+  <p class="f-status" id="f-status" role="status" aria-live="polite"></p>
+
+  <div class="fcta-trust">
+    <div class="fcta-trust-item">
+      <span class="fcta-trust-check">✓</span><span>Free first consultation</span
+      >
+    </div>
+    <div class="fcta-trust-item">
+      <span class="fcta-trust-check">✓</span><span
+        >Response within 24 hours</span
+      >
+    </div>
+    <div class="fcta-trust-item">
+      <span class="fcta-trust-check">✓</span><span>No commitment required</span>
+    </div>
+  </div>
+</form>
+
+<style>
+  .fcta-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .f-row {
+    display: flex;
+    gap: 1rem;
+  }
+  .f-row .f-field {
+    flex: 1;
+  }
+  .f-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .f-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #71717a;
+    font-family: var(--mono);
+  }
+  .fi {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #3f3f46;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    color: #f4f4f5;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    outline: none;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .fi:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(26, 158, 92, 0.15);
+  }
+  .fi::placeholder {
+    color: #52525b;
+  }
+  .f-select-wrap {
+    position: relative;
+  }
+  .fi-sel {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #3f3f46;
+    border-radius: 6px;
+    padding: 0.85rem 2.5rem 0.85rem 1rem;
+    color: #d4d4d8;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .fi-sel:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(26, 158, 92, 0.15);
+  }
+  .fi-sel option {
+    background: #1a1a1a;
+    color: #f4f4f5;
+  }
+  .f-chevron {
+    position: absolute;
+    right: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #71717a;
+  }
+  .f-submit {
+    background: var(--green);
+    color: #0b0b0b;
+    border: none;
+    border-radius: 6px;
+    padding: 1rem 1.5rem;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    width: 100%;
+    transition:
+      background 0.2s,
+      transform 0.2s,
+      box-shadow 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .f-submit:hover {
+    background: #15845e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(26, 158, 92, 0.3);
+  }
+  .f-submit:disabled {
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+  }
+  .f-error {
+    font-size: 0.72rem;
+    color: #f87171;
+    min-height: 1em;
+  }
+  .f-status {
+    font-size: 0.85rem;
+    min-height: 1.2em;
+  }
+  .f-status.ok {
+    color: var(--green);
+  }
+  .f-status.err {
+    color: #f87171;
+  }
+  .fcta-trust {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .fcta-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+    color: #d4d4d8;
+  }
+  .fcta-trust-check {
+    color: var(--green);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+  @media (max-width: 640px) {
+    .f-row {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  import emailjs from "@emailjs/browser";
+  import { z } from "zod";
+
+  // Ported from v1 src/lib/schemas.ts — same rules & messages, surviving fields only.
+  const hireFormSchema = z.object({
+    name: z
+      .string()
+      .min(6, "Name is required, and must contain at least 6 characters.")
+      .max(25, "Name must contain at most 25 characters."),
+    email: z
+      .string()
+      .max(40, "Email must contain at most 40 characters.")
+      .email({ message: "Email is required, and must be valid." }),
+    companyName: z
+      .string()
+      .min(
+        2,
+        "Company Name is required, and must contain at least 2 characters.",
+      )
+      .max(25, "Company Name must contain at most 25 characters."),
+    hiringRoles: z.string().min(1, "Please select a role category."),
+  });
+
+  // Same protections v1 configured in main.tsx.
+  emailjs.init({
+    publicKey: import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY,
+    blockHeadless: true,
+    limitRate: { id: "app", throttle: 10000 }, // 1 send / 10s
+  });
+
+  document.addEventListener("astro:page-load", () => {
+    const form = document.getElementById("hire-form") as HTMLFormElement | null;
+    if (!form) return; // not on this page
+
+    const status = document.getElementById("f-status")!;
+    const submitBtn = form.querySelector<HTMLButtonElement>(".f-submit")!;
+    const errorEls = form.querySelectorAll<HTMLElement>(".f-error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEls.forEach((el) => (el.textContent = ""));
+      status.textContent = "";
+      status.className = "f-status";
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      const parsed = hireFormSchema.safeParse(data);
+
+      if (!parsed.success) {
+        for (const issue of parsed.error.issues) {
+          const el = form.querySelector<HTMLElement>(
+            `.f-error[data-for="${issue.path[0]}"]`,
+          );
+          if (el) el.textContent = issue.message;
+        }
+        return;
+      }
+
+      submitBtn.disabled = true;
+      try {
+        await emailjs.sendForm(
+          import.meta.env.PUBLIC_EMAILJS_SERVICE_ID,
+          import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID,
+          form,
+        );
+        status.textContent = "Message sent — we reply within 24 hours.";
+        status.classList.add("ok");
+        form.reset();
+      } catch {
+        status.textContent =
+          "Something went wrong. Try again, or email jwolf@rockcruit.com.";
+        status.classList.add("err");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  });
+</script>

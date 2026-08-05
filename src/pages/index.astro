@@ -1,17 +1,1421 @@
 ---
-
+// src/pages/index.astro — Home. Port of prototype index.html (structural refactor, not redesign).
+import Layout from "../layouts/Layout.astro";
+import HireForm from "../components/HireForm.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout
+  title="Rockcruit — Tech Headhunters · LATAM"
+  description="Embedded tech recruiting for scaling companies across LATAM. First candidate in 5 days, no per-hire fees on RaaS."
+>
+  <!-- ═══════ HERO ═══════ -->
+  <section class="hero" id="top">
+    <div class="hero-glow"></div>
+
+    <div class="hero-eyebrow-row reveal">
+      <span class="hero-eyebrow">Tech headhunters · LATAM</span>
+    </div>
+
+    <div class="hero-h1-wrap reveal">
+      <h1>
+        <span class="hl-ink">FAST-GROWING</span>
+        <span class="hl-green">TEAMS NEED</span>
+        <span class="hl-ink">BETTER HIRING</span>
+        <span class="hl-muted">PARTNERS.</span>
+      </h1>
+    </div>
+
+    <div class="subhero-grid reveal">
+      <div class="subhero-left">
+        <h2 class="subhero-title">
+          When growth accelerates, most talent teams become <strong
+            >overloaded fast.</strong
+          >
+        </h2>
+        <p class="subhero-body">
+          We plug in as an embedded recruiting layer focused on high-impact
+          digital roles across LATAM — helping scaling companies hire faster
+          without increasing fixed recruiting headcount.
+        </p>
+        <div class="subhero-ctas">
+          <a href="/#contact" class="btn-primary">Start hiring →</a>
+          <a href="/services" class="btn-ghost-sub">See how we work →</a>
+        </div>
+      </div>
+      <div class="subhero-right">
+        <div class="subhero-prop">
+          <div class="subhero-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><circle cx="12" cy="12" r="10"></circle><polyline
+                points="12 6 12 12 16 14"></polyline></svg
+            >
+          </div>
+          <div>
+            <div class="subhero-prop-title">First candidate in 5 days</div>
+            <div class="subhero-prop-sub">
+              In 85% of our searches — no waiting for inbound applicants.
+            </div>
+          </div>
+        </div>
+        <div class="subhero-prop">
+          <div class="subhero-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><rect x="2" y="3" width="20" height="14" rx="2"></rect><path
+                d="M8 21h8M12 17v4"></path></svg
+            >
+          </div>
+          <div>
+            <div class="subhero-prop-title">Embedded in your workflow</div>
+            <div class="subhero-prop-sub">
+              We operate inside Slack, Teams, and your hiring process — not
+              outside of it.
+            </div>
+          </div>
+        </div>
+        <div class="subhero-prop">
+          <div class="subhero-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              ></path></svg
+            >
+          </div>
+          <div>
+            <div class="subhero-prop-title">
+              No cold starts between searches
+            </div>
+            <div class="subhero-prop-sub">
+              Context from every previous search makes the next one faster and
+              sharper.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item reveal">
+        <div class="stat-num g">+10,000</div>
+        <div class="stat-label">Qualified candidates in our network</div>
+      </div>
+      <div class="stat-item featured reveal">
+        <div class="stat-num v">3–5 DAYS</div>
+        <div class="stat-label">To first candidate from kickoff</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-num g">3–4 WEEKS</div>
+        <div class="stat-label">Average time to fill a role</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ TRUSTED BY ═══════ -->
+  <div class="logos">
+    <div class="logos-label">Trusted by</div>
+    <div class="logos-track">
+      {
+        [0, 1].map(() => (
+          <>
+            <>
+              <div class="logo-item">
+                <span class="logo-text">Magoya</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Patagonian</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Sidom</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Hearth</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Hiberus</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Aureum</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Bizland</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Bricks M2V</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Bridgenext</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">EGA</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Wunderkind</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">iplan</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">TGN</span>
+              </div>
+              <div class="logo-item">
+                <span class="logo-text">Eureka Labs</span>
+              </div>
+            </>
+          </>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- ═══════ CORE POSITIONING ═══════ -->
+  <section class="positioning">
+    <div class="pos-header reveal">
+      <div class="pos-eyebrow">Why companies switch to Rockcruit</div>
+      <h2 class="pos-h2">
+        Most recruiting firms restart from zero <em>every search.</em> We don't.
+      </h2>
+      <div class="pos-intro">
+        <p>Traditional recruiting works transaction by transaction.</p>
+        <p>But scaling teams don't hire that way.</p>
+        <p>
+          Every new search forces external recruiters to relearn your culture,
+          your hiring standards, your interview process, and what actually makes
+          someone succeed inside your company. That creates friction, slow
+          ramp-up time, and inconsistent candidate quality.
+        </p>
+      </div>
+    </div>
+
+    <div class="pos-cols">
+      <div class="pos-col reveal">
+        <div class="pos-col-num">01</div>
+        <div class="pos-col-title">Embedded, not external</div>
+        <p class="pos-col-body">
+          We operate inside your workflow, not outside of it. Slack, Teams,
+          weekly calibration, direct hiring alignment — like an internal
+          recruiting function with external flexibility.
+        </p>
+      </div>
+      <div class="pos-col reveal">
+        <div class="pos-col-num">02</div>
+        <div class="pos-col-title">Context compounds over time</div>
+        <p class="pos-col-body">
+          Every search improves the next one. We build pattern recognition
+          around your culture, your leadership team, and the profiles that
+          actually succeed long term.
+        </p>
+      </div>
+      <div class="pos-col reveal">
+        <div class="pos-col-num">03</div>
+        <div class="pos-col-title">Elastic recruiting capacity</div>
+        <p class="pos-col-body">
+          Activate support when hiring spikes hit. Scale down when the pressure
+          drops. No unnecessary fixed recruiting headcount between growth
+          cycles.
+        </p>
+      </div>
+    </div>
+
+    <div class="pos-footer reveal">
+      <p class="pos-closing">
+        Anyone can send resumes.<br /><strong
+          >Very few recruiting partners actually learn how your company hires.</strong
+        >
+      </p>
+      <a href="/services" class="pos-cta">Explore our delivery models →</a>
+    </div>
+  </section>
+
+  <!-- ═══════ DIFFERENTIATORS (accordion) ═══════ -->
+  <section class="diff">
+    <div class="diff-header">
+      <h2 class="diff-h2 reveal">
+        What you'll actually feel<br />working with <em>us.</em>
+      </h2>
+      <p class="diff-sub reveal">
+        Not buzzwords. Operational differences that change how hiring moves.
+      </p>
+    </div>
+
+    <div class="diff-item open reveal">
+      <button class="diff-item-btn"
+        ><span class="di-num">01</span><span class="di-title"
+          >First candidate in <em>5 days</em></span
+        ><span class="di-icon">+</span></button
+      >
+      <div class="di-body">
+        <div class="di-body-inner">
+          In 85% of our searches, we present the first candidate within the
+          first 5 business days. No waiting weeks for inbound applicants. No
+          empty progress updates.
+        </div>
+      </div>
+    </div>
+    <div class="diff-item reveal">
+      <button class="diff-item-btn"
+        ><span class="di-num">02</span><span class="di-title"
+          >Embedded recruiting <em>partnership</em></span
+        ><span class="di-icon">+</span></button
+      >
+      <div class="di-body">
+        <div class="di-body-inner">
+          We integrate into your hiring process and represent your company like
+          an internal team would — not like an external vendor forwarding
+          resumes.
+        </div>
+      </div>
+    </div>
+    <div class="diff-item reveal">
+      <button class="diff-item-btn"
+        ><span class="di-num">03</span><span class="di-title"
+          >Culture fit matters as much as <em>technical fit</em></span
+        ><span class="di-icon">+</span></button
+      >
+      <div class="di-body">
+        <div class="di-body-inner">
+          Strong technical profiles fail all the time for cultural reasons. We
+          evaluate both from the first conversation — not just at the offer
+          stage.
+        </div>
+      </div>
+    </div>
+    <div class="diff-item reveal">
+      <button class="diff-item-btn"
+        ><span class="di-num">04</span><span class="di-title"
+          ><em>Transparent</em> communication</span
+        ><span class="di-icon">+</span></button
+      >
+      <div class="di-body">
+        <div class="di-body-inner">
+          No black boxes. No disappearing recruiters. You always know pipeline
+          status, market feedback, and where searches stand.
+        </div>
+      </div>
+    </div>
+
+    <div class="diff-footer reveal">
+      <p class="diff-closing">
+        The goal isn't sending more candidates.<br /><strong
+          >It's reducing hiring mistakes.</strong
+        >
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════ SERVICES TEASER ═══════ -->
+  <section class="services-teaser">
+    <div class="st-header reveal">
+      <div class="st-eyebrow">Delivery models</div>
+      <h2 class="st-h2">Two ways to<br />work with <em>us.</em></h2>
+      <p class="st-intro">
+        The right model depends mostly on one thing:<br />how often you hire.
+      </p>
+    </div>
+    <div class="st-cards">
+      <div class="st-card reveal">
+        <div class="st-card-num">01</div>
+        <div class="st-card-title">For companies<br />hiring continuously.</div>
+        <p class="st-card-body">
+          An embedded recruiting model designed for companies making multiple
+          digital hires per year. Continuous sourcing, accumulated context, and
+          flexible monthly engagement without per-hire fees.
+        </p>
+        <a href="/services#raas" class="st-card-link">See RaaS →</a>
+        <div class="st-card-bg">01</div>
+      </div>
+      <div class="st-card reveal">
+        <div class="st-card-num">02</div>
+        <div class="st-card-title">For focused,<br />isolated searches.</div>
+        <p class="st-card-body">
+          A structured headhunting engagement for critical one-off hires where
+          precision, speed, and deep vetting matter most.
+        </p>
+        <a href="/services#contingency" class="st-card-link"
+          >See Contingency →</a
+        >
+        <div class="st-card-bg">02</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ TESTIMONIALS (carousel) ═══════ -->
+  <section class="testimonials">
+    <div class="testi-top">
+      <div>
+        <div class="testi-eyebrow reveal">Client reviews</div>
+        <h2 class="testi-h2 reveal">What our<br /><em>clients say.</em></h2>
+      </div>
+      <p class="testi-sub reveal">
+        Real feedback from leaders hiring digital talent under pressure.
+      </p>
+    </div>
+    <div class="testi-grid reveal">
+      <div class="testi-track">
+        <div class="testi-card">
+          <span class="testi-qmark">"</span><p class="testi-text">
+            The quality of profiles was completely different from what we were
+            used to. They clearly understood our team dynamics — not just the
+            job description.
+          </p><div class="testi-author">
+            <div class="testi-av">
+              <span class="testi-initials">MR</span>
+            </div><div>
+              <div class="testi-name">M. Rodriguez</div><div class="testi-role">
+                Head of People · Magoya
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-qmark">"</span><p class="testi-text">
+            We'd been trying to fill a senior DevOps role for months. Rockcruit
+            sent 4 candidates in 3 days. We hired one — he's still with us two
+            years later.
+          </p><div class="testi-author">
+            <div class="testi-av">
+              <span class="testi-initials">AL</span>
+            </div><div>
+              <div class="testi-name">A. Lopez</div><div class="testi-role">
+                CTO · Patagonian
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <span class="testi-qmark">"</span><p class="testi-text">
+            What I value most is that they push back when something doesn't feel
+            right. They're not just closing placements — they actually care
+            about the fit.
+          </p><div class="testi-author">
+            <div class="testi-av">
+              <span class="testi-initials">JP</span>
+            </div><div>
+              <div class="testi-name">J. Pereyra</div><div class="testi-role">
+                Talent Acquisition · Hiberus
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-controls">
+        <button class="testi-btn" id="tPrev" aria-label="Previous testimonial"
+          >←</button
+        >
+        <div class="testi-dots">
+          <button class="testi-dot active" data-i="0" aria-label="Testimonial 1"
+          ></button><button
+            class="testi-dot"
+            data-i="1"
+            aria-label="Testimonial 2"></button><button
+            class="testi-dot"
+            data-i="2"
+            aria-label="Testimonial 3"></button>
+        </div>
+        <button class="testi-btn" id="tNext" aria-label="Next testimonial"
+          >→</button
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FINAL CTA ═══════ -->
+  <section class="final-cta" id="contact">
+    <div class="fcta-inner">
+      <div class="fcta-left reveal">
+        <div class="fcta-eyebrow">Let's work together</div>
+        <h2 class="fcta-h2">
+          <span>YOUR TEAM IS</span>
+          <span class="green">GROWING.</span>
+          <span>LET'S BUILD</span>
+          <span>HIRING TO</span>
+          <span class="green">MATCH.</span>
+        </h2>
+      </div>
+      <div class="fcta-right reveal">
+        <p class="fcta-intro-p">
+          Growth creates pressure on recruiting faster than most companies
+          expect. We help scaling teams build hiring capacity without slowing
+          down execution.
+        </p>
+        <HireForm />
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Section CSS from prototype index.html, verbatim.
+   NOT here (lives elsewhere): :root/resets/body/noise/.reveal/.label-tag (global.css),
+   nav/footer (components), .fcta-form/.f-* (HireForm.astro). */
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    padding-top: 54px;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--bdark);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute;
+    bottom: -80px;
+    right: -80px;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(26, 158, 92, 0.06);
+    filter: blur(100px);
+    pointer-events: none;
+  }
+  .hero-h1-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 5% 3rem;
+  }
+  h1 {
+    font-family: var(--bebas);
+    font-size: clamp(5.5rem, 13vw, 16rem);
+    line-height: 0.86;
+    letter-spacing: 0.01em;
+  }
+  .hl-ink {
+    display: block;
+    color: var(--paper);
+  }
+  .hl-green {
+    display: block;
+    color: var(--green);
+  }
+  .hl-muted {
+    display: block;
+    color: rgba(240, 237, 227, 0.18);
+  }
+  .hero-eyebrow-row {
+    padding: 2.5rem 5% 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+  }
+  .subhero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+    padding: 4rem 5%;
+    border-top: 1px solid var(--bdark);
+    background: #0b0b0b;
+  }
+  .subhero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  .subhero-title {
+    font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: #e4e4e7;
+  }
+  .subhero-title strong {
+    font-weight: 700;
+    color: #fff;
+  }
+  .subhero-body {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #a1a1aa;
+    max-width: 440px;
+  }
+  .subhero-ctas {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    padding-top: 0.4rem;
+  }
+  .btn-ghost-sub {
+    font-size: 0.88rem;
+    color: #e4e4e7;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.85rem 2rem;
+    transition:
+      border-color 0.2s,
+      color 0.2s,
+      background 0.2s;
+  }
+  .btn-ghost-sub:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .subhero-right {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .subhero-prop {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+  }
+  .subhero-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(26, 158, 92, 0.1);
+    border: 1px solid rgba(26, 158, 92, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .subhero-prop-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e4e4e7;
+    margin-bottom: 0.25rem;
+  }
+  .subhero-prop-sub {
+    font-size: 0.82rem;
+    color: #71717a;
+    line-height: 1.6;
+  }
+  .btn-primary {
+    background: var(--green);
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 0.85rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition:
+      background 0.2s,
+      transform 0.2s;
+  }
+  .btn-primary:hover {
+    background: #15845e;
+    transform: translateY(-2px);
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--bdark);
+    margin-top: 3rem;
+    background: #0b0b0b;
+    overflow: hidden;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 2.5rem 5%;
+    border-right: 1px solid #27272a;
+    text-align: center;
+  }
+  .stat-item:last-child {
+    border-right: none;
+  }
+  .stat-item.featured {
+    background: rgba(255, 255, 255, 0.03);
+    border: none;
+    border-right: 1px solid #27272a;
+    position: relative;
+  }
+  .stat-item.featured::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-top: 1px solid rgba(124, 58, 237, 0.35);
+    pointer-events: none;
+  }
+  .stat-num {
+    font-family: var(--bebas);
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    letter-spacing: 0.03em;
+    line-height: 1;
+    font-weight: 400;
+  }
+  .stat-num.g {
+    color: #22c55e;
+  }
+  .stat-num.v {
+    color: #a78bfa;
+  }
+  .stat-label {
+    font-size: 0.82rem;
+    color: #a1a1aa;
+    line-height: 1.5;
+  }
+
+  /* LOGOS */
+  .logos {
+    overflow: hidden;
+    border-bottom: 1px solid var(--bdark);
+    padding: 1.5rem 0;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .logos-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.25);
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+  .logos-track {
+    display: flex;
+    width: max-content;
+    animation: mq 32s linear infinite;
+  }
+  @keyframes mq {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2.5rem;
+    height: 28px;
+    border-right: 1px solid var(--bdark);
+  }
+  .logo-text {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--paper);
+    opacity: 0.18;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .logo-item:hover .logo-text {
+    opacity: 0.5;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logos-track {
+      animation: none;
+    }
+  }
+
+  /* POSITIONING */
+  .positioning {
+    border-bottom: 1px solid var(--bdark);
+  }
+  .pos-header {
+    padding: 5rem 5% 4rem;
+    border-bottom: 1px solid var(--bdark);
+  }
+  .pos-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 1.5rem;
+  }
+  .pos-h2 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    max-width: 700px;
+    margin-bottom: 2.5rem;
+  }
+  .pos-h2 em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .pos-intro {
+    font-size: 0.95rem;
+    color: rgba(240, 237, 227, 0.45);
+    line-height: 1.85;
+    max-width: 600px;
+  }
+  .pos-intro p + p {
+    margin-top: 1rem;
+  }
+  .pos-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--bdark);
+    border-bottom: 1px solid var(--bdark);
+  }
+  .pos-col {
+    background: var(--ink);
+    padding: 3rem 5%;
+    transition: background 0.2s;
+  }
+  .pos-col:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .pos-col-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.2);
+    margin-bottom: 1.2rem;
+  }
+  .pos-col-title {
+    font-family: var(--bebas);
+    font-size: 1.6rem;
+    letter-spacing: 0.03em;
+    color: var(--paper);
+    margin-bottom: 0.9rem;
+    line-height: 1;
+  }
+  .pos-col-body {
+    font-size: 0.85rem;
+    color: rgba(240, 237, 227, 0.45);
+    line-height: 1.8;
+  }
+  .pos-footer {
+    padding: 3rem 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .pos-closing {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    color: rgba(240, 237, 227, 0.4);
+    line-height: 1.4;
+  }
+  .pos-closing strong {
+    color: var(--paper);
+    font-weight: 400;
+    font-style: normal;
+  }
+  .pos-cta {
+    font-size: 0.83rem;
+    color: rgba(240, 237, 227, 0.35);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--bdark);
+    border-radius: 4px;
+    padding: 0.7rem 1.4rem;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+    white-space: nowrap;
+  }
+  .pos-cta:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  /* DIFFERENTIATORS */
+  .diff {
+    border-bottom: 1px solid var(--bdark);
+  }
+  .diff-header {
+    padding: 5rem 5% 3rem;
+    border-bottom: 1px solid var(--bdark);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4rem;
+    flex-wrap: wrap;
+  }
+  .diff-h2 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+  }
+  .diff-h2 em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .diff-sub {
+    font-size: 0.88rem;
+    color: rgba(240, 237, 227, 0.35);
+    line-height: 1.7;
+    max-width: 300px;
+    text-align: right;
+  }
+  .diff-item {
+    border-bottom: 1px solid var(--bdark);
+    overflow: hidden;
+  }
+  .diff-item-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 80px 1fr 36px;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 5%;
+    text-align: left;
+    transition: background 0.2s;
+  }
+  .diff-item-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .diff-item.open .diff-item-btn {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .di-num {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .di-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+  }
+  .di-title em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .diff-item.open .di-title {
+    color: var(--green);
+  }
+  .di-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--bdark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(240, 237, 227, 0.3);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition:
+      border-color 0.2s,
+      color 0.2s,
+      transform 0.35s;
+  }
+  .diff-item.open .di-icon {
+    border-color: var(--green);
+    color: var(--green);
+    transform: rotate(45deg);
+  }
+  .di-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s ease;
+  }
+  .di-body-inner {
+    padding: 0.5rem 5% 2rem calc(5% + 80px + 2rem);
+    font-size: 0.88rem;
+    color: rgba(240, 237, 227, 0.45);
+    line-height: 1.85;
+    max-width: 580px;
+  }
+  .diff-item.open .di-body {
+    max-height: 200px;
+  }
+  .diff-footer {
+    padding: 3rem 5%;
+    border-top: 1px solid var(--bdark);
+  }
+  .diff-closing {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: rgba(240, 237, 227, 0.4);
+    line-height: 1.5;
+  }
+  .diff-closing strong {
+    color: var(--paper);
+    font-weight: 400;
+    font-style: normal;
+    display: block;
+  }
+
+  /* SERVICES TEASER */
+  .services-teaser {
+    border-bottom: 1px solid var(--bdark);
+  }
+  .st-header {
+    padding: 5rem 5% 3.5rem;
+    border-bottom: 1px solid var(--bdark);
+  }
+  .st-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 1.2rem;
+  }
+  .st-h2 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    margin-bottom: 1.2rem;
+  }
+  .st-h2 em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .st-intro {
+    font-size: 0.9rem;
+    color: rgba(240, 237, 227, 0.4);
+    line-height: 1.75;
+    max-width: 480px;
+  }
+  .st-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--bdark);
+  }
+  .st-card {
+    background: var(--ink);
+    padding: 3.5rem 5%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .st-card:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+  .st-card::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--green);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s;
+  }
+  .st-card:hover::after {
+    transform: scaleX(1);
+  }
+  .st-card-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.2);
+  }
+  .st-card-title {
+    font-family: var(--bebas);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    letter-spacing: 0.02em;
+    line-height: 0.9;
+    color: var(--paper);
+  }
+  .st-card-body {
+    font-size: 0.85rem;
+    color: rgba(240, 237, 227, 0.45);
+    line-height: 1.8;
+    flex: 1;
+  }
+  .st-card-link {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.2s;
+  }
+  .st-card-link:hover {
+    gap: 0.9rem;
+  }
+  .st-card-bg {
+    position: absolute;
+    top: 1rem;
+    right: 2rem;
+    font-family: var(--bebas);
+    font-size: 8rem;
+    color: rgba(240, 237, 227, 0.025);
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  /* TESTIMONIALS */
+  .testimonials {
+    padding: 5rem 5%;
+    border-bottom: 1px solid var(--border);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .testi-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: end;
+    margin-bottom: 3rem;
+  }
+  .testi-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 1rem;
+  }
+  .testi-h2 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .testi-h2 em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .testi-sub {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 320px;
+  }
+  .testi-grid {
+    position: relative;
+    overflow: hidden;
+  }
+  .testi-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .testi-track .testi-card {
+    min-width: 100%;
+    flex-shrink: 0;
+  }
+  .testi-card {
+    background: var(--paper2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.2rem;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.3s;
+  }
+  .testi-card:hover {
+    box-shadow: 0 12px 40px rgba(20, 18, 16, 0.08);
+  }
+  .testi-qmark {
+    font-family: var(--serif);
+    font-size: 3rem;
+    line-height: 0.8;
+    color: var(--green);
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 0.8rem;
+  }
+  .testi-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--ink2);
+    flex: 1;
+    margin-bottom: 1.8rem;
+  }
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .testi-av {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--paper3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .testi-initials {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+  .testi-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .testi-role {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    margin-top: 0.1rem;
+  }
+  .testi-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .testi-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .testi-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .testi-dots {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .testi-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition:
+      background 0.2s,
+      width 0.2s;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .testi-dot.active {
+    background: var(--ink);
+    width: 18px;
+    border-radius: 3px;
+  }
+
+  /* FINAL CTA (layout only — form styles live in HireForm.astro) */
+  .final-cta {
+    border-top: 1px solid var(--bdark);
+    background: #0b0b0b;
+  }
+  .fcta-inner {
+    padding: 7rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+  .fcta-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+    margin-bottom: 1.5rem;
+  }
+  .fcta-h2 {
+    font-family: var(--bebas);
+    font-size: clamp(4rem, 8vw, 9rem);
+    line-height: 0.85;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    margin-bottom: 0;
+  }
+  .fcta-h2 span {
+    display: block;
+  }
+  .fcta-h2 .green {
+    color: var(--green);
+  }
+  .fcta-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .fcta-intro-p {
+    font-size: 0.92rem;
+    color: #d4d4d8;
+    line-height: 1.8;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .subhero-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .pos-cols {
+      grid-template-columns: 1fr;
+    }
+    .diff-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .diff-sub {
+      text-align: left;
+    }
+    .st-cards {
+      grid-template-columns: 1fr;
+    }
+    .testi-top {
+      grid-template-columns: 1fr;
+    }
+    .fcta-inner {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+  @media (max-width: 640px) {
+    h1 {
+      font-size: clamp(4.5rem, 16vw, 8rem);
+    }
+    .hero-stats {
+      grid-template-columns: 1fr;
+    }
+    .stat-item {
+      border-right: none;
+      border-bottom: 1px solid #27272a;
+      text-align: left;
+    }
+    .stat-item:last-child {
+      border-bottom: none;
+    }
+    .stat-item.featured {
+      border: none;
+      border-bottom: 1px solid #27272a;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .stat-item.featured::before {
+      border-top: none;
+      border-left: 3px solid rgba(124, 58, 237, 0.5);
+    }
+    .diff-item-btn {
+      grid-template-columns: 50px 1fr 34px;
+      gap: 1rem;
+      padding: 1.5rem 5%;
+    }
+    .di-body-inner {
+      padding: 0.5rem 5% 1.5rem calc(5% + 50px + 1rem);
+    }
+  }
+</style>
+
+<script>
+  // Accordion — event delegation (survives ClientRouter navigations, never double-binds).
+  document.addEventListener("click", (e) => {
+    const btn = (e.target as Element).closest?.(".diff-item-btn");
+    if (!btn) return;
+    const item = btn.closest(".diff-item");
+    const wasOpen = item?.classList.contains("open");
+    document
+      .querySelectorAll(".diff-item")
+      .forEach((i) => i.classList.remove("open"));
+    if (!wasOpen) item?.classList.add("open");
+  });
+
+  // Carousel — fresh state per page entry (astro:page-load pattern).
+  document.addEventListener("astro:page-load", () => {
+    const track = document.querySelector<HTMLElement>(".testi-track");
+    if (!track) return;
+    const dots = document.querySelectorAll<HTMLButtonElement>(".testi-dot");
+    const count = dots.length;
+    let idx = 0;
+    const goTo = (i: number) => {
+      idx = (i + count) % count;
+      track.style.transform = `translateX(-${idx * 100}%)`;
+      dots.forEach((d, j) => d.classList.toggle("active", j === idx));
+    };
+    document
+      .getElementById("tNext")
+      ?.addEventListener("click", () => goTo(idx + 1));
+    document
+      .getElementById("tPrev")
+      ?.addEventListener("click", () => goTo(idx - 1));
+    dots.forEach((d) =>
+      d.addEventListener("click", () => goTo(Number(d.dataset.i))),
+    );
+  });
+</script>

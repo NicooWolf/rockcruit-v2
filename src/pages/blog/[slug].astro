@@ -1,0 +1,60 @@
+---
+// src/pages/blog/[slug].astro — one static HTML file per published post.
+import Layout from '../../layouts/Layout.astro';
+import { getAllPosts, getPostBySlug } from '../../lib/wp';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug!);
+if (!post) throw new Error(`Post not found at build time: ${slug}`);
+
+const metaDescription = post.excerpt.replace(/<[^>]+>/g, '').trim().slice(0, 160);
+const dateLabel = new Date(post.date).toLocaleDateString('en-US', { dateStyle: 'long' });
+---
+<Layout title={`${post.title} — Rockcruit`} description={metaDescription}>
+
+<article class="post">
+  <header class="post-header reveal">
+    <a class="post-back" href="/blog">← All posts</a>
+    <h1 class="post-h1">{post.title}</h1>
+    <time class="post-meta" datetime={post.date}>{dateLabel}</time>
+  </header>
+
+  <!-- set:html: WP editors are the only authors — trusted content.
+       Images inside hotlink cms.rockcruit.com (MIGRATION.md decision). -->
+  <div class="post-content reveal" set:html={post.content} />
+
+  <footer class="post-footer reveal">
+    <p class="post-cta-line">Hiring for a role like this?</p>
+    <a href="/#contact" class="btn-primary">Talk to us →</a>
+  </footer>
+</article>
+
+</Layout>
+
+<style>
+.post{padding:6.5rem 5% 4rem;max-width:820px;margin:0 auto}
+.post-back{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(240,237,227,.35);text-decoration:none;transition:color .2s}
+.post-back:hover{color:var(--green)}
+.post-h1{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.05;letter-spacing:-.02em;color:var(--paper);margin:1.5rem 0 1rem}
+.post-meta{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(240,237,227,.3)}
+.post-content{margin-top:3rem;font-size:.98rem;line-height:1.9;color:rgba(240,237,227,.7)}
+/* WP content arrives unscoped-able — :global() lets scoped CSS style it */
+.post-content :global(h2){font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.7rem;color:var(--paper);margin:2.5rem 0 1rem}
+.post-content :global(h3){font-family:var(--bebas);font-size:1.3rem;letter-spacing:.03em;color:var(--paper);margin:2rem 0 .8rem}
+.post-content :global(p){margin-bottom:1.2rem}
+.post-content :global(a){color:var(--green);text-decoration:none;border-bottom:1px solid rgba(26,158,92,.35)}
+.post-content :global(ul),.post-content :global(ol){margin:0 0 1.2rem 1.4rem}
+.post-content :global(li){margin-bottom:.4rem}
+.post-content :global(img){max-width:100%;height:auto;border-radius:8px;margin:1.5rem 0}
+.post-content :global(blockquote){border-left:2px solid var(--green);padding-left:1.2rem;font-family:var(--serif);font-style:italic;color:rgba(240,237,227,.55);margin:1.8rem 0}
+.post-content :global(pre){background:#0b0b0b;border:1px solid var(--bdark);border-radius:8px;padding:1.2rem;overflow-x:auto;font-family:var(--mono);font-size:.82rem;margin:1.5rem 0}
+.post-footer{margin-top:4rem;padding-top:2.5rem;border-top:1px solid var(--bdark);display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.post-cta-line{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:rgba(240,237,227,.5)}
+.btn-primary{background:var(--green);color:var(--ink);font-size:.88rem;font-weight:500;padding:.85rem 2rem;border-radius:4px;text-decoration:none;transition:background .2s,transform .2s}
+.btn-primary:hover{background:#15845e;transform:translateY(-2px)}
+</style>

@@ -1,0 +1,95 @@
+/* ══════════════════════════════════════════════════════════════
+   ROCKCRUIT — global.css
+   The ONLY place shared CSS lives. Never redefine these per page.
+   Canonical decisions (prototypes disagreed): --bdark = .06
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --paper: #f0ede3;
+  --paper2: #e8e4d8;
+  --paper3: #ddd9cc;
+  --ink: #141210;
+  --ink2: #2a2620;
+  --muted: #7a7060;
+  --green: #1a9e5c;
+  --green2: #22c55e;
+  --violet: #7c3aed;
+  --border: rgba(20, 18, 16, 0.1);
+  --bdark: rgba(240, 237, 227, 0.06);
+  --bg-base: #070708;
+  --bg-surface: #0f0f11;
+  --bg-card: #141417;
+  --bebas: "Bebas Neue", sans-serif;
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "DM Sans", sans-serif;
+  --mono: "DM Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── Film-grain noise overlay ── */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 900;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+}
+
+/* ── Scroll-reveal (JS in Layout.astro toggles .on via IntersectionObserver) ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+}
+.reveal.on {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── Shared label utility ── */
+.label-tag {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.label-tag.g {
+  color: var(--green);
+}
+.label-tag.v {
+  color: #a78bfa;
+}
+.label-tag.m {
+  color: rgba(240, 237, 227, 0.3);
+}

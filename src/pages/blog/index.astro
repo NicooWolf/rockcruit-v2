@@ -1,0 +1,59 @@
+---
+// src/pages/blog/index.astro — post list, pre-rendered at build time.
+import Layout from '../../layouts/Layout.astro';
+import { getAllPosts } from '../../lib/wp';
+
+const posts = await getAllPosts(); // build-time only — never runs in a browser
+const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { dateStyle: 'medium' });
+---
+<Layout title="Blog — Rockcruit" description="Hiring insights from the Rockcruit team: tech recruiting, LATAM talent markets, and building teams under pressure.">
+
+<div class="page-hero reveal">
+  <div class="page-hero-glow"></div>
+  <div class="page-hero-label">Notes from the field</div>
+  <h1 class="page-hero-h"><span>HIRING,</span><span class="dim">WRITTEN DOWN.</span></h1>
+  <p class="page-hero-sub">What we learn running searches every week — talent markets, process, and the mistakes that cost companies their best candidates.</p>
+</div>
+
+<section class="post-list">
+  {posts.length === 0 && (
+    <p class="empty reveal">First posts are on the way. <a href="/blog/rss.xml">Grab the RSS feed</a> to catch them.</p>
+  )}
+  {posts.map((post) => (
+    <a class="post-row reveal" href={`/blog/${post.slug}/`}>
+      <time class="post-date" datetime={post.date}>{fmt(post.date)}</time>
+      <div>
+        <h2 class="post-title">{post.title}</h2>
+        <div class="post-excerpt" set:html={post.excerpt} />
+      </div>
+      <span class="post-arrow">→</span>
+    </a>
+  ))}
+</section>
+
+</Layout>
+
+<style>
+.page-hero{padding:6.5rem 5% 4rem;border-bottom:1px solid var(--bdark);position:relative;overflow:hidden}
+.page-hero-glow{position:absolute;top:-60px;right:-60px;width:400px;height:400px;border-radius:50%;background:rgba(26,158,92,.05);filter:blur(80px);pointer-events:none}
+.page-hero-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:2rem}
+.page-hero-h{font-family:var(--bebas);font-size:clamp(4rem,10vw,11rem);line-height:.86;letter-spacing:.02em;color:var(--paper);margin-bottom:2.5rem}
+.page-hero-h span{display:block}
+.page-hero-h .dim{color:rgba(240,237,227,.2)}
+.page-hero-sub{font-size:.95rem;color:#a1a1aa;line-height:1.8;max-width:540px}
+
+.post-list{border-bottom:1px solid var(--bdark);min-height:30vh}
+.empty{padding:4rem 5%;font-size:.95rem;color:rgba(240,237,227,.45)}
+.empty a{color:var(--green);text-decoration:none}
+.post-row{display:grid;grid-template-columns:140px 1fr 40px;gap:2.5rem;align-items:center;padding:2.4rem 5%;border-bottom:1px solid var(--bdark);text-decoration:none;transition:background .2s}
+.post-row:last-child{border-bottom:none}
+.post-row:hover{background:rgba(255,255,255,.02)}
+.post-date{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:rgba(240,237,227,.3)}
+.post-title{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(1.3rem,2.4vw,1.9rem);color:var(--paper);letter-spacing:-.01em;margin-bottom:.5rem;transition:color .2s}
+.post-row:hover .post-title{color:var(--green)}
+.post-excerpt{font-size:.86rem;color:rgba(240,237,227,.4);line-height:1.7;max-width:640px}
+.post-excerpt :global(p){margin:0}
+.post-arrow{font-size:1.1rem;color:rgba(240,237,227,.25);transition:color .2s,transform .2s}
+.post-row:hover .post-arrow{color:var(--green);transform:translateX(4px)}
+@media(max-width:1024px){.post-row{grid-template-columns:1fr;gap:.6rem}.post-arrow{display:none}}
+</style>

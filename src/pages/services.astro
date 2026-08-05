@@ -1,0 +1,836 @@
+---
+// src/pages/services.astro — port of prototype services.html.
+// Finalized decisions: shared <HireForm/> (boxed style) replaces the prototype's
+// underline-style form — one form implementation site-wide; select options stay shared.
+import Layout from "../layouts/Layout.astro";
+import HireForm from "../components/HireForm.astro";
+---
+
+<Layout
+  title="Services — Rockcruit"
+  description="Two delivery models: Contingency Recruiting for critical one-off hires, and Recruiting as a Service for continuous hiring. Both embedded, both proactive."
+>
+  <div class="services-page">
+    <!-- ═══════ PAGE HERO ═══════ -->
+    <div class="page-hero reveal">
+      <div class="page-hero-glow"></div>
+      <div class="page-hero-label">Our delivery models</div>
+      <h1 class="page-hero-h">
+        <span>THE WAY YOU HIRE</span>
+        <span>SHOULD DEFINE</span>
+        <span>THE RECRUITING</span>
+        <span class="dim">MODEL.</span>
+      </h1>
+      <p class="page-hero-sub">
+        Different hiring patterns require different recruiting structures. Most
+        companies default to the same model regardless — and pay for that
+        mismatch in time, quality, and cost.<br /><br />We operate two distinct
+        models. <strong
+          >Both are built around embedded, proactive headhunting.</strong
+        > The difference is how they activate.
+      </p>
+    </div>
+
+    <!-- ═══════ DECISION FRAME ═══════ -->
+    <section class="decision">
+      <div class="decision-header reveal">
+        <div class="decision-label">Self-selection</div>
+        <h2 class="decision-h">Which model <em>fits you?</em></h2>
+      </div>
+      <div class="decision-cols">
+        <div class="decision-col reveal">
+          <div class="decision-col-head">
+            <span class="dc-badge cont">Contingency</span>
+            <span class="dc-title">Contingency Recruiting</span>
+          </div>
+          <p class="dc-desc">
+            For a single, high-stakes hire where precision and discretion matter
+            more than volume. Search-by-search, no long-term commitment.
+          </p>
+          <a href="#contingency" class="dc-cta v">See Contingency details →</a>
+        </div>
+        <div class="decision-col decision-col-r reveal">
+          <div class="decision-col-head">
+            <span class="dc-badge raas">RaaS</span>
+            <span class="dc-title">Recruiting as a Service</span>
+          </div>
+          <p class="dc-desc">
+            For companies hiring continuously across multiple roles, who want
+            embedded recruiting support that scales with growth. Flexible
+            monthly engagement.
+          </p>
+          <a href="#raas" class="dc-cta g">See RaaS details →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CONTINGENCY ═══════ -->
+    <section class="cont" id="contingency">
+      <div class="cont-hero reveal">
+        <div>
+          <div class="cont-label">
+            01 — Surgical execution for critical hires.
+          </div>
+          <h2 class="cont-h">Contingency <em>Recruiting</em></h2>
+          <p class="cont-body">
+            Our core model. For companies making a specific, high-stakes hire
+            where precision matters more than volume.<br /><br />Proactive
+            sourcing — no job posting needed. Deep culture and role-fit vetting
+            from the first conversation. Full support from kickoff to signed
+            offer. <strong
+              >The same embedded standard as RaaS, focused entirely on landing
+              the right person for one critical seat.</strong
+            >
+          </p>
+        </div>
+        <div class="hero-facts">
+          <div class="hero-fact v">
+            <div class="hero-fact-num">Quality over volume</div>
+            <div class="hero-fact-label">
+              Every candidate deeply vetted, not just sourced
+            </div>
+          </div>
+          <div class="hero-fact v">
+            <div class="hero-fact-num">3–5 days</div>
+            <div class="hero-fact-label">To your first candidate</div>
+          </div>
+          <div class="hero-fact v">
+            <div class="hero-fact-num">Search-by-search</div>
+            <div class="hero-fact-label">No monthly retainer required</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="raas-when reveal">
+        <div class="raas-when-header">
+          <div class="raas-when-label v">Activation scenarios</div>
+          <div class="raas-when-h">WHEN CONTINGENCY MAKES SENSE</div>
+        </div>
+        <div class="raas-when-cols">
+          <div class="rwc cwc reveal">
+            <div class="rwc-num">01</div>
+            <div class="rwc-title">One critical seat</div>
+            <p class="rwc-body">
+              When a single role carries outsized impact and there's no room for
+              a mis-hire. Full embedded search, start to close, with nothing
+              else competing for attention.
+            </p>
+            <div class="rwc-note">
+              <span>Full focus on one search.</span><span
+                >Same depth, single seat.</span
+              >
+            </div>
+          </div>
+          <div class="rwc cwc reveal">
+            <div class="rwc-num">02</div>
+            <div class="rwc-title">When discretion matters</div>
+            <p class="rwc-body">
+              For confidential replacements, sensitive leadership changes, or
+              searches that can't be posted publicly. Handled quietly, end to
+              end.
+            </p>
+            <div class="rwc-note">
+              <span>Confidential by default.</span><span
+                >No public postings.</span
+              >
+            </div>
+          </div>
+          <div class="rwc cwc reveal">
+            <div class="rwc-num">03</div>
+            <div class="rwc-title">Flexibility without commitment</div>
+            <p class="rwc-body">
+              Engage per search, with no monthly retainer. If hiring picks up
+              later, moving into RaaS is a natural next step — not a new
+              relationship.
+            </p>
+            <div class="rwc-note">
+              <span>No long-term lock-in.</span><span
+                >Structured, search by search.</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ RAAS ═══════ -->
+    <section class="raas" id="raas">
+      <div class="raas-hero reveal">
+        <div>
+          <div class="raas-hero-label">
+            02 — An embedded recruiting layer for companies in growth mode.
+          </div>
+          <h2 class="raas-hero-h">Recruiting as a <em>Service</em></h2>
+          <p class="raas-hero-body">
+            RaaS is designed for companies navigating growth, hiring spikes, or
+            continuous digital hiring. Instead of restarting every search with a
+            new external recruiter, we operate as an embedded recruiting
+            function that learns your company over time — improving alignment,
+            speed, and candidate quality with every search.<br /><br /><strong
+              >Flexible activation. No per-hire commissions. No cold starts
+              between searches.</strong
+            >
+          </p>
+        </div>
+        <div class="hero-facts">
+          <div class="hero-fact">
+            <div class="hero-fact-num">Dedicated Recruiter</div>
+            <div class="hero-fact-label">Embedded inside your workflow</div>
+          </div>
+          <div class="hero-fact">
+            <div class="hero-fact-num">Full team support</div>
+            <div class="hero-fact-label">
+              Weekly calibration + strategic input
+            </div>
+          </div>
+          <div class="hero-fact">
+            <div class="hero-fact-num">Up to 3 searches</div>
+            <div class="hero-fact-label">Running at the same time</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="raas-when reveal">
+        <div class="raas-when-header">
+          <div class="raas-when-label g">Activation scenarios</div>
+          <div class="raas-when-h">WHEN RAAS MAKES SENSE</div>
+        </div>
+        <div class="raas-when-cols">
+          <div class="rwc reveal">
+            <div class="rwc-num">01</div>
+            <div class="rwc-title">During hiring spikes</div>
+            <p class="rwc-body">
+              When growth accelerates faster than your internal recruiting
+              bandwidth. Activate embedded recruiting support for exactly as
+              long as you need it — even a single month.
+            </p>
+            <div class="rwc-note">
+              <span>No permanent overhead.</span><span
+                >No long-term lock-in.</span
+              >
+            </div>
+          </div>
+          <div class="rwc reveal">
+            <div class="rwc-num">02</div>
+            <div class="rwc-title">When hiring never fully stops</div>
+            <p class="rwc-body">
+              For companies continuously building Product, Engineering, Data,
+              Design, or GTM teams. The longer we work together, the sharper the
+              hiring alignment becomes.
+            </p>
+            <div class="rwc-note">
+              <span>Context compounds with every search.</span><span
+                >Every hire improves the next.</span
+              >
+            </div>
+          </div>
+          <div class="rwc reveal">
+            <div class="rwc-num">03</div>
+            <div class="rwc-title">When flexibility matters</div>
+            <p class="rwc-body">
+              Scale recruiting capacity up or down depending on growth cycles,
+              launches, funding stages, or expansion periods. No fixed
+              recruiting headcount between growth bursts.
+            </p>
+            <div class="rwc-note">
+              <span>Adjust monthly.</span><span
+                >No friction to start or stop.</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ STANDARD OF SERVICE — SHARED ═══════ -->
+    <section class="raas pillars-section">
+      <div class="raas-when raas-when-open reveal">
+        <div class="raas-when-header">
+          <div class="raas-when-label">Standard of service</div>
+          <div class="raas-when-h">WHAT YOU GET — WITH EITHER MODEL</div>
+        </div>
+      </div>
+      <div class="pillars-list reveal">
+        <div class="pillars-row">
+          <div class="pillars-row-num">01</div>
+          <div class="pillars-row-title">Weekly Hiring Calibration</div>
+          <p class="pillars-row-body">
+            Short weekly syncs on priorities, pipeline movement, and hiring
+            blockers — no re-briefing, no lag.
+          </p>
+        </div>
+        <div class="pillars-row">
+          <div class="pillars-row-num">02</div>
+          <div class="pillars-row-title">Strategic Hiring Support</div>
+          <p class="pillars-row-body">
+            Help thinking through hiring strategy, talent positioning, and
+            market competitiveness — not just execution.
+          </p>
+        </div>
+        <div class="pillars-row">
+          <div class="pillars-row-num">03</div>
+          <div class="pillars-row-title">Continuous Alignment</div>
+          <p class="pillars-row-body">
+            Every search sharpens understanding of candidate quality, team fit,
+            and decision-making patterns.
+          </p>
+        </div>
+        <div class="pillars-row">
+          <div class="pillars-row-num">04</div>
+          <div class="pillars-row-title">Real Market Visibility</div>
+          <p class="pillars-row-body">
+            Salary expectations and talent availability, visible from the first
+            week — not after weeks of failed outreach.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ FINAL CTA ═══════ -->
+    <section class="final-cta" id="contact">
+      <div class="fcta-inner">
+        <div class="reveal">
+          <div class="fcta-label">Let's work together</div>
+          <h2 class="fcta-h">
+            The wrong recruiting model<br />creates hiring friction <em
+              >fast.</em
+            >
+          </h2>
+          <p class="fcta-body">
+            We'll tell you honestly which structure makes more sense for your
+            hiring volume, growth stage, and internal bandwidth. No pressure. No
+            generic sales pitch.
+          </p>
+          <div class="fcta-note">
+            <span>Most companies figure it out in 20 minutes.</span>
+            <span>First conversation is always free.</span>
+          </div>
+        </div>
+        <div class="fcta-right reveal">
+          <p class="fcta-intro">
+            Tell us what you're working with and we'll give you a direct, honest
+            take on which model fits.
+          </p>
+          <HireForm />
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  /* Page-scoped background wrapper: services uses a deeper base (#070708) than the
+   global body (--ink). A wrapper div keeps this page-local instead of fighting body. */
+  .services-page {
+    background: var(--bg-base, #070708);
+    --surface: #0f0f11;
+    --card: #141417;
+  }
+
+  /* PAGE HERO */
+  .page-hero {
+    padding: 6.5rem 5% 4rem;
+    border-bottom: 1px solid var(--bdark);
+    position: relative;
+    overflow: hidden;
+  }
+  .page-hero-glow {
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(26, 158, 92, 0.05);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .page-hero-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 2rem;
+  }
+  .page-hero-h {
+    font-family: var(--bebas);
+    font-size: clamp(4rem, 10vw, 11rem);
+    line-height: 0.86;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    margin-bottom: 2.5rem;
+  }
+  .page-hero-h span {
+    display: block;
+  }
+  .page-hero-h .dim {
+    color: rgba(240, 237, 227, 0.2);
+  }
+  .page-hero-sub {
+    font-size: 0.95rem;
+    color: #a1a1aa;
+    line-height: 1.8;
+    max-width: 540px;
+  }
+  .page-hero-sub strong {
+    color: var(--paper);
+    font-weight: 400;
+  }
+
+  /* DECISION */
+  .decision {
+    border-bottom: 1px solid var(--bdark);
+    background: var(--surface);
+  }
+  .decision-header {
+    padding: 3rem 5% 2rem;
+    border-bottom: 1px solid var(--bdark);
+  }
+  .decision-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+    margin-bottom: 1rem;
+  }
+  .decision-h {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+  }
+  .decision-h em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .decision-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--bdark);
+  }
+  .decision-col {
+    background: #0b0b0b;
+    padding: 2.2rem 5%;
+  }
+  .decision-col-r {
+    border-left: 1px solid var(--bdark);
+  }
+  .decision-col-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.2rem;
+  }
+  .dc-badge {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 3px;
+  }
+  .dc-badge.raas {
+    background: rgba(26, 158, 92, 0.1);
+    color: var(--green);
+    border: 1px solid rgba(26, 158, 92, 0.2);
+  }
+  .dc-badge.cont {
+    background: rgba(124, 58, 237, 0.08);
+    color: #a78bfa;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+  }
+  .dc-title {
+    font-family: var(--bebas);
+    font-size: 1.5rem;
+    letter-spacing: 0.03em;
+    color: var(--paper);
+  }
+  .dc-desc {
+    font-size: 0.85rem;
+    color: #a1a1aa;
+    line-height: 1.7;
+  }
+  .dc-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    margin-top: 1.2rem;
+    transition: color 0.2s;
+  }
+  .dc-cta.g {
+    color: rgba(26, 158, 92, 0.5);
+  }
+  .dc-cta.g:hover {
+    color: var(--green);
+  }
+  .dc-cta.v {
+    color: rgba(167, 139, 250, 0.5);
+  }
+  .dc-cta.v:hover {
+    color: #a78bfa;
+  }
+
+  /* CONTINGENCY + RAAS shared patterns */
+  .cont {
+    border-bottom: 1px solid var(--bdark);
+    background: linear-gradient(
+      180deg,
+      rgba(124, 58, 237, 0.035),
+      transparent 35%
+    );
+  }
+  .cont-hero {
+    padding: 3.5rem 5% 3rem;
+    border-bottom: 1px solid var(--bdark);
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .cont-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    color: rgba(167, 139, 250, 0.75);
+    margin-bottom: 1.3rem;
+    max-width: 460px;
+    line-height: 1.6;
+  }
+  .cont-h {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    max-width: 700px;
+    margin-bottom: 1.8rem;
+  }
+  .cont-h em {
+    font-style: normal;
+    color: #a78bfa;
+  }
+  .cont-body {
+    font-size: 0.92rem;
+    color: #a1a1aa;
+    line-height: 1.85;
+    max-width: 600px;
+    margin-bottom: 2rem;
+  }
+  .cont-body strong {
+    color: var(--paper);
+    font-weight: 400;
+  }
+  .raas {
+    border-bottom: 1px solid var(--bdark);
+  }
+  #raas {
+    background: linear-gradient(
+      180deg,
+      rgba(26, 158, 92, 0.035),
+      transparent 35%
+    );
+  }
+  .raas-hero {
+    padding: 3.5rem 5% 3rem;
+    border-bottom: 1px solid var(--bdark);
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .raas-hero-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    color: rgba(26, 158, 92, 0.75);
+    margin-bottom: 1.3rem;
+    max-width: 460px;
+    line-height: 1.6;
+  }
+  .raas-hero-h {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    max-width: 700px;
+    margin-bottom: 1.8rem;
+  }
+  .raas-hero-h em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .raas-hero-body {
+    font-size: 0.92rem;
+    color: #a1a1aa;
+    line-height: 1.85;
+    max-width: 600px;
+    margin-bottom: 2rem;
+  }
+  .raas-hero-body strong {
+    color: var(--paper);
+    font-weight: 400;
+  }
+  .hero-facts {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 0.4rem;
+  }
+  .hero-fact {
+    padding-left: 1.1rem;
+    border-left: 2px solid rgba(26, 158, 92, 0.35);
+  }
+  .hero-fact.v {
+    border-left-color: rgba(124, 58, 237, 0.4);
+  }
+  .hero-fact-num {
+    font-family: var(--bebas);
+    font-size: 1.35rem;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    line-height: 1.15;
+    margin-bottom: 0.35rem;
+  }
+  .hero-fact-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: #a1a1aa;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+  .raas-when {
+    border-bottom: 1px solid var(--bdark);
+    background: var(--surface);
+  }
+  .raas-when-open {
+    border-bottom: none;
+  }
+  .raas-when-header {
+    padding: 2.5rem 5% 2rem;
+  }
+  .raas-when-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+    margin-bottom: 0.8rem;
+  }
+  .raas-when-label.v {
+    color: rgba(167, 139, 250, 0.6);
+  }
+  .raas-when-label.g {
+    color: rgba(26, 158, 92, 0.7);
+  }
+  .raas-when-h {
+    font-family: var(--bebas);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    letter-spacing: 0.03em;
+    color: var(--paper);
+  }
+  .raas-when-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    padding: 0 5% 3rem;
+  }
+  .rwc {
+    background: var(--card);
+    border: 1px solid var(--bdark);
+    border-radius: 12px;
+    padding: 2.2rem 1.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 250px;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .rwc:hover {
+    background: #18181c;
+    border-color: rgba(26, 158, 92, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+  .rwc-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 1rem;
+  }
+  .rwc-title {
+    font-family: var(--bebas);
+    font-size: 1.6rem;
+    letter-spacing: 0.03em;
+    color: var(--paper);
+    margin-bottom: 0.8rem;
+    line-height: 1;
+  }
+  .rwc-body {
+    font-size: 0.83rem;
+    color: #a1a1aa;
+    line-height: 1.75;
+    margin-bottom: 1rem;
+  }
+  .rwc-note {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: rgba(240, 237, 227, 0.25);
+    line-height: 1.8;
+  }
+  .rwc-note span {
+    display: block;
+  }
+  .cwc:hover {
+    border-color: rgba(124, 58, 237, 0.35);
+  }
+  .cwc .rwc-num {
+    color: #a78bfa;
+  }
+
+  /* PILLARS */
+  .pillars-section {
+    border-bottom: 1px solid var(--bdark);
+  }
+  .pillars-list {
+    border-top: 1px solid var(--bdark);
+    margin-bottom: 1rem;
+  }
+  .pillars-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 1.3fr;
+    gap: 2.5rem;
+    align-items: center;
+    padding: 1.9rem 5%;
+    border-bottom: 1px solid var(--bdark);
+    transition: background 0.2s;
+  }
+  .pillars-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .pillars-row-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: rgba(240, 237, 227, 0.25);
+  }
+  .pillars-row-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    color: var(--paper);
+    letter-spacing: -0.01em;
+  }
+  .pillars-row-body {
+    font-size: 0.83rem;
+    color: #a1a1aa;
+    line-height: 1.65;
+  }
+
+  /* FINAL CTA (layout only — form styles in HireForm.astro) */
+  .final-cta {
+    background: #0b0b0b;
+  }
+  .fcta-inner {
+    padding: 5rem 5%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+  .fcta-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+    margin-bottom: 1.5rem;
+  }
+  .fcta-h {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    margin-bottom: 1.5rem;
+  }
+  .fcta-h em {
+    font-style: normal;
+    color: var(--green);
+  }
+  .fcta-body {
+    font-size: 0.9rem;
+    color: #a1a1aa;
+    line-height: 1.85;
+    max-width: 400px;
+    margin-bottom: 2rem;
+  }
+  .fcta-note {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: rgba(240, 237, 227, 0.25);
+    line-height: 2;
+  }
+  .fcta-note span {
+    display: block;
+  }
+  .fcta-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .fcta-intro {
+    font-size: 0.88rem;
+    color: #d4d4d8;
+    line-height: 1.8;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .decision-cols {
+      grid-template-columns: 1fr;
+    }
+    .raas-when-cols {
+      grid-template-columns: 1fr;
+    }
+    .fcta-inner {
+      grid-template-columns: 1fr;
+      gap: 3.5rem;
+    }
+    .cont-hero,
+    .raas-hero {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .hero-facts {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .pillars-row {
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+    }
+  }
+</style>
