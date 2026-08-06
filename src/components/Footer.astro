@@ -1,7 +1,9 @@
 ---
 // src/components/Footer.astro
 const year = new Date().getFullYear(); // computed at build time — never stale
+const showBlog = import.meta.env.WP_ENABLED !== "false";
 ---
+
 <footer>
   <a href="/" class="foot-logo">
     <span class="foot-word">ROCKCRUIT</span>
@@ -13,19 +15,66 @@ const year = new Date().getFullYear(); // computed at build time — never stale
     <li><a href="/team">Team</a></li>
     <li><a href="/process">Process</a></li>
     <li><a href="/faq">FAQ</a></li>
-    <li><a href="/blog">Blog</a></li>
+    {
+      showBlog && (
+        <li>
+          <a href="/blog">Blog</a>
+        </li>
+      )
+    }
     <li><a href="/#contact">Hire With Us</a></li>
   </ul>
   <div class="foot-copy">© {year} Rockcruit · All rights reserved</div>
 </footer>
 
 <style>
-  footer{padding:2.5rem 5%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;border-top:1px solid var(--bdark)}
-  .foot-logo{display:flex;align-items:center;gap:.5rem;text-decoration:none}
-  .foot-word{font-family:var(--bebas);font-size:1.3rem;letter-spacing:.05em;color:var(--paper);font-weight:normal}
-  .foot-dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
-  .foot-links{display:flex;gap:2.5rem;list-style:none;flex-wrap:wrap;margin:0;padding:0}
-  .foot-links a{font-size:.77rem;color:rgba(240,237,227,.35);text-decoration:none;transition:color .2s}
-  .foot-links a:hover{color:var(--paper)}
-  .foot-copy{font-size:.7rem;color:rgba(240,237,227,.2)}
+  footer {
+    padding: 2.5rem 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    border-top: 1px solid var(--bdark);
+  }
+  .foot-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+  .foot-word {
+    font-family: var(--bebas);
+    font-size: 1.3rem;
+    letter-spacing: 0.05em;
+    color: var(--paper);
+    font-weight: normal;
+  }
+  .foot-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .foot-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+  }
+  .foot-links a {
+    font-size: 0.77rem;
+    color: rgba(240, 237, 227, 0.35);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .foot-links a:hover {
+    color: var(--paper);
+  }
+  .foot-copy {
+    font-size: 0.7rem;
+    color: rgba(240, 237, 227, 0.2);
+  }
 </style>

@@ -4,6 +4,11 @@
 const ENDPOINT =
   import.meta.env.WP_GRAPHQL_ENDPOINT ?? "https://cms.rockcruit.com/graphql";
 
+// Build-time kill switch. Set WP_ENABLED=false to build without WordPress:
+// blog list renders its empty state, zero post pages generate, RSS is empty.
+// Any other value (or unset) = WP required, and failures still kill the build loudly.
+export const WP_ENABLED = import.meta.env.WP_ENABLED !== "false";
+
 // ── Types ────────────────────────────────────────────────────────────────
 // TODO(ACF): extend once the field list arrives (MIGRATION.md open ledger).
 // Replace with real GraphQL field names configured in WPGraphQL-for-ACF.
@@ -44,6 +49,7 @@ async function gql<T>(
 
 // ── Public API ───────────────────────────────────────────────────────────
 export async function getAllPosts(): Promise<Post[]> {
+  if (!WP_ENABLED) return [];
   const data = await gql<{ posts: { nodes: Post[] } }>(`
     query AllPosts {
       posts(where: { status: PUBLISH }, first: 100) {
@@ -57,6 +63,7 @@ export async function getAllPosts(): Promise<Post[]> {
 // when the post count approaches it. Not before (speculative abstraction).
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
+  if (!WP_ENABLED) return null;
   const data = await gql<{ post: Post | null }>(
     `
     query PostBySlug($slug: ID!) {
