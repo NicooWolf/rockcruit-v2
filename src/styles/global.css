@@ -11,7 +11,8 @@
   --ink2: #2a2620;
   --muted: #7a7060;
   --green: #1a9e5c;
-  --green2: #22c55e;
+  --green-1: #2cc97a;
+  --green-2: #5ed499;
   --violet: #7c3aed;
   --border: rgba(20, 18, 16, 0.1);
   --bdark: rgba(240, 237, 227, 0.06);
@@ -33,6 +34,10 @@
 }
 html {
   scroll-behavior: smooth;
+}
+/* The nav is fixed and 54px high. Keep a hash target below it. */
+[id] {
+  scroll-margin-top: 70px;
 }
 body {
   background: var(--ink);
