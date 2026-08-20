@@ -34,6 +34,11 @@
 }
 html {
   scroll-behavior: smooth;
+  /* Safari gives its top bar the color of a fixed element at the top edge, and
+     falls back to this element when it finds none. The bar leaves on the way
+     down the page, so name the color here too. A root with no color falls back
+     to white on iOS. See WebKit bug 301756. */
+  background: var(--ink);
 }
 /* The nav is fixed and 54px high. Keep a hash target below it. */
 [id] {
