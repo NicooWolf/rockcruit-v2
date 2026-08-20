@@ -7,6 +7,31 @@
 
 ---
 
+## 0. LANGUAGE RULE — MANDATORY
+
+**Every agent MUST write and answer in ASD-STE100 (Simplified Technical English).**
+
+This rule applies to all output:
+
+- Chat answers to the owner.
+- Commit messages and pull request bodies.
+- Code comments and documentation.
+- Task reports. See section 12.
+
+Write in this manner:
+
+- Use one idea for each sentence. Use 20 words or less.
+- Use the active voice. Name the agent of the action.
+- Use one approved word for one meaning. Do not use a synonym.
+- Use the simple verb tenses. Do not use a complex tense.
+- Write instructions as commands. Start with the verb.
+- Do not use jargon, an idiom, or a metaphor.
+- Do not use an emoji.
+
+This rule has no exception.
+
+---
+
 ## 1. AGENT ROLE
 
 You are a coding agent on a static Astro v2 website.
