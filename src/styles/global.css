@@ -53,11 +53,32 @@ body {
   overflow-x: hidden;
 }
 
+/* ── The strip that gives the phone top bar its color ── */
+/* Safari measures this element once, when it draws the page. It asks for a
+   fixed element at the top edge, 3px high or more, and 80% of the width or
+   more. A transform, an opacity, a filter, a backdrop filter or display:none
+   takes the element out of the reckoning, so this rule holds none of them.
+   The inset height also covers the curved area of a phone screen. */
+.ios-tint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(env(safe-area-inset-top, 0px), 8px);
+  background-color: var(--ink);
+  z-index: 950;
+  pointer-events: none;
+}
+
 /* ── Film-grain noise overlay ── */
 body::after {
   content: "";
   position: fixed;
-  inset: 0;
+  /* The grain starts below the strip above. Two fixed elements at the top edge
+     make the color of the phone top bar a race, and the grain carries an
+     opacity and no color of its own, so it must stay out of the zone that
+     Safari measures. The strip covers this space and hides the change. */
+  inset: 8px 0 0;
   pointer-events: none;
   z-index: 900;
   opacity: 0.35;

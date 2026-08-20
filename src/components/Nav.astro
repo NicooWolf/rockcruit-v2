@@ -105,9 +105,7 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     left: 0;
     right: 0;
     height: 56px;
-    /* DEBUG ONLY — makes the shield visible. Put back var(--ink) before you
-       ship: a red strip above the bar is not the design. */
-    background: red;
+    background: var(--ink);
     pointer-events: none;
   }
   nav {

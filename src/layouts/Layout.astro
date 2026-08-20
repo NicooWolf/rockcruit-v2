@@ -55,6 +55,11 @@ const canonical = Astro.site
     <ClientRouter />
   </head>
   <body>
+    <!-- Safari fills its top bar with the color of a fixed element that touches
+         the top edge of the window, and leaves the bar clear when it finds
+         none. The nav leaves the top edge on the way down the page, so the nav
+         cannot be that element. This strip never moves. See WebKit bug 301756. -->
+    <div class="ios-tint" aria-hidden="true"></div>
     <!-- transition:persist = this exact DOM node survives client-side navigations -->
     <Nav />
     <slot />
