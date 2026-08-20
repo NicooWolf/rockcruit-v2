@@ -102,11 +102,16 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5%;
-    height: 54px;
-    background: rgba(20, 18, 16, 0.95);
+    /* The top inset fills the curved area of a phone screen. Without it, the
+       page shows through above the bar. */
+    padding: env(safe-area-inset-top, 0px) 5% 0;
+    height: calc(54px + env(safe-area-inset-top, 0px));
+    background: var(--ink);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--bdark);
+    transition:
+      transform 0.4s ease,
+      opacity 0.4s ease;
   }
   .nav-logo {
     display: flex;
@@ -276,7 +281,7 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
   }
   .nav-mobile-panel {
     position: fixed;
-    top: 54px;
+    top: calc(54px + env(safe-area-inset-top, 0px));
     left: 0;
     right: 0;
     display: flex;
@@ -378,6 +383,20 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     }
     .nav-mobile-panel > .nav-mobile-open {
       display: flex;
+    }
+  }
+  /* Small screens give little height, so the bar leaves while the reader
+     goes down the page and comes back when the reader goes up. */
+  @media (max-width: 900px) {
+    nav.is-hidden {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    nav {
+      transition: none;
     }
   }
 </style>
@@ -564,6 +583,56 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     }
   };
 
+  // ── The bar leaves on the way down and returns on the way up.
+  // CSS applies this only below 900px. The listener sits on the window, so it
+  // survives a client-side navigation and reads the current bar each time.
+  const MOVE_STEP = 8; // px, ignores the jitter of a touch screen
+  const TOP_ZONE = 40; // px, the bar always shows this near the top
+
+  let lastDepth = window.scrollY;
+  let framePending = false;
+
+  const updateBar = () => {
+    const bar = document.querySelector<HTMLElement>("nav");
+    if (!bar) return;
+
+    const depth = Math.max(window.scrollY, 0);
+    const move = depth - lastDepth;
+    if (Math.abs(move) < MOVE_STEP) return;
+    lastDepth = depth;
+
+    const panelOpen = bar.querySelector(".nav-mobile.is-open") !== null;
+    if (panelOpen || depth <= TOP_ZONE) {
+      bar.classList.remove("is-hidden");
+      return;
+    }
+
+    bar.classList.toggle("is-hidden", move > 0);
+  };
+
+  const showBar = () => {
+    lastDepth = window.scrollY;
+    document.querySelector<HTMLElement>("nav")?.classList.remove("is-hidden");
+  };
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (framePending) return;
+      framePending = true;
+      requestAnimationFrame(() => {
+        framePending = false;
+        updateBar();
+      });
+    },
+    { passive: true },
+  );
+
+  window.addEventListener("hashchange", showBar);
+
   initializeNav();
-  document.addEventListener("astro:page-load", initializeNav);
+  document.addEventListener("astro:page-load", () => {
+    initializeNav();
+    showBar();
+  });
 </script>
