@@ -9,9 +9,6 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 ---
 
 <nav>
-  <!-- Fills the strip above the bar. It hangs from the top edge of the bar,
-       so the two always move together and no gap can open between them. -->
-  <div class="nav-shield" aria-hidden="true"></div>
   <a href={href("/")} class="nav-logo">
     <span class="logo-word">ROCKCRUIT</span>
     <div class="nav-dot"></div>
@@ -95,19 +92,6 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 </nav>
 
 <style>
-  /* The block hangs from the top edge of the bar and reaches far above the
-     screen, so it covers the strip that opens when the phone pulls the page
-     down or when the browser bar changes size. It travels with the bar.
-     Two viewport heights cover the longest pull a hand can make. */
-  .nav-shield {
-    position: absolute;
-    bottom: 65%;
-    left: 0;
-    right: 0;
-    height: 56px;
-    background: var(--ink);
-    pointer-events: none;
-  }
   nav {
     position: fixed;
     top: 0;
