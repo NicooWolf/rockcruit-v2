@@ -105,7 +105,9 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     left: 0;
     right: 0;
     height: 200vh;
-    background: var(--ink);
+    /* DEBUG ONLY — makes the shield visible. Put back var(--ink) before you
+       ship: a red strip above the bar is not the design. */
+    background: red;
     pointer-events: none;
   }
   nav {
@@ -118,8 +120,10 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     align-items: center;
     justify-content: space-between;
     /* The top inset fills the curved area of a phone screen. Without it, the
-       page shows through above the bar. */
-    padding: env(safe-area-inset-top, 0px) 5% 0;
+       page shows through above the bar. The inset stands alone: a browser
+       without env() drops this one line and keeps the side padding. */
+    padding: 0 5%;
+    padding-top: env(safe-area-inset-top, 0px);
     height: calc(54px + env(safe-area-inset-top, 0px));
     background: var(--ink);
     /* Do not add a backdrop filter here. iOS gives the top strip the color of
