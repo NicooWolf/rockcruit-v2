@@ -95,8 +95,18 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 </nav>
 
 <style>
+  /* The block hangs from the top edge of the bar and reaches far above the
+     screen, so it covers the strip that opens when the phone pulls the page
+     down or when the browser bar changes size. It travels with the bar.
+     Two viewport heights cover the longest pull a hand can make. */
   .nav-shield {
-    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 200vh;
+    background: var(--ink);
+    pointer-events: none;
   }
   nav {
     position: fixed;
@@ -112,7 +122,10 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     padding: env(safe-area-inset-top, 0px) 5% 0;
     height: calc(54px + env(safe-area-inset-top, 0px));
     background: var(--ink);
-    backdrop-filter: blur(16px);
+    /* Do not add a backdrop filter here. iOS gives the top strip the color of
+       the bar, but it stops when the bar has a backdrop filter. The strip then
+       shows the page and a gap appears. The background is solid, so a blur
+       gives no gain. See WebKit change f1caad5. */
     border-bottom: 1px solid var(--bdark);
     transition:
       transform 0.4s ease,
@@ -185,7 +198,6 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     min-width: 230px;
     padding: 0.4rem 0;
     z-index: 600;
-    backdrop-filter: blur(20px);
   }
   .nav-dropdown:hover .nav-dropdown-menu,
   .nav-dropdown:focus-within .nav-dropdown-menu,
@@ -388,19 +400,6 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     }
   }
   @media (max-width: 900px) {
-    /* The block hangs from the top edge of the bar and reaches above the
-       screen. iOS moves a fixed bar during an elastic scroll and during the
-       browser bar change, and this block covers the strip that opens. */
-    .nav-shield {
-      display: block;
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      right: 0;
-      height: 140px;
-      background: var(--ink);
-      pointer-events: none;
-    }
     /* Small screens give little height, so the bar leaves while the reader
        goes down the page and comes back when the reader goes up. */
     nav.is-hidden {
