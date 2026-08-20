@@ -2,60 +2,568 @@
 // src/components/Nav.astro — one canonical nav (prototypes drifted; normalized here).
 // Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
 // "Open Positions" → /#contact until its real destination is decided (open ledger).
+import { href } from "../lib/url";
+
 const path = Astro.url.pathname;
-const isActive = (p: string) => (p === '/' ? path === '/' : path.startsWith(p));
+const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 ---
+
 <nav>
-  <a href="/" class="nav-logo">
+  <a href={href("/")} class="nav-logo">
     <span class="logo-word">ROCKCRUIT</span>
     <div class="nav-dot"></div>
   </a>
   <ul class="nav-links">
-    <li><a href="/" class={isActive('/') ? 'active' : ''}>Home</a></li>
+    <li><a href={href("/")} class={isActive("/") ? "active" : ""}>Home</a></li>
     <li class="nav-dropdown">
-      <a href="/services" class={isActive('/services') ? 'active' : ''}>Services <span class="nav-dropdown-arrow">▾</span></a>
+      <a href={href("/services")} class={isActive("/services") ? "active" : ""}>
+        Services <span class="nav-dropdown-arrow">▾</span>
+      </a>
       <div class="nav-dropdown-menu">
-        <a href="/services#raas"><span>01</span> Recruiting as a Service</a>
+        <a class="service-link" href={href("/services#contingency")}
+          ><span class="service-index contingency-index">01</span>
+          Contingency Recruiting</a
+        >
         <div class="nav-dropdown-divider"></div>
-        <a href="/services#contingency"><span>02</span> Contingency Recruiting</a>
+        <a class="service-link" href={href("/services#raas")}
+          ><span class="service-index">02</span> Recruiting as a Service</a
+        >
       </div>
     </li>
-    <li><a href="/team" class={isActive('/team') ? 'active' : ''}>Team</a></li>
-    <li><a href="/process" class={isActive('/process') ? 'active' : ''}>Process</a></li>
-    <li><a href="/faq" class={isActive('/faq') ? 'active' : ''}>FAQ</a></li>
-    <li><a href="/blog" class={isActive('/blog') ? 'active' : ''}>Blog</a></li>
+    <li>
+      <a href={href("/team")} class={isActive("/team") ? "active" : ""}>Team</a>
+    </li>
+    <li>
+      <a href={href("/process")} class={isActive("/process") ? "active" : ""}
+        >Process</a
+      >
+    </li>
+    <li>
+      <a href={href("/faq")} class={isActive("/faq") ? "active" : ""}>FAQ</a>
+    </li>
+    <li>
+      <a href={href("/blog")} class={isActive("/blog") ? "active" : ""}>Blog</a>
+    </li>
   </ul>
   <div class="nav-actions">
-    <a href="/#contact" class="nav-open">Open Positions</a>
-    <a href="/#contact" class="nav-cta">Hire With Us</a>
+    <a href={href("/#contact")} class="nav-open">Open Positions</a>
+    <a href={href("/#contact")} class="nav-cta">Hire With Us</a>
+  </div>
+  <div class="nav-mobile">
+    <button
+      class="nav-mobile-toggle"
+      type="button"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="nav-mobile-panel"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="nav-mobile-panel" id="nav-mobile-panel" hidden>
+      <div class="nav-mobile-services">
+        <button
+          class="nav-mobile-services-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="nav-mobile-services-menu"
+        >
+          Services <span class="nav-dropdown-arrow">▾</span>
+        </button>
+        <div id="nav-mobile-services-menu" hidden>
+          <a class="service-link" href={href("/services#contingency")}
+            ><span class="service-index contingency-index">01</span>
+            Contingency Recruiting</a
+          >
+          <a class="service-link" href={href("/services#raas")}
+            ><span class="service-index">02</span> Recruiting as a Service</a
+          >
+        </div>
+      </div>
+      <a href={href("/team")} class={isActive("/team") ? "active" : ""}>Team</a>
+      <a href={href("/process")} class={isActive("/process") ? "active" : ""}
+        >Process</a
+      >
+      <a href={href("/faq")} class={isActive("/faq") ? "active" : ""}>FAQ</a>
+      <a href={href("/blog")} class={isActive("/blog") ? "active" : ""}>Blog</a>
+      <a href={href("/#contact")} class="nav-mobile-open">Open Positions</a>
+    </div>
   </div>
 </nav>
 
 <style>
-  nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:54px;background:rgba(20,18,16,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--bdark)}
-  .nav-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
-  .logo-word{font-family:var(--bebas);font-size:1.6rem;letter-spacing:.05em;color:var(--paper);font-weight:normal}
-  .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2.5s ease infinite;flex-shrink:0}
-  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:.4}}
-  .nav-links{display:flex;gap:2.5rem;list-style:none}
-  .nav-links a{font-size:.82rem;color:rgba(240,237,227,.4);text-decoration:none;transition:color .2s}
-  .nav-links a:hover,.nav-links a.active{color:var(--paper)}
-  .nav-links a.active{border-bottom:1px solid var(--paper);padding-bottom:1px}
-  .nav-dropdown{position:relative}
-  .nav-dropdown-menu{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);background:rgba(20,18,16,.98);border:1px solid var(--bdark);border-radius:8px;min-width:230px;padding:.4rem 0;z-index:600;backdrop-filter:blur(20px)}
-  .nav-dropdown:hover .nav-dropdown-menu{display:block}
-  .nav-dropdown-menu::before{content:'';position:absolute;top:-12px;left:0;right:0;height:12px;background:transparent}
-  .nav-dropdown-menu a{display:flex;align-items:center;gap:.6rem;padding:.65rem 1.1rem;font-size:.8rem;color:rgba(240,237,227,.5);text-decoration:none;transition:color .2s,background .2s;white-space:nowrap}
-  .nav-dropdown-menu a:hover{color:var(--paper);background:rgba(255,255,255,.04)}
-  .nav-dropdown-menu a span{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
-  .nav-dropdown-divider{height:1px;background:var(--bdark);margin:.3rem 0}
-  .nav-dropdown-arrow{display:inline-block;margin-left:.25rem;font-size:.6rem;transition:transform .2s}
-  .nav-dropdown:hover .nav-dropdown-arrow{transform:rotate(180deg)}
-  .nav-actions{display:flex;align-items:center;gap:.75rem}
-  .nav-cta{background:var(--green);color:var(--ink);font-size:.82rem;font-weight:500;padding:.45rem 1.2rem;border-radius:4px;text-decoration:none;transition:background .2s}
-  .nav-cta:hover{background:#15845e}
-  .nav-open{font-size:.82rem;color:rgba(240,237,227,.5);text-decoration:none;border:1px solid var(--bdark);border-radius:4px;padding:.45rem 1.2rem;transition:border-color .2s,color .2s}
-  .nav-open:hover{border-color:rgba(240,237,227,.4);color:var(--paper)}
-  /* Mobile: keep it simple until a burger menu is a real requirement (AGENTS.md) */
-  @media(max-width:900px){.nav-links{display:none}}
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    height: 54px;
+    background: rgba(20, 18, 16, 0.95);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--bdark);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+  .logo-word {
+    font-family: var(--bebas);
+    font-size: 1.6rem;
+    letter-spacing: 0.05em;
+    color: var(--paper);
+    font-weight: normal;
+  }
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2.5s ease infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.8);
+      opacity: 0.4;
+    }
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.82rem;
+    color: rgba(240, 237, 227, 0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--paper);
+  }
+  .nav-links a.active {
+    border-bottom: 1px solid var(--paper);
+    padding-bottom: 1px;
+  }
+  .nav-dropdown {
+    position: relative;
+  }
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 18, 16, 0.98);
+    border: 1px solid var(--bdark);
+    border-radius: 8px;
+    min-width: 230px;
+    padding: 0.4rem 0;
+    z-index: 600;
+    backdrop-filter: blur(20px);
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown:focus-within .nav-dropdown-menu,
+  .nav-dropdown.is-open .nav-dropdown-menu {
+    display: block;
+  }
+  .nav-dropdown-menu::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: transparent;
+  }
+  .nav-dropdown-menu a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1.1rem;
+    font-size: 0.8rem;
+    color: rgba(240, 237, 227, 0.5);
+    text-decoration: none;
+    transition:
+      color 0.2s,
+      background 0.2s;
+    white-space: nowrap;
+  }
+  .nav-dropdown-menu a:hover {
+    color: var(--paper);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .service-index {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    font-weight: 400;
+  }
+  .contingency-index {
+    color: var(--violet);
+  }
+  .service-link.is-selected .service-index {
+    font-weight: 700;
+  }
+  .nav-dropdown-divider {
+    height: 1px;
+    background: var(--bdark);
+    margin: 0.3rem 0;
+  }
+  .nav-dropdown-arrow {
+    display: inline-block;
+    margin-left: 0.25rem;
+    font-size: 0.6rem;
+    transition: transform 0.2s;
+  }
+  .nav-dropdown:hover .nav-dropdown-arrow,
+  .nav-dropdown:focus-within .nav-dropdown-arrow,
+  .nav-dropdown.is-open .nav-dropdown-arrow,
+  .nav-mobile-services.is-open .nav-dropdown-arrow {
+    transform: rotate(180deg);
+  }
+  .nav-mobile {
+    display: none;
+    position: relative;
+  }
+  .nav-mobile-toggle {
+    width: 36px;
+    height: 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0;
+    border: 1px solid var(--bdark);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .nav-mobile-toggle span {
+    width: 16px;
+    height: 1px;
+    background: var(--paper);
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
+  }
+  .nav-mobile.is-open .nav-mobile-toggle span:first-child {
+    transform: translateY(5px) rotate(45deg);
+  }
+  .nav-mobile.is-open .nav-mobile-toggle span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-mobile.is-open .nav-mobile-toggle span:last-child {
+    transform: translateY(-5px) rotate(-45deg);
+  }
+  .nav-mobile-panel {
+    position: fixed;
+    top: 54px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.8rem 5% 1rem;
+    background: var(--ink);
+    border-bottom: 1px solid var(--bdark);
+  }
+  .nav-mobile-panel[hidden] {
+    display: none;
+  }
+  .nav-mobile-panel > a,
+  .nav-mobile-services-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--bdark);
+    background: transparent;
+    color: var(--paper);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nav-mobile-panel > a.active {
+    font-weight: 700;
+  }
+  .nav-mobile-services > div {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--bdark);
+  }
+  .nav-mobile-services > div[hidden] {
+    display: none;
+  }
+  .nav-mobile-services .service-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.7rem;
+    color: var(--paper);
+    font-size: 0.8rem;
+    text-decoration: none;
+  }
+  .nav-mobile-panel > .nav-mobile-open {
+    display: none;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .nav-cta {
+    background: var(--green);
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.45rem 1.2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover {
+    background: #15845e;
+  }
+  .nav-open {
+    font-size: 0.82rem;
+    color: rgba(240, 237, 227, 0.5);
+    text-decoration: none;
+    border: 1px solid var(--bdark);
+    border-radius: 4px;
+    padding: 0.45rem 1.2rem;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .nav-open:hover {
+    border-color: rgba(240, 237, 227, 0.4);
+    color: var(--paper);
+  }
+  @media (max-width: 900px) {
+    .nav-links {
+      display: none;
+    }
+    .nav-actions {
+      margin-left: auto;
+    }
+    .nav-mobile {
+      display: block;
+      margin-left: 0.75rem;
+    }
+  }
+  @media (max-width: 640px) {
+    .nav-open {
+      display: none;
+    }
+    .nav-mobile-panel > .nav-mobile-open {
+      display: flex;
+    }
+  }
 </style>
+
+<script>
+  const initializeNav = () => {
+    const nav = document.querySelector<HTMLElement>("nav");
+    if (!nav || nav.dataset.initialized === "true") return;
+    nav.dataset.initialized = "true";
+
+    const serviceLinks =
+      nav.querySelectorAll<HTMLAnchorElement>(".service-link");
+    const desktopServices = nav.querySelector<HTMLElement>(".nav-dropdown");
+    const mobileNav = nav.querySelector<HTMLElement>(".nav-mobile");
+    const mobileNavToggle =
+      nav.querySelector<HTMLButtonElement>(".nav-mobile-toggle");
+    const mobilePanel = nav.querySelector<HTMLElement>(".nav-mobile-panel");
+    const mobileServices = nav.querySelector<HTMLElement>(
+      ".nav-mobile-services",
+    );
+    const mobileServicesToggle = nav.querySelector<HTMLButtonElement>(
+      ".nav-mobile-services-toggle",
+    );
+    const mobileServicesMenu = document.getElementById(
+      "nav-mobile-services-menu",
+    );
+    const dropdowns = [desktopServices, mobileServices].filter(
+      (dropdown): dropdown is HTMLElement => dropdown !== null,
+    );
+
+    const clearSelection = (dropdown: HTMLElement) => {
+      dropdown
+        .querySelectorAll(".service-link")
+        .forEach((link) => link.classList.remove("is-selected"));
+    };
+
+    const setMobileServicesOpen = (open: boolean) => {
+      if (!mobileServices || !mobileServicesToggle || !mobileServicesMenu)
+        return;
+      mobileServicesMenu.hidden = !open;
+      mobileServicesToggle.setAttribute("aria-expanded", String(open));
+      mobileServices.classList.toggle("is-open", open);
+      if (!open) clearSelection(mobileServices);
+    };
+
+    const setMobileNavOpen = (open: boolean) => {
+      if (!mobileNav || !mobileNavToggle || !mobilePanel) return;
+      mobilePanel.hidden = !open;
+      mobileNavToggle.setAttribute("aria-expanded", String(open));
+      mobileNavToggle.setAttribute(
+        "aria-label",
+        open ? "Close navigation menu" : "Open navigation menu",
+      );
+      mobileNav.classList.toggle("is-open", open);
+      if (!open) setMobileServicesOpen(false);
+    };
+
+    const closeDropdown = (dropdown: HTMLElement) => {
+      if (dropdown === mobileServices) {
+        setMobileServicesOpen(false);
+        return;
+      }
+
+      dropdown.classList.remove("is-open");
+      clearSelection(dropdown);
+    };
+
+    // A link to the same page gives no navigation, and a link to the current
+    // hash gives no hashchange event. Write the hash and jump in both cases.
+    const jumpToSection = (link: HTMLAnchorElement) => {
+      const url = new URL(link.href);
+      if (url.pathname !== window.location.pathname) return false;
+
+      if (window.location.hash !== url.hash) {
+        history.pushState(
+          history.state,
+          "",
+          url.pathname + url.search + url.hash,
+        );
+      }
+
+      // The layout listens for this event and holds the section hash while the
+      // jump runs.
+      window.dispatchEvent(new Event("hashchange"));
+
+      const target = document.getElementById(
+        decodeURIComponent(url.hash.slice(1)),
+      );
+      target?.scrollIntoView({ block: "start" });
+
+      return true;
+    };
+
+    serviceLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const dropdown = link.closest<HTMLElement>(
+          ".nav-dropdown, .nav-mobile-services",
+        );
+        if (dropdown) {
+          clearSelection(dropdown);
+          link.classList.add("is-selected");
+          if (dropdown === mobileServices) {
+            setMobileNavOpen(true);
+            setMobileServicesOpen(true);
+          } else {
+            dropdown.classList.add("is-open");
+          }
+        }
+
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button)
+          return;
+        if (jumpToSection(link)) event.preventDefault();
+      });
+    });
+
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener("focusout", () => {
+        requestAnimationFrame(() => {
+          if (dropdown.contains(document.activeElement)) return;
+          if (dropdown !== mobileServices && dropdown.matches(":hover")) return;
+          closeDropdown(dropdown);
+        });
+      });
+    });
+
+    desktopServices?.addEventListener("mouseleave", () => {
+      closeDropdown(desktopServices);
+    });
+
+    mobileNavToggle?.addEventListener("click", () => {
+      setMobileNavOpen(
+        mobileNavToggle.getAttribute("aria-expanded") !== "true",
+      );
+    });
+
+    mobileServicesToggle?.addEventListener("click", () => {
+      setMobileServicesOpen(
+        mobileServicesToggle.getAttribute("aria-expanded") !== "true",
+      );
+    });
+
+    mobilePanel
+      ?.querySelectorAll<HTMLAnchorElement>(":scope > a")
+      .forEach((link) => {
+        link.addEventListener("click", () => setMobileNavOpen(false));
+      });
+
+    mobileNav?.addEventListener("focusout", () => {
+      requestAnimationFrame(() => {
+        if (!mobileNav.contains(document.activeElement))
+          setMobileNavOpen(false);
+      });
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (desktopServices && !desktopServices.contains(target))
+        closeDropdown(desktopServices);
+      if (mobileNav && !mobileNav.contains(target)) setMobileNavOpen(false);
+    });
+
+    nav.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      dropdowns.forEach(closeDropdown);
+      setMobileNavOpen(false);
+      mobileNavToggle?.focus();
+    });
+
+    // A page load starts with every menu closed. The hash only marks the
+    // matching number, which stays hidden until the user opens the dropdown.
+    setMobileNavOpen(false);
+    if (desktopServices) closeDropdown(desktopServices);
+
+    const serviceHash = ["#contingency", "#raas"].includes(window.location.hash)
+      ? window.location.hash
+      : "";
+    if (serviceHash) {
+      nav
+        .querySelectorAll<HTMLAnchorElement>(
+          `.service-link[href$="${serviceHash}"]`,
+        )
+        .forEach((link) => link.classList.add("is-selected"));
+    }
+  };
+
+  initializeNav();
+  document.addEventListener("astro:page-load", initializeNav);
+</script>
