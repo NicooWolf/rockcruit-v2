@@ -12,6 +12,9 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
   <!-- Fills the strip above the bar. It hangs from the top edge of the bar,
        so the two always move together and no gap can open between them. -->
   <div class="nav-shield" aria-hidden="true"></div>
+  <!-- TEMP DEBUG: remove both nodes after the iPhone test. -->
+  <div class="nav-inset-probe" aria-hidden="true"></div>
+  <span class="nav-debug" id="nav-debug" aria-hidden="true"></span>
   <a href={href("/")} class="nav-logo">
     <span class="logo-word">ROCKCRUIT</span>
     <div class="nav-dot"></div>
@@ -96,6 +99,19 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 
 <style>
   .nav-shield {
+    display: none;
+  }
+  /* TEMP DEBUG: the probe reports the real top inset, the badge prints it. */
+  .nav-inset-probe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: env(safe-area-inset-top, 0px);
+    pointer-events: none;
+    opacity: 0;
+  }
+  .nav-debug {
     display: none;
   }
   nav {
@@ -398,7 +414,21 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
       left: 0;
       right: 0;
       height: 140px;
-      background: var(--ink);
+      /* TEMP DEBUG: red shows every moment that the block enters the screen.
+         Put var(--ink) back after the test. */
+      background: red;
+      pointer-events: none;
+    }
+    /* TEMP DEBUG */
+    .nav-debug {
+      display: block;
+      position: absolute;
+      left: 50%;
+      bottom: 2px;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      color: var(--green);
       pointer-events: none;
     }
     /* Small screens give little height, so the bar leaves while the reader
@@ -645,9 +675,30 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 
   window.addEventListener("hashchange", showBar);
 
+  // TEMP DEBUG: print the real inset and the viewport shift. Remove after the
+  // iPhone test, together with the two nodes and their styles.
+  const printDebug = () => {
+    const badge = document.getElementById("nav-debug");
+    const probe = document.querySelector<HTMLElement>(".nav-inset-probe");
+    if (!badge || !probe) return;
+
+    const inset = probe.offsetHeight;
+    const shift = Math.round(window.visualViewport?.offsetTop ?? 0);
+    const barTop = Math.round(
+      document.querySelector("nav")?.getBoundingClientRect().top ?? 0,
+    );
+    badge.textContent = `inset ${inset} · shift ${shift} · top ${barTop}`;
+  };
+
+  window.addEventListener("scroll", printDebug, { passive: true });
+  window.addEventListener("resize", printDebug);
+  window.visualViewport?.addEventListener("resize", printDebug);
+  window.visualViewport?.addEventListener("scroll", printDebug);
+
   initializeNav();
   document.addEventListener("astro:page-load", () => {
     initializeNav();
     showBar();
+    printDebug();
   });
 </script>
