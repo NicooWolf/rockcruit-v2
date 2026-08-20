@@ -122,7 +122,7 @@
   }
   .fi {
     width: 100%;
-    background: #1a1a1a;
+    background: var(--ink);
     border: 1px solid #3f3f46;
     border-radius: 6px;
     padding: 0.85rem 1rem;
@@ -133,6 +133,13 @@
     transition:
       border-color 0.2s,
       box-shadow 0.2s;
+  }
+  .fi:-webkit-autofill,
+  .fi:-webkit-autofill:hover,
+  .fi:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--paper);
+    -webkit-box-shadow: 0 0 0 1000px var(--ink) inset;
+    caret-color: var(--paper);
   }
   .fi:focus {
     border-color: var(--green);
@@ -146,7 +153,7 @@
   }
   .fi-sel {
     width: 100%;
-    background: #1a1a1a;
+    background: var(--ink);
     border: 1px solid #3f3f46;
     border-radius: 6px;
     padding: 0.85rem 2.5rem 0.85rem 1rem;
@@ -166,7 +173,7 @@
     box-shadow: 0 0 0 3px rgba(26, 158, 92, 0.15);
   }
   .fi-sel option {
-    background: #1a1a1a;
+    background: var(--ink);
     color: #f4f4f5;
   }
   .f-chevron {
@@ -212,12 +219,17 @@
   .f-status {
     font-size: 0.85rem;
     min-height: 1.2em;
+    opacity: 1;
+    transition: opacity 1.2s ease;
   }
   .f-status.ok {
     color: var(--green);
   }
   .f-status.err {
     color: #f87171;
+  }
+  .f-status.vanish {
+    opacity: 0;
   }
   .fcta-trust {
     display: flex;
@@ -248,6 +260,10 @@
   import emailjs from "@emailjs/browser";
   import { z } from "zod";
 
+  const publicKey = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY;
+  const serviceId = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID;
+  const templateId = import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID;
+
   // Ported from v1 src/lib/schemas.ts — same rules & messages, surviving fields only.
   const hireFormSchema = z.object({
     name: z
@@ -270,48 +286,112 @@
 
   // Same protections v1 configured in main.tsx.
   emailjs.init({
-    publicKey: import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY,
+    publicKey,
     blockHeadless: true,
     limitRate: { id: "app", throttle: 10000 }, // 1 send / 10s
   });
 
-  document.addEventListener("astro:page-load", () => {
+  const initializeHireForm = () => {
     const form = document.getElementById("hire-form") as HTMLFormElement | null;
     if (!form) return; // not on this page
+    if (form.dataset.initialized === "true") return;
+    form.dataset.initialized = "true";
 
     const status = document.getElementById("f-status")!;
     const submitBtn = form.querySelector<HTMLButtonElement>(".f-submit")!;
     const errorEls = form.querySelectorAll<HTMLElement>(".f-error");
+    const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+      ".fi, .fi-sel",
+    );
+    let validationStarted = false;
+
+    status.addEventListener("transitionend", (event) => {
+      if (
+        event.propertyName !== "opacity" ||
+        !status.classList.contains("vanish")
+      )
+        return;
+
+      status.textContent = "";
+      status.classList.remove("ok", "vanish");
+    });
+
+    const getData = () => Object.fromEntries(new FormData(form).entries());
+
+    const clearFieldError = (fieldName: string) => {
+      const errorEl = form.querySelector<HTMLElement>(
+        `.f-error[data-for="${fieldName}"]`,
+      );
+      const field = form.elements.namedItem(fieldName);
+      if (errorEl) errorEl.textContent = "";
+      if (field instanceof HTMLElement) field.removeAttribute("aria-invalid");
+    };
+
+    const showIssue = (fieldName: string, message: string) => {
+      const errorEl = form.querySelector<HTMLElement>(
+        `.f-error[data-for="${fieldName}"]`,
+      );
+      const field = form.elements.namedItem(fieldName);
+      if (errorEl) errorEl.textContent = message;
+      if (field instanceof HTMLElement)
+        field.setAttribute("aria-invalid", "true");
+    };
+
+    const validateField = (fieldName: string) => {
+      clearFieldError(fieldName);
+      const parsed = hireFormSchema.safeParse(getData());
+      if (parsed.success) return;
+
+      const issue = parsed.error.issues.find(
+        (item) => item.path[0] === fieldName,
+      );
+      if (issue) showIssue(fieldName, issue.message);
+    };
+
+    fields.forEach((field) => {
+      field.addEventListener("blur", () => {
+        if (validationStarted) validateField(field.name);
+      });
+    });
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      errorEls.forEach((el) => (el.textContent = ""));
+      validationStarted = true;
+      errorEls.forEach((el) => {
+        el.textContent = "";
+        const fieldName = el.dataset.for;
+        if (fieldName) clearFieldError(fieldName);
+      });
       status.textContent = "";
       status.className = "f-status";
 
-      const data = Object.fromEntries(new FormData(form).entries());
-      const parsed = hireFormSchema.safeParse(data);
+      const parsed = hireFormSchema.safeParse(getData());
 
       if (!parsed.success) {
         for (const issue of parsed.error.issues) {
-          const el = form.querySelector<HTMLElement>(
-            `.f-error[data-for="${issue.path[0]}"]`,
-          );
-          if (el) el.textContent = issue.message;
+          showIssue(String(issue.path[0]), issue.message);
         }
         return;
       }
 
+      if (!publicKey || !serviceId || !templateId) {
+        status.textContent = "An error occurred. Email jwolf@rockcruit.com.";
+        status.classList.add("err");
+        return;
+      }
+
       submitBtn.disabled = true;
+
       try {
-        await emailjs.sendForm(
-          import.meta.env.PUBLIC_EMAILJS_SERVICE_ID,
-          import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID,
-          form,
-        );
+        await emailjs.sendForm(serviceId, templateId, form);
         status.textContent = "Message sent — we reply within 24 hours.";
         status.classList.add("ok");
         form.reset();
+        validationStarted = false;
+
+        setTimeout(() => {
+          status.classList.add("vanish");
+        }, 5000);
       } catch {
         status.textContent =
           "Something went wrong. Try again, or email jwolf@rockcruit.com.";
@@ -320,5 +400,8 @@
         submitBtn.disabled = false;
       }
     });
-  });
+  };
+
+  initializeHireForm();
+  document.addEventListener("astro:page-load", initializeHireForm);
 </script>
