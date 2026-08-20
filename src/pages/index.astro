@@ -504,6 +504,11 @@ import HireForm from "../components/HireForm.astro";
     font-size: clamp(5.5rem, 13vw, 16rem);
     line-height: 0.86;
     letter-spacing: 0.01em;
+    /* The headline reads as an image: no selection, no text cursor. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    cursor: default;
   }
   .hl-ink {
     display: block;
