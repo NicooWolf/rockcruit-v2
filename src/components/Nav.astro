@@ -8,11 +8,10 @@ const path = Astro.url.pathname;
 const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 ---
 
-<!-- Fills the top strip of a phone screen. It sits outside <nav>, so it stays
-     in place when the bar leaves on scroll. -->
-<div class="nav-shield" aria-hidden="true"></div>
-
 <nav>
+  <!-- Fills the strip above the bar. It hangs from the top edge of the bar,
+       so the two always move together and no gap can open between them. -->
+  <div class="nav-shield" aria-hidden="true"></div>
   <a href={href("/")} class="nav-logo">
     <span class="logo-word">ROCKCRUIT</span>
     <div class="nav-dot"></div>
@@ -389,17 +388,17 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     }
   }
   @media (max-width: 900px) {
-    /* The block starts above the screen edge, so an elastic scroll on iOS
-       shows ink and not the page. The visible part equals the top inset. */
+    /* The block hangs from the top edge of the bar and reaches above the
+       screen. iOS moves a fixed bar during an elastic scroll and during the
+       browser bar change, and this block covers the strip that opens. */
     .nav-shield {
       display: block;
-      position: fixed;
-      top: -120px;
+      position: absolute;
+      bottom: 100%;
       left: 0;
       right: 0;
-      height: calc(120px + env(safe-area-inset-top, 0px));
+      height: 140px;
       background: var(--ink);
-      z-index: 501;
       pointer-events: none;
     }
     /* Small screens give little height, so the bar leaves while the reader
