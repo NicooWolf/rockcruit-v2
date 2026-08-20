@@ -55,6 +55,91 @@ const canonical = Astro.site
     <Footer />
 
     <script>
+      // ── Scroll depth and the section hash.
+      // A hash jump moves the page by itself. Only a move that the reader
+      // makes may drop the hash, so the code waits for the jump to settle and
+      // then for a real change of the scroll depth. Touch and mouse raise the
+      // same scroll event, so one rule serves mobile and desktop.
+      const END_ZONE = 8; // px, absorbs sub-pixel and elastic scroll values
+      const SETTLE_TIME = 900; // ms, the wait for a jump to start
+      const IDLE_TIME = 250; // ms without a scroll event ends a jump
+
+      let settleUntil = 0;
+      let landingDepth = 0;
+      let readerMoved = false;
+
+      const startJump = () => {
+        settleUntil = performance.now() + SETTLE_TIME;
+        landingDepth = window.scrollY;
+        readerMoved = false;
+      };
+
+      // ClientRouter owns scroll restoration, so the browser does not jump to
+      // the section on a reload. Do that jump here.
+      document.addEventListener("astro:page-load", () => {
+        startJump();
+
+        const id = decodeURIComponent(window.location.hash.slice(1));
+        if (!id) return;
+
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        requestAnimationFrame(() => {
+          target.scrollIntoView({ behavior: "instant", block: "start" });
+          startJump();
+        });
+      });
+
+      // A click on a same-page link also jumps, and CSS makes that jump smooth.
+      window.addEventListener("hashchange", startJump);
+
+      const trimHashAtEnds = () => {
+        if (!window.location.hash) return;
+
+        const depth = window.scrollY;
+
+        // The jump still runs: it owns every move, and it sets the landing.
+        // A smooth jump takes many frames, so each move holds the jump open.
+        const now = performance.now();
+        if (now < settleUntil) {
+          landingDepth = depth;
+          settleUntil = Math.max(settleUntil, now + IDLE_TIME);
+          return;
+        }
+
+        if (!readerMoved) {
+          if (Math.abs(depth - landingDepth) <= END_ZONE) return;
+          readerMoved = true;
+        }
+
+        const maxDepth =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const atTop = depth <= END_ZONE;
+        const atBottom = maxDepth - depth <= END_ZONE;
+        if (!atTop && !atBottom) return;
+
+        history.replaceState(
+          history.state,
+          "",
+          window.location.pathname + window.location.search,
+        );
+      };
+
+      let scrollPending = false;
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (scrollPending) return;
+          scrollPending = true;
+          requestAnimationFrame(() => {
+            scrollPending = false;
+            trimHashAtEnds();
+          });
+        },
+        { passive: true },
+      );
+
       // ── Scroll reveals: fresh observer per page entry.
       // astro:page-load fires on initial load AND after every navigation.
       document.addEventListener("astro:page-load", () => {
