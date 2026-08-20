@@ -8,6 +8,10 @@ const path = Astro.url.pathname;
 const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 ---
 
+<!-- Fills the top strip of a phone screen. It sits outside <nav>, so it stays
+     in place when the bar leaves on scroll. -->
+<div class="nav-shield" aria-hidden="true"></div>
+
 <nav>
   <a href={href("/")} class="nav-logo">
     <span class="logo-word">ROCKCRUIT</span>
@@ -59,7 +63,6 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     >
       <span></span>
       <span></span>
-      <span></span>
     </button>
     <div class="nav-mobile-panel" id="nav-mobile-panel" hidden>
       <div class="nav-mobile-services">
@@ -93,6 +96,9 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 </nav>
 
 <style>
+  .nav-shield {
+    display: none;
+  }
   nav {
     position: fixed;
     top: 0;
@@ -249,35 +255,32 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     position: relative;
   }
   .nav-mobile-toggle {
-    width: 36px;
-    height: 34px;
+    /* Two lines only, no border. The button keeps a 40px touch area. */
+    width: 40px;
+    height: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
     padding: 0;
-    border: 1px solid var(--bdark);
-    border-radius: 4px;
+    border: 0;
     background: transparent;
     cursor: pointer;
   }
   .nav-mobile-toggle span {
-    width: 16px;
+    width: 22px;
     height: 1px;
     background: var(--paper);
     transition:
-      transform 0.2s,
-      opacity 0.2s;
+      transform 0.25s ease,
+      opacity 0.25s ease;
   }
   .nav-mobile.is-open .nav-mobile-toggle span:first-child {
-    transform: translateY(5px) rotate(45deg);
-  }
-  .nav-mobile.is-open .nav-mobile-toggle span:nth-child(2) {
-    opacity: 0;
+    transform: translateY(3.5px) rotate(45deg);
   }
   .nav-mobile.is-open .nav-mobile-toggle span:last-child {
-    transform: translateY(-5px) rotate(-45deg);
+    transform: translateY(-3.5px) rotate(-45deg);
   }
   .nav-mobile-panel {
     position: fixed;
@@ -385,9 +388,22 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
       display: flex;
     }
   }
-  /* Small screens give little height, so the bar leaves while the reader
-     goes down the page and comes back when the reader goes up. */
   @media (max-width: 900px) {
+    /* The block starts above the screen edge, so an elastic scroll on iOS
+       shows ink and not the page. The visible part equals the top inset. */
+    .nav-shield {
+      display: block;
+      position: fixed;
+      top: -120px;
+      left: 0;
+      right: 0;
+      height: calc(120px + env(safe-area-inset-top, 0px));
+      background: var(--ink);
+      z-index: 501;
+      pointer-events: none;
+    }
+    /* Small screens give little height, so the bar leaves while the reader
+       goes down the page and comes back when the reader goes up. */
     nav.is-hidden {
       transform: translateY(-100%);
       opacity: 0;
