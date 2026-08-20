@@ -474,7 +474,9 @@ import HireForm from "../components/HireForm.astro";
   /* HERO */
   .hero {
     min-height: 100vh;
-    padding-top: 54px;
+    /* The bar grows by the top inset of the phone, so the first line of the
+       page must move down by the same amount. */
+    padding-top: calc(54px + env(safe-area-inset-top, 0px));
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid var(--bdark);
