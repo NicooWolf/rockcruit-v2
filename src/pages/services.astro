@@ -16,9 +16,9 @@ import HireForm from "../components/HireForm.astro";
       <div class="page-hero-glow"></div>
       <div class="page-hero-label">Our delivery models</div>
       <h1 class="page-hero-h">
-        <span>THE WAY YOU HIRE</span>
-        <span>SHOULD DEFINE</span>
-        <span>THE RECRUITING</span>
+        <span>THE WAY YOU <span class="g">HIRE</span></span>
+        <span>SHOULD <span class="g1">DEFINE</span></span>
+        <span>THE <span class="g2">RECRUITING</span></span>
         <span class="dim">MODEL.</span>
       </h1>
       <p class="page-hero-sub">
@@ -360,9 +360,23 @@ import HireForm from "../components/HireForm.astro";
     letter-spacing: 0.02em;
     color: var(--paper);
     margin-bottom: 2.5rem;
+    /* The headline reads as an image: no selection, no text cursor. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    cursor: default;
   }
-  .page-hero-h span {
+  .page-hero-h > span {
     display: block;
+  }
+  .page-hero-h .g {
+    color: var(--green);
+  }
+  .page-hero-h .g1 {
+    color: var(--green-1);
+  }
+  .page-hero-h .g2 {
+    color: var(--green-2);
   }
   .page-hero-h .dim {
     color: rgba(240, 237, 227, 0.2);
