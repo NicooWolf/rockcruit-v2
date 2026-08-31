@@ -70,7 +70,11 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
         >
           Services <span class="nav-dropdown-arrow">▾</span>
         </button>
-        <div id="nav-mobile-services-menu" hidden>
+        <div
+          id="nav-mobile-services-menu"
+          class="nav-mobile-services-menu"
+          hidden
+        >
           <a class="service-link" href={href("/services#contingency")}
             ><span class="service-index contingency-index">01</span>
             Contingency Recruiting</a
@@ -116,6 +120,13 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     transition:
       transform 0.4s ease,
       opacity 0.4s ease;
+    /* The gap between two rows of the mobile cascade, and the length of one
+       fade. The category menu in HireForm uses the same numbers.
+       --cascade-span is the time of the slide of the panel. See
+       .nav-mobile-panel. */
+    --cascade-step: 132ms;
+    --cascade-fade: 180ms;
+    --cascade-span: calc(7 * var(--cascade-step) + var(--cascade-fade));
   }
   .nav-logo {
     display: flex;
@@ -293,6 +304,98 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
   .nav-mobile-panel[hidden] {
     display: none;
   }
+  /* ── The cascade of the mobile panel and of the Services menu ──
+     The category menu in HireForm gives the model. The panel and its rows do
+     one motion. The rows come in from the top down, one step after the other,
+     and they leave from the bottom up. The panel opens like a slider: its
+     height grows from zero, and its lower border goes down with the rows. The
+     script gives each visible row a place with --in-step and --out-step, and
+     it gives the panel its full height with --panel-height. The hidden
+     attribute gives display:none, and display cannot animate, so the script
+     writes the attribute only after the last row leaves. */
+  .nav-mobile-panel:not([hidden]),
+  .nav-mobile-services-menu:not([hidden]) {
+    /* The rows must stay inside the box while the box grows. */
+    overflow: hidden;
+    max-height: var(--panel-height, none);
+    animation:
+      nav-panel-in var(--cascade-fade) ease both,
+      nav-slide var(--cascade-span) ease both;
+  }
+  .nav-mobile-panel:not([hidden]) > *,
+  .nav-mobile-services-menu:not([hidden]) > * {
+    animation: nav-row-in var(--cascade-fade) ease both;
+    animation-delay: calc(var(--in-step, 0) * var(--cascade-step));
+  }
+  .nav-mobile-panel.is-closing:not([hidden]),
+  .nav-mobile-services-menu.is-closing:not([hidden]) {
+    /* The panel still shows while it leaves. It must take no more taps. */
+    pointer-events: none;
+    /* The box shrinks with the rows. The background leaves at the end. */
+    animation:
+      nav-slide-out var(--cascade-span) ease both,
+      nav-panel-out var(--cascade-fade) ease both;
+    animation-delay: 0s, calc(var(--cascade-span) - var(--cascade-fade));
+  }
+  .nav-mobile-panel.is-closing:not([hidden]) > *,
+  .nav-mobile-services-menu.is-closing:not([hidden]) > * {
+    animation: nav-row-out var(--cascade-fade) ease both;
+    animation-delay: calc(var(--out-step, 0) * var(--cascade-step));
+  }
+  @keyframes nav-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes nav-panel-out {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+  }
+  @keyframes nav-slide {
+    from {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+  @keyframes nav-slide-out {
+    to {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+  @keyframes nav-row-in {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes nav-row-out {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+  }
   .nav-mobile-panel > a,
   .nav-mobile-services-toggle {
     width: 100%;
@@ -348,7 +451,7 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     transition: background 0.2s;
   }
   .nav-cta:hover {
-    background: #15845e;
+    background: var(--green-light);
   }
   .nav-open {
     font-size: 0.82rem;
@@ -398,6 +501,13 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     nav {
       transition: none;
     }
+    /* The panel opens and closes in one step. A length of zero holds the
+       cascade rules but takes the motion away. The script reads the same
+       setting and writes the hidden attribute immediately. */
+    nav {
+      --cascade-step: 0ms;
+      --cascade-fade: 0ms;
+    }
   }
 </style>
 
@@ -433,25 +543,160 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
         .forEach((link) => link.classList.remove("is-selected"));
     };
 
-    const setMobileServicesOpen = (open: boolean) => {
+    // ── The cascade of the mobile panel ──
+    // The rows come in from the top down and they leave from the bottom up.
+    // The CSS holds the animation. The script holds the order of the rows and
+    // the hidden attribute, because display:none stops every animation.
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const cascadeEnds = new WeakMap<
+      HTMLElement,
+      { onEnd: (event: AnimationEvent) => void; timer: number }
+    >();
+
+    // The browser gives a time in seconds or in milliseconds.
+    const toMs = (time: string) =>
+      time.trim().endsWith("ms") ? parseFloat(time) : parseFloat(time) * 1000;
+
+    // An element can run more than one animation. Take the longest one.
+    const animationEnd = (element: HTMLElement) => {
+      const style = getComputedStyle(element);
+      const delays = style.animationDelay.split(",");
+      return style.animationDuration
+        .split(",")
+        .reduce(
+          (longest, time, index) =>
+            Math.max(longest, toMs(time) + toMs(delays[index % delays.length])),
+          0,
+        );
+    };
+
+    const cascadeLength = (panel: HTMLElement) => {
+      const rows = Array.from(panel.children).filter(
+        (row): row is HTMLElement => row instanceof HTMLElement,
+      );
+      return rows.reduce(
+        (longest, row) => Math.max(longest, animationEnd(row)),
+        animationEnd(panel),
+      );
+    };
+
+    // The slide needs a height. max-height:none cannot animate, so the script
+    // measures the content and writes the value to --panel-height. The
+    // measurement stops the animation first, because the first frame of the
+    // slide takes the padding away and gives a short height.
+    const fitPanel = (panel: HTMLElement) => {
+      const saved = panel.style.animation;
+      panel.style.animation = "none";
+      const height = panel.scrollHeight;
+      panel.style.animation = saved;
+      panel.style.setProperty("--panel-height", `${height}px`);
+    };
+
+    // A row that the CSS hides at this width takes no place in the cascade.
+    const setCascadeOrder = (panel: HTMLElement) => {
+      const rows = Array.from(panel.children).filter(
+        (row): row is HTMLElement =>
+          row instanceof HTMLElement && row.getClientRects().length > 0,
+      );
+      rows.forEach((row, index) => {
+        row.style.setProperty("--in-step", String(index));
+        row.style.setProperty("--out-step", String(rows.length - 1 - index));
+      });
+    };
+
+    const stopCascade = (panel: HTMLElement) => {
+      const close = cascadeEnds.get(panel);
+      if (close) {
+        panel.removeEventListener("animationend", close.onEnd);
+        window.clearTimeout(close.timer);
+        cascadeEnds.delete(panel);
+      }
+      panel.classList.remove("is-closing");
+    };
+
+    const openCascade = (panel: HTMLElement) => {
+      stopCascade(panel);
+      panel.hidden = false;
+      setCascadeOrder(panel);
+      fitPanel(panel);
+    };
+
+    const closeCascade = (panel: HTMLElement, done: () => void) => {
+      if (panel.hidden) {
+        done();
+        return;
+      }
+      // The panel already leaves. A second start would repeat the animation.
+      if (panel.classList.contains("is-closing")) return;
+      if (reducedMotion.matches) {
+        stopCascade(panel);
+        panel.hidden = true;
+        done();
+        return;
+      }
+      setCascadeOrder(panel);
+      fitPanel(panel);
+      panel.classList.add("is-closing");
+
+      const finish = () => {
+        stopCascade(panel);
+        panel.hidden = true;
+        done();
+      };
+      const onEnd = (event: AnimationEvent) => {
+        // Every row sends this event. Answer only for the panel itself.
+        if (event.target !== panel) return;
+        finish();
+      };
+      // The event closes the panel. The timer closes it if the event never
+      // comes, because a panel that stays open blocks the page.
+      const timer = window.setTimeout(finish, cascadeLength(panel) + 100);
+      cascadeEnds.set(panel, { onEnd, timer });
+      panel.addEventListener("animationend", onEnd);
+    };
+
+    const setMobileServicesOpen = (open: boolean, animate = true) => {
       if (!mobileServices || !mobileServicesToggle || !mobileServicesMenu)
         return;
-      mobileServicesMenu.hidden = !open;
       mobileServicesToggle.setAttribute("aria-expanded", String(open));
       mobileServices.classList.toggle("is-open", open);
-      if (!open) clearSelection(mobileServices);
+      if (open) {
+        openCascade(mobileServicesMenu);
+        // The panel must hold the Services menu. The menu still grows, so its
+        // full height comes from scrollHeight. A larger value only lifts the
+        // limit of the panel. closeCascade measures the true height again.
+        if (mobilePanel) {
+          mobilePanel.style.setProperty(
+            "--panel-height",
+            `${mobilePanel.scrollHeight + mobileServicesMenu.scrollHeight}px`,
+          );
+        }
+        return;
+      }
+      if (animate) {
+        closeCascade(mobileServicesMenu, () => clearSelection(mobileServices));
+        return;
+      }
+      stopCascade(mobileServicesMenu);
+      mobileServicesMenu.hidden = true;
+      clearSelection(mobileServices);
     };
 
     const setMobileNavOpen = (open: boolean) => {
       if (!mobileNav || !mobileNavToggle || !mobilePanel) return;
-      mobilePanel.hidden = !open;
       mobileNavToggle.setAttribute("aria-expanded", String(open));
       mobileNavToggle.setAttribute(
         "aria-label",
         open ? "Close navigation menu" : "Open navigation menu",
       );
       mobileNav.classList.toggle("is-open", open);
-      if (!open) setMobileServicesOpen(false);
+      if (open) {
+        openCascade(mobilePanel);
+        return;
+      }
+      // The Services menu leaves inside the panel. It must not run a second
+      // animation of its own, so it closes after the panel leaves.
+      closeCascade(mobilePanel, () => setMobileServicesOpen(false, false));
     };
 
     const closeDropdown = (dropdown: HTMLElement) => {
@@ -561,7 +806,9 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 
     nav.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
-      dropdowns.forEach(closeDropdown);
+      // The panel closes the Services menu inside it. A second call here
+      // would run the animation of the menu twice.
+      if (desktopServices) closeDropdown(desktopServices);
       setMobileNavOpen(false);
       mobileNavToggle?.focus();
     });
