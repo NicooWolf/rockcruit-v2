@@ -47,7 +47,7 @@ const dateLabel = new Date(post.date).toLocaleDateString('en-US', { dateStyle: '
 .post-content :global(h2){font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.7rem;color:var(--paper);margin:2.5rem 0 1rem}
 .post-content :global(h3){font-family:var(--bebas);font-size:1.3rem;letter-spacing:.03em;color:var(--paper);margin:2rem 0 .8rem}
 .post-content :global(p){margin-bottom:1.2rem}
-.post-content :global(a){color:var(--green);text-decoration:none;border-bottom:1px solid rgba(26,158,92,.35)}
+.post-content :global(a){color:var(--green);text-decoration:none;border-bottom:1px solid rgba(var(--green-rgb),.35)}
 .post-content :global(ul),.post-content :global(ol){margin:0 0 1.2rem 1.4rem}
 .post-content :global(li){margin-bottom:.4rem}
 .post-content :global(img){max-width:100%;height:auto;border-radius:8px;margin:1.5rem 0}
@@ -56,5 +56,5 @@ const dateLabel = new Date(post.date).toLocaleDateString('en-US', { dateStyle: '
 .post-footer{margin-top:4rem;padding-top:2.5rem;border-top:1px solid var(--bdark);display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
 .post-cta-line{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:rgba(240,237,227,.5)}
 .btn-primary{background:var(--green);color:var(--ink);font-size:.88rem;font-weight:500;padding:.85rem 2rem;border-radius:4px;text-decoration:none;transition:background .2s,transform .2s}
-.btn-primary:hover{background:#15845e;transform:translateY(-2px)}
+.btn-primary:hover{background:var(--green-light);transform:translateY(-2px)}
 </style>

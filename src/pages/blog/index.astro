@@ -35,7 +35,7 @@ const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { dateStyle: 
 
 <style>
 .page-hero{padding:6.5rem 5% 4rem;border-bottom:1px solid var(--bdark);position:relative;overflow:hidden}
-.page-hero-glow{position:absolute;top:-60px;right:-60px;width:400px;height:400px;border-radius:50%;background:rgba(26,158,92,.05);filter:blur(80px);pointer-events:none}
+.page-hero-glow{position:absolute;top:-60px;right:-60px;width:400px;height:400px;border-radius:50%;background:rgba(var(--green-rgb),.05);filter:blur(80px);pointer-events:none}
 .page-hero-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:2rem}
 .page-hero-h{font-family:var(--bebas);font-size:clamp(4rem,10vw,11rem);line-height:.86;letter-spacing:.02em;color:var(--paper);margin-bottom:2.5rem}
 .page-hero-h span{display:block}

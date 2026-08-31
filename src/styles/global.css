@@ -4,16 +4,21 @@
    Canonical decisions (prototypes disagreed): --bdark = .06
    ══════════════════════════════════════════════════════════════ */
 :root {
-  --paper: #f0ede3;
+  --paper: #e9e9e9;
   --paper2: #e8e4d8;
   --paper3: #ddd9cc;
-  --ink: #141210;
+  --ink: #141414;
   --ink2: #2a2620;
   --muted: #7a7060;
-  --green: #1a9e5c;
-  --green-1: #2cc97a;
-  --green-2: #5ed499;
-  --violet: #7c3aed;
+  --green: #72d6aa;
+  --green-light: #b7fadf;
+  --violet: #b186f1;
+  --violet-light: #caacf9;
+  --violet-dark: #5603ad;
+  --green-rgb: 114, 214, 170;
+  --green-light-rgb: 183, 250, 223;
+  --violet-rgb: 177, 134, 241;
+  --violet-light-rgb: 202, 172, 249;
   --border: rgba(20, 18, 16, 0.1);
   --bdark: rgba(240, 237, 227, 0.06);
   --bg-base: #070708;
@@ -119,7 +124,7 @@ body::after {
   color: var(--green);
 }
 .label-tag.v {
-  color: #a78bfa;
+  color: var(--violet-light);
 }
 .label-tag.m {
   color: rgba(240, 237, 227, 0.3);

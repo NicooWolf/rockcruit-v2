@@ -341,7 +341,7 @@ import HireForm from "../components/HireForm.astro";
     width: 400px;
     height: 400px;
     border-radius: 50%;
-    background: rgba(26, 158, 92, 0.05);
+    background: rgba(var(--green-rgb), 0.05);
     filter: blur(80px);
     pointer-events: none;
   }
@@ -373,10 +373,10 @@ import HireForm from "../components/HireForm.astro";
     color: var(--green);
   }
   .page-hero-h .g1 {
-    color: var(--green-1);
+    color: var(--green-light);
   }
   .page-hero-h .g2 {
-    color: var(--green-2);
+    color: var(--green);
   }
   .page-hero-h .dim {
     color: rgba(240, 237, 227, 0.2);
@@ -450,14 +450,14 @@ import HireForm from "../components/HireForm.astro";
     border-radius: 3px;
   }
   .dc-badge.raas {
-    background: rgba(26, 158, 92, 0.1);
+    background: rgba(var(--green-rgb), 0.1);
     color: var(--green);
-    border: 1px solid rgba(26, 158, 92, 0.2);
+    border: 1px solid rgba(var(--green-rgb), 0.2);
   }
   .dc-badge.cont {
-    background: rgba(124, 58, 237, 0.08);
-    color: #a78bfa;
-    border: 1px solid rgba(124, 58, 237, 0.2);
+    background: rgba(var(--violet-rgb), 0.08);
+    color: var(--violet-light);
+    border: 1px solid rgba(var(--violet-rgb), 0.2);
   }
   .dc-title {
     font-family: var(--bebas);
@@ -483,16 +483,16 @@ import HireForm from "../components/HireForm.astro";
     transition: color 0.2s;
   }
   .dc-cta.g {
-    color: rgba(26, 158, 92, 0.5);
+    color: rgba(var(--green-rgb), 0.5);
   }
   .dc-cta.g:hover {
     color: var(--green);
   }
   .dc-cta.v {
-    color: rgba(167, 139, 250, 0.5);
+    color: rgba(var(--violet-light-rgb), 0.5);
   }
   .dc-cta.v:hover {
-    color: #a78bfa;
+    color: var(--violet-light);
   }
 
   /* CONTINGENCY + RAAS shared patterns */
@@ -500,7 +500,7 @@ import HireForm from "../components/HireForm.astro";
     border-bottom: 1px solid var(--bdark);
     background: linear-gradient(
       180deg,
-      rgba(124, 58, 237, 0.035),
+      rgba(var(--violet-rgb), 0.035),
       transparent 35%
     );
   }
@@ -517,7 +517,7 @@ import HireForm from "../components/HireForm.astro";
     font-family: var(--mono);
     font-size: 0.75rem;
     letter-spacing: 0.01em;
-    color: rgba(167, 139, 250, 0.75);
+    color: rgba(var(--violet-light-rgb), 0.75);
     margin-bottom: 1.3rem;
     max-width: 460px;
     line-height: 1.6;
@@ -535,7 +535,7 @@ import HireForm from "../components/HireForm.astro";
   }
   .cont-h em {
     font-style: normal;
-    color: #a78bfa;
+    color: var(--violet-light);
   }
   .cont-body {
     font-size: 0.92rem;
@@ -554,7 +554,7 @@ import HireForm from "../components/HireForm.astro";
   #raas {
     background: linear-gradient(
       180deg,
-      rgba(26, 158, 92, 0.035),
+      rgba(var(--green-rgb), 0.035),
       transparent 35%
     );
   }
@@ -571,7 +571,7 @@ import HireForm from "../components/HireForm.astro";
     font-family: var(--mono);
     font-size: 0.75rem;
     letter-spacing: 0.01em;
-    color: rgba(26, 158, 92, 0.75);
+    color: rgba(var(--green-rgb), 0.75);
     margin-bottom: 1.3rem;
     max-width: 460px;
     line-height: 1.6;
@@ -610,10 +610,10 @@ import HireForm from "../components/HireForm.astro";
   }
   .hero-fact {
     padding-left: 1.1rem;
-    border-left: 2px solid rgba(26, 158, 92, 0.35);
+    border-left: 2px solid rgba(var(--green-rgb), 0.35);
   }
   .hero-fact.v {
-    border-left-color: rgba(124, 58, 237, 0.4);
+    border-left-color: rgba(var(--violet-rgb), 0.4);
   }
   .hero-fact-num {
     font-family: var(--bebas);
@@ -649,10 +649,10 @@ import HireForm from "../components/HireForm.astro";
     margin-bottom: 0.8rem;
   }
   .raas-when-label.v {
-    color: rgba(167, 139, 250, 0.6);
+    color: rgba(var(--violet-light-rgb), 0.6);
   }
   .raas-when-label.g {
-    color: rgba(26, 158, 92, 0.7);
+    color: rgba(var(--green-rgb), 0.7);
   }
   .raas-when-h {
     font-family: var(--bebas);
@@ -679,7 +679,7 @@ import HireForm from "../components/HireForm.astro";
   }
   .rwc:hover {
     background: #18181c;
-    border-color: rgba(26, 158, 92, 0.3);
+    border-color: rgba(var(--green-rgb), 0.3);
     transform: translateY(-4px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
@@ -715,10 +715,10 @@ import HireForm from "../components/HireForm.astro";
     display: block;
   }
   .cwc:hover {
-    border-color: rgba(124, 58, 237, 0.35);
+    border-color: rgba(var(--violet-rgb), 0.35);
   }
   .cwc .rwc-num {
-    color: #a78bfa;
+    color: var(--violet-light);
   }
 
   /* PILLARS */
