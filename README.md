@@ -117,7 +117,9 @@ Static HTML/CSS/JS → GitHub Pages (now) / Hostinger (production)
 ### 7.3 Locked design decisions
 
 - Dark editorial style. Fonts: Bebas Neue, Instrument Serif, DM Sans, DM Mono.
-- Accent colors: green `#1a9e5c`, violet `#7c3aed`.
+- Accent colors: green `#72d6aa`, violet `#b186f1`.
+- Accent tints: `--green-light` `#b7fadf`, `--violet-light` `#caacf9`, `--violet-dark` `#5603ad`.
+- `global.css` holds every color. Use a variable. Do not write a raw color value.
 - `--bdark` opacity: `.06`.
 - No custom cursor. Interactive elements use `cursor:pointer`.
 - Services dropdown order: 01 RaaS / 02 Contingency.

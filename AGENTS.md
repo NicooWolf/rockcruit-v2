@@ -119,13 +119,34 @@ Keep the `site` value in `astro.config.mjs`.
 
 Use the CSS variables. Do not write a raw color value.
 
-| Variable   | Value                   |
-| ---------- | ----------------------- |
-| `--green`  | `#1a9e5c`               |
-| `--violet` | `#7c3aed`               |
-| `--paper`  | `#f0ede3`               |
-| `--ink`    | `#141210`               |
-| `--bdark`  | `rgba(240,237,227,.06)` |
+| Variable         | Value                   |
+| ---------------- | ----------------------- |
+| `--green`        | `#72d6aa`               |
+| `--green-light`  | `#b7fadf`               |
+| `--violet`       | `#b186f1`               |
+| `--violet-light` | `#caacf9`               |
+| `--violet-dark`  | `#5603ad`               |
+| `--paper`        | `#f0ede3`               |
+| `--ink`          | `#141210`               |
+| `--bdark`        | `rgba(240,237,227,.06)` |
+
+`--green-light` is the hover color of a green button.
+`--violet-light` is the violet color of text on a dark background.
+
+Use a companion triplet for a tint. `rgba()` cannot read a hex from a variable.
+
+| Variable             | Value           |
+| -------------------- | --------------- |
+| `--green-rgb`        | `114, 214, 170` |
+| `--green-light-rgb`  | `183, 250, 223` |
+| `--violet-rgb`       | `177, 134, 241` |
+| `--violet-light-rgb` | `202, 172, 249` |
+
+```css
+background: rgba(var(--green-rgb), 0.1);
+```
+
+Each triplet must stay equal to its hex value. Change both lines together.
 
 Fonts: Bebas Neue, Instrument Serif, DM Sans, DM Mono. Do not add a font.
 Use `cursor:pointer` on interactive elements. Do not add a custom cursor.
