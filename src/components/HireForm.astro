@@ -4,6 +4,61 @@
 // send with blockHeadless + 10s throttle. Input name attrs match v1's EmailJS
 // template variables (name, email, companyName, hiringRoles) so the existing
 // template works untouched. Keys: PUBLIC_EMAILJS_* env vars (never committed).
+
+// The category field is a custom menu, not a native select. A native menu takes
+// no style, and the owner asked for the style of the nav dropdown. A hidden
+// input carries the value, so FormData and emailjs.sendForm stay unchanged.
+const flatCategories = [
+  "Software Development",
+  "Data / AI / ML",
+  "DevOps / Cloud",
+  "Product / UX",
+  "Tech Sales",
+  "Multiple roles",
+];
+
+const roleGroups = [
+  {
+    category: "Cybersecurity",
+    roles: ["Security Analyst", "SOC", "AppSec", "Pentester"],
+  },
+  {
+    category: "IT & Infrastructure",
+    roles: ["SysAdmin", "IT Support", "Network Engineer"],
+  },
+  {
+    category: "QA / Testing",
+    roles: ["Manual QA", "Automation QA", "SDET"],
+  },
+  {
+    category: "Data Engineering & Analytics",
+    roles: ["Data Engineer", "Analytics Engineer", "BI Analyst"],
+  },
+  {
+    category: "Marketing (Growth / Performance / B2B)",
+    roles: ["Growth Marketer", "Performance Marketer", "Demand Gen", "Content"],
+  },
+  {
+    category: "Operations / Project Management",
+    roles: ["PMO", "Project Manager", "Operations Manager", "Scrum Master"],
+  },
+  {
+    category: "Customer Success / Support",
+    roles: ["CSM", "Technical Support", "Implementation Specialist"],
+  },
+  {
+    category: "Finance / HR / Admin (Tech-enabled roles)",
+    roles: ["FP&A", "HRBP", "Talent Acquisition", "Payroll", "Office Manager"],
+  },
+  {
+    category: "Design (UI, Visual, Brand)",
+    roles: ["UI Designer", "Visual Designer", "Brand Designer"],
+  },
+  {
+    category: "Leadership",
+    roles: ["CTO", "CPO", "COO", "Head of Engineering", "Head of Product"],
+  },
+];
 ---
 
 <form class="fcta-form" id="hire-form" novalidate>
@@ -15,7 +70,7 @@
         id="fc-name"
         name="name"
         type="text"
-        placeholder="Jane Smith"
+        placeholder="John Doe"
         autocomplete="name"
       />
       <span class="f-error" data-for="name"></span>
@@ -27,7 +82,7 @@
         id="fc-email"
         name="email"
         type="email"
-        placeholder="jane@company.com"
+        placeholder="rockcruit@rockcruit.com"
         autocomplete="email"
       />
       <span class="f-error" data-for="email"></span>
@@ -41,24 +96,34 @@
       id="fc-company"
       name="companyName"
       type="text"
-      placeholder="Acme Corp"
+      placeholder="Rockcruit"
       autocomplete="organization"
     />
     <span class="f-error" data-for="companyName"></span>
   </div>
 
   <div class="f-field">
-    <label class="f-label" for="fc-role">Type of role</label>
-    <div class="f-select-wrap">
-      <select class="fi-sel" id="fc-role" name="hiringRoles">
-        <option value="" disabled selected>Select a category</option>
-        <option>Software Development</option>
-        <option>Data / AI / ML</option>
-        <option>DevOps / Cloud</option>
-        <option>Product / UX</option>
-        <option>Tech Sales</option>
-        <option>Multiple roles</option>
-      </select>
+    {
+      /* This label has no for attribute. A click on it must not open the menu.
+    The button reads its name from aria-labelledby. */
+    }
+    <span class="f-label" id="fc-role-label">Type of role</span>
+    <div class="f-select-wrap" data-role-select>
+      <button
+        class="fi-sel"
+        id="fc-role"
+        type="button"
+        data-role-trigger
+        data-field="hiringRoles"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="fc-role-menu"
+        aria-labelledby="fc-role-label fc-role"
+      >
+        <span class="fi-sel-value is-placeholder" data-role-value
+          >Select a category</span
+        >
+      </button>
       <span class="f-chevron">
         <svg
           width="16"
@@ -72,6 +137,65 @@
           ><polyline points="6 9 12 15 18 9"></polyline></svg
         >
       </span>
+      <input type="hidden" name="hiringRoles" value="" data-role-input />
+      {
+        /* --in-step gives each row its place in the cascade. The list is
+      static, so the value comes from the build, not from a script. */
+      }
+      <div class="f-menu" id="fc-role-menu" data-role-menu hidden>
+        {
+          flatCategories.map((category, index) => (
+            <button
+              class="f-menu-item"
+              type="button"
+              style={`--in-step:${index}`}
+              data-value={category}
+              data-role-item
+            >
+              <span>{category}</span>
+            </button>
+          ))
+        }
+        <div
+          class="f-menu-divider"
+          style={`--in-step:${flatCategories.length}`}
+        >
+        </div>
+        {
+          roleGroups.map((group, index) => (
+            <div
+              class="f-menu-group"
+              style={`--in-step:${flatCategories.length + 1 + index}`}
+              data-role-group
+            >
+              <button
+                class="f-menu-group-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls={`fc-role-group-${index}`}
+              >
+                <span>{group.category}</span>
+                <span class="f-menu-arrow" aria-hidden="true">
+                  ▾
+                </span>
+              </button>
+              <div class="f-menu-roles" id={`fc-role-group-${index}`} hidden>
+                {group.roles.map((role, roleIndex) => (
+                  <button
+                    class="f-menu-item"
+                    type="button"
+                    style={`--in-step:${roleIndex}`}
+                    data-value={`${group.category} — ${role}`}
+                    data-role-item
+                  >
+                    <span>{role}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
     </div>
     <span class="f-error" data-for="hiringRoles"></span>
   </div>
@@ -143,16 +267,27 @@
   }
   .fi:focus {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(26, 158, 92, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--green-rgb), 0.15);
   }
   .fi::placeholder {
     color: #52525b;
   }
   .f-select-wrap {
     position: relative;
+    /* The gap between two rows of the cascade, and the length of one fade.
+       The panel holds 17 rows. The last row therefore ends at 16 x 132ms plus
+       380ms, near 2.5s. Change both values together to keep that total.
+       --cascade-span is the time of the eight rows that the panel shows. The
+       panel grows and shrinks in that time. */
+    --cascade-step: 132ms;
+    --cascade-fade: 180ms;
+    --cascade-span: calc(7 * var(--cascade-step) + var(--cascade-fade));
   }
   .fi-sel {
     width: 100%;
+    display: flex;
+    align-items: center;
+    text-align: left;
     background: var(--ink);
     border: 1px solid #3f3f46;
     border-radius: 6px;
@@ -160,6 +295,7 @@
     color: #d4d4d8;
     font-family: var(--sans);
     font-size: 0.88rem;
+    line-height: 1.35;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -168,21 +304,209 @@
       border-color 0.2s,
       box-shadow 0.2s;
   }
-  .fi-sel:focus {
+  /* The green border marks the open panel. A pointer leaves the focus on the
+     button after a choice, so :focus gives no green. The keyboard still needs
+     a mark, and :focus-visible answers only to the keyboard. */
+  .fi-sel:focus-visible,
+  .f-select-wrap.is-open .fi-sel {
     border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(26, 158, 92, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--green-rgb), 0.15);
   }
-  .fi-sel option {
-    background: var(--ink);
-    color: #f4f4f5;
+  .fi-sel-value.is-placeholder {
+    color: #52525b;
   }
   .f-chevron {
     position: absolute;
     right: 0.9rem;
-    top: 50%;
+    top: 1.4rem;
     transform: translateY(-50%);
     pointer-events: none;
     color: #71717a;
+  }
+  .f-chevron svg {
+    display: block;
+    transition: transform 0.2s;
+  }
+  .f-select-wrap.is-open .f-chevron svg {
+    transform: rotate(180deg);
+  }
+
+  /* ── The category menu ──
+     The panel follows the nav dropdown: dark card, hairline border, rows that
+     light up. The list is long, so the panel scrolls and one group opens at a
+     time. The panel always opens below the field. The script writes the free
+     space to --menu-space, and the panel cuts its height there. */
+  .f-menu {
+    position: absolute;
+    z-index: 400;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid #3f3f46;
+    border-radius: 8px;
+    padding: 0.35rem 0;
+    /* --menu-space is the free space above the footer. The script writes it. */
+    max-height: min(320px, 50vh, var(--menu-space, 50vh));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .f-menu[hidden] {
+    display: none;
+  }
+  /* ── The cascade ──
+     The panel and its rows do one motion. Each row waits one step more than
+     the row above it, so the full list spans near 2.5s. The panel opens like
+     a slider: its height grows from zero, and its lower border goes down with
+     the rows. The growth follows the eight rows that the panel shows, so the
+     border stays with the row that arrives.
+
+     The close mirrors the open. The rows leave from the bottom up, and the
+     panel shrinks to zero in the same time. The script writes --out-step,
+     because the number of rows in sight changes. The panel fades at the end,
+     and the script writes hidden after that. */
+  .f-menu:not([hidden]) > *,
+  .f-menu-roles:not([hidden]) > * {
+    animation: f-menu-in var(--cascade-fade) ease both;
+    animation-delay: calc(var(--in-step, 0) * var(--cascade-step));
+  }
+  .f-menu:not([hidden]) {
+    animation:
+      f-menu-in var(--cascade-fade) ease both,
+      f-menu-slide var(--cascade-span) ease both;
+  }
+  .f-menu.is-closing {
+    pointer-events: none;
+    animation:
+      f-menu-slide-out var(--cascade-span) ease both,
+      f-menu-out var(--cascade-fade) ease both;
+    animation-delay: 0s, calc(var(--cascade-span) - var(--cascade-fade));
+  }
+  .f-menu.is-closing > *,
+  .f-menu.is-closing .f-menu-roles > * {
+    animation: f-menu-row-out var(--cascade-fade) ease both;
+    animation-delay: calc(var(--out-step, 0) * var(--cascade-step));
+  }
+  @keyframes f-menu-slide {
+    from {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+  @keyframes f-menu-slide-out {
+    to {
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+  @keyframes f-menu-row-out {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+  }
+  @keyframes f-menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes f-menu-out {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+  }
+  .f-menu-item,
+  .f-menu-group-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+    border: 0;
+    background: transparent;
+    color: rgba(240, 237, 227, 0.5);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      color 0.2s,
+      background 0.2s;
+  }
+  .f-menu-item:hover,
+  .f-menu-item:focus-visible,
+  .f-menu-group-toggle:hover,
+  .f-menu-group-toggle:focus-visible,
+  .f-menu-group.is-open > .f-menu-group-toggle {
+    color: var(--paper);
+    background: rgba(255, 255, 255, 0.04);
+    outline: none;
+  }
+  .f-menu-divider {
+    height: 1px;
+    background: var(--bdark);
+    margin: 0.3rem 0;
+  }
+  .f-menu-arrow {
+    font-size: 0.6rem;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .f-menu-group.is-open .f-menu-arrow {
+    transform: rotate(180deg);
+  }
+  .f-menu-roles {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 0.3rem 1.6rem;
+    border-left: 1px solid var(--bdark);
+  }
+  .f-menu-roles[hidden] {
+    display: none;
+  }
+  .f-menu-roles .f-menu-item {
+    padding-left: 0.9rem;
+    font-size: 0.8rem;
+  }
+  /* The green tint marks the choice. It must win over the hover rule above. */
+  .f-menu-item[aria-current="true"],
+  .f-menu-item[aria-current="true"]:hover,
+  .f-menu-item[aria-current="true"]:focus-visible {
+    color: var(--paper);
+    background: rgba(var(--green-rgb), 0.1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .f-menu-arrow,
+    .f-chevron svg,
+    .f-menu-item,
+    .f-menu-group-toggle {
+      transition: none;
+    }
+    /* The panel opens and closes in one step. A length of zero holds the
+       cascade rules but takes the motion away. The script reads the same
+       setting and writes hidden immediately. */
+    .f-select-wrap {
+      --cascade-step: 0ms;
+      --cascade-fade: 0ms;
+    }
   }
   .f-submit {
     background: var(--green);
@@ -202,9 +526,9 @@
     letter-spacing: 0.01em;
   }
   .f-submit:hover {
-    background: #15845e;
+    background: var(--green-light);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(26, 158, 92, 0.3);
+    box-shadow: 0 8px 24px rgba(var(--green-rgb), 0.3);
   }
   .f-submit:disabled {
     opacity: 0.6;
@@ -253,6 +577,17 @@
     .f-row {
       flex-direction: column;
     }
+    /* A finger needs a larger row than a pointer. */
+    .f-menu {
+      max-height: min(300px, 45vh, var(--menu-space, 45vh));
+    }
+    .f-menu-item,
+    .f-menu-group-toggle {
+      padding: 0.8rem 1rem;
+    }
+    .f-menu-roles .f-menu-item {
+      padding-left: 0.9rem;
+    }
   }
 </style>
 
@@ -291,6 +626,264 @@
     limitRate: { id: "app", throttle: 10000 }, // 1 send / 10s
   });
 
+  // ── The category menu ──
+  // A native select gives no style to its list, so this control is a button
+  // and a panel of buttons. A hidden input holds the value, so FormData and
+  // emailjs.sendForm need no change. onSelect reports a new value to the form.
+  const initializeRoleMenu = (form: HTMLFormElement, onSelect: () => void) => {
+    const wrap = form.querySelector<HTMLElement>("[data-role-select]");
+    const trigger = form.querySelector<HTMLButtonElement>(
+      "[data-role-trigger]",
+    );
+    const menu = form.querySelector<HTMLElement>("[data-role-menu]");
+    const valueEl = form.querySelector<HTMLElement>("[data-role-value]");
+    const input = form.querySelector<HTMLInputElement>("[data-role-input]");
+    if (!wrap || !trigger || !menu || !valueEl || !input) return;
+
+    const placeholder = valueEl.textContent ?? "";
+    const items = Array.from(
+      menu.querySelectorAll<HTMLButtonElement>("[data-role-item]"),
+    );
+    const groups = Array.from(
+      menu.querySelectorAll<HTMLElement>("[data-role-group]"),
+    );
+
+    const setGroupOpen = (group: HTMLElement, open: boolean) => {
+      const toggle = group.querySelector<HTMLButtonElement>(
+        ".f-menu-group-toggle",
+      );
+      const list = group.querySelector<HTMLElement>(".f-menu-roles");
+      if (!toggle || !list) return;
+      toggle.setAttribute("aria-expanded", String(open));
+      group.classList.toggle("is-open", open);
+      list.hidden = !open;
+    };
+
+    // One open group keeps the panel short on a small screen.
+    const openOnlyGroup = (group: HTMLElement | null) => {
+      groups.forEach((item) => setGroupOpen(item, item === group));
+    };
+
+    // A row of a closed group has no box, so it takes no place in the order.
+    const rows = () =>
+      Array.from(menu.querySelectorAll<HTMLButtonElement>("button")).filter(
+        (row) => row.getClientRects().length > 0,
+      );
+
+    const isOpen = () => trigger.getAttribute("aria-expanded") === "true";
+
+    // ── The height of the panel ──
+    // The panel always opens below the field, and it always takes its full
+    // height. The footer gives the only limit: the panel must never cover it.
+    // That distance stays the same at every scroll position, so the place of
+    // the screen edge changes nothing. The script writes the free space to
+    // --menu-space, and the CSS keeps the other limits.
+    const MENU_GAP = 8; // between the field and the panel
+    const EDGE_GAP = 16; // between the panel and the footer
+
+    const placeMenu = () => {
+      const box = trigger.getBoundingClientRect();
+      const footer = document.querySelector("footer");
+      const top = box.bottom + MENU_GAP;
+      // A page without a footer gives no limit. 10000px stands for that.
+      const toFooter = footer
+        ? footer.getBoundingClientRect().top - EDGE_GAP - top
+        : 10000;
+
+      wrap.style.setProperty("--menu-space", `${Math.max(toFooter, 0)}px`);
+    };
+
+    // ── The cascade ──
+    // The CSS holds the animation. The script holds the hidden attribute,
+    // because display:none stops every animation. The panel leaves after the
+    // last row. A reader who asks for less motion gets no delay.
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let closeTimer = 0;
+
+    // The browser gives a time in seconds or in milliseconds.
+    const toMs = (time: string) =>
+      time.trim().endsWith("ms") ? parseFloat(time) : parseFloat(time) * 1000;
+
+    // An element can run more than one animation. Take the longest one.
+    const animationEnd = (element: HTMLElement) => {
+      const style = getComputedStyle(element);
+      const delays = style.animationDelay.split(",");
+      return style.animationDuration
+        .split(",")
+        .reduce(
+          (longest, time, index) =>
+            Math.max(longest, toMs(time) + toMs(delays[index % delays.length])),
+          0,
+        );
+    };
+
+    // ── The order of the rows on the way out ──
+    // The rows leave from the bottom up. Only a row in sight takes a place in
+    // the order. A row out of sight leaves with the first one.
+    const setOutOrder = () => {
+      const top = menu.scrollTop;
+      const bottom = top + menu.clientHeight;
+      const blocks = Array.from(menu.children).filter(
+        (row): row is HTMLElement => row instanceof HTMLElement,
+      );
+      const inSight = blocks.filter(
+        (row) =>
+          row.offsetTop < bottom && row.offsetTop + row.offsetHeight > top,
+      );
+
+      blocks.forEach((row) => row.style.setProperty("--out-step", "0"));
+      inSight.forEach((row, index) =>
+        row.style.setProperty("--out-step", String(inSight.length - 1 - index)),
+      );
+
+      // The roles of an open group leave in the same manner.
+      const roles = groups.flatMap((group) => {
+        const list = group.querySelector<HTMLElement>(".f-menu-roles");
+        if (!list || list.hidden) return [];
+        return Array.from(list.children).filter(
+          (row): row is HTMLElement => row instanceof HTMLElement,
+        );
+      });
+      roles.forEach((row, index) =>
+        row.style.setProperty("--out-step", String(roles.length - 1 - index)),
+      );
+
+      // The first row of the group leaves last. Give both lists back, so the
+      // caller can measure the end of the motion.
+      return [...blocks, ...roles];
+    };
+
+    const open = () => {
+      window.clearTimeout(closeTimer);
+      menu.classList.remove("is-closing");
+      trigger.setAttribute("aria-expanded", "true");
+      wrap.classList.add("is-open");
+      menu.hidden = false;
+      placeMenu();
+      const selected =
+        items.find((item) => item.dataset.value === input.value) ?? null;
+      openOnlyGroup(
+        selected?.closest<HTMLElement>("[data-role-group]") ?? null,
+      );
+      // The panel starts with no height, so scrollIntoView would move the
+      // page. Move the scroll of the panel instead.
+      menu.scrollTop = selected ? Math.max(selected.offsetTop - 8, 0) : 0;
+    };
+
+    const close = (returnFocus = false) => {
+      if (!isOpen()) return;
+      trigger.setAttribute("aria-expanded", "false");
+      wrap.classList.remove("is-open");
+
+      if (reducedMotion.matches) {
+        menu.hidden = true;
+      } else {
+        const cascade = setOutOrder();
+        menu.classList.add("is-closing");
+        const span = cascade.reduce(
+          (longest, row) => Math.max(longest, animationEnd(row)),
+          animationEnd(menu),
+        );
+        closeTimer = window.setTimeout(() => {
+          menu.classList.remove("is-closing");
+          menu.hidden = true;
+        }, span + 30);
+      }
+
+      if (returnFocus) trigger.focus();
+    };
+
+    const clear = () => {
+      input.value = "";
+      valueEl.textContent = placeholder;
+      valueEl.classList.add("is-placeholder");
+      items.forEach((item) => item.removeAttribute("aria-current"));
+    };
+
+    const select = (item: HTMLButtonElement) => {
+      input.value = item.dataset.value ?? "";
+      valueEl.textContent = input.value;
+      valueEl.classList.remove("is-placeholder");
+      items.forEach((other) => other.removeAttribute("aria-current"));
+      item.setAttribute("aria-current", "true");
+      close(true);
+      onSelect();
+    };
+
+    const moveFocus = (step: number) => {
+      const visible = rows();
+      if (visible.length === 0) return;
+      const here = visible.indexOf(document.activeElement as HTMLButtonElement);
+      const next =
+        here === -1 ? 0 : (here + step + visible.length) % visible.length;
+      visible[next].focus();
+    };
+
+    trigger.addEventListener("click", () => (isOpen() ? close() : open()));
+
+    groups.forEach((group) => {
+      const toggle = group.querySelector<HTMLButtonElement>(
+        ".f-menu-group-toggle",
+      );
+      toggle?.addEventListener("click", () => {
+        const willOpen = toggle.getAttribute("aria-expanded") !== "true";
+        openOnlyGroup(willOpen ? group : null);
+      });
+    });
+
+    items.forEach((item) => item.addEventListener("click", () => select(item)));
+
+    wrap.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        close(true);
+        return;
+      }
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        event.preventDefault();
+        if (!isOpen()) {
+          open();
+          rows()[0]?.focus();
+          return;
+        }
+        if (document.activeElement === trigger) {
+          rows()[0]?.focus();
+          return;
+        }
+        moveFocus(event.key === "ArrowDown" ? 1 : -1);
+        return;
+      }
+      if (!isOpen() || (event.key !== "Home" && event.key !== "End")) return;
+      event.preventDefault();
+      const visible = rows();
+      const row =
+        event.key === "Home" ? visible[0] : visible[visible.length - 1];
+      row?.focus();
+    });
+
+    wrap.addEventListener("focusout", () => {
+      requestAnimationFrame(() => {
+        if (!wrap.contains(document.activeElement)) close();
+      });
+    });
+
+    // A page swap keeps this listener but drops the panel. Leave in that case.
+    document.addEventListener("pointerdown", (event) => {
+      if (!wrap.isConnected) return;
+      const target = event.target;
+      if (target instanceof Node && wrap.contains(target)) return;
+      close();
+    });
+
+    window.addEventListener("resize", () => {
+      if (wrap.isConnected && isOpen()) placeMenu();
+    });
+
+    form.addEventListener("reset", () => {
+      clear();
+      close();
+    });
+  };
+
   const initializeHireForm = () => {
     const form = document.getElementById("hire-form") as HTMLFormElement | null;
     if (!form) return; // not on this page
@@ -300,9 +893,7 @@
     const status = document.getElementById("f-status")!;
     const submitBtn = form.querySelector<HTMLButtonElement>(".f-submit")!;
     const errorEls = form.querySelectorAll<HTMLElement>(".f-error");
-    const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-      ".fi, .fi-sel",
-    );
+    const fields = form.querySelectorAll<HTMLElement>(".fi, .fi-sel");
     let validationStarted = false;
 
     status.addEventListener("transitionend", (event) => {
@@ -318,23 +909,31 @@
 
     const getData = () => Object.fromEntries(new FormData(form).entries());
 
+    // The category field sends a hidden input, so the visible control carries
+    // data-field. Every other field is its own control.
+    const controlFor = (fieldName: string) => {
+      const proxy = form.querySelector<HTMLElement>(
+        `[data-field="${fieldName}"]`,
+      );
+      if (proxy) return proxy;
+      const field = form.elements.namedItem(fieldName);
+      return field instanceof HTMLElement ? field : null;
+    };
+
     const clearFieldError = (fieldName: string) => {
       const errorEl = form.querySelector<HTMLElement>(
         `.f-error[data-for="${fieldName}"]`,
       );
-      const field = form.elements.namedItem(fieldName);
       if (errorEl) errorEl.textContent = "";
-      if (field instanceof HTMLElement) field.removeAttribute("aria-invalid");
+      controlFor(fieldName)?.removeAttribute("aria-invalid");
     };
 
     const showIssue = (fieldName: string, message: string) => {
       const errorEl = form.querySelector<HTMLElement>(
         `.f-error[data-for="${fieldName}"]`,
       );
-      const field = form.elements.namedItem(fieldName);
       if (errorEl) errorEl.textContent = message;
-      if (field instanceof HTMLElement)
-        field.setAttribute("aria-invalid", "true");
+      controlFor(fieldName)?.setAttribute("aria-invalid", "true");
     };
 
     const validateField = (fieldName: string) => {
@@ -349,9 +948,15 @@
     };
 
     fields.forEach((field) => {
+      const fieldName = field.dataset.field ?? field.getAttribute("name");
+      if (!fieldName) return;
       field.addEventListener("blur", () => {
-        if (validationStarted) validateField(field.name);
+        if (validationStarted) validateField(fieldName);
       });
+    });
+
+    initializeRoleMenu(form, () => {
+      if (validationStarted) validateField("hiringRoles");
     });
 
     form.addEventListener("submit", async (e) => {
