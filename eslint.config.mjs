@@ -10,23 +10,12 @@ export default [
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  ...eslintPluginAstro.configs.recommended,
-
-  ...eslintPluginAstro.configs["flat/recommended"].map((config) => ({
-    ...config,
-    files: ["**/*.astro"],
-  })),
+  ...eslintPluginAstro.configs["flat/recommended"],
+  eslintPluginPrettierRecommended,
   {
-    files: ["**/*.astro"],
-    languageOptions: {
-      parser: eslintPluginAstro.parser,
-      parserOptions: {
-        parser: tseslint.parser,
-        extraFileExtensions: [".astro"],
-      },
+    files: ["**/*.astro", "**/*.astro/*.js", "**/*.astro/*.ts"],
+    rules: {
+      "prettier/prettier": "off",
     },
   },
-  // 👆 END OF ASTRO SPECIAL OVERRIDE
-
-  eslintPluginPrettierRecommended,
 ];
