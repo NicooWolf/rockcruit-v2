@@ -4,6 +4,7 @@
 // rendered in the prototypes' pillars-row pattern. Numbered markers are appropriate
 // here: this content IS a sequence.
 import Layout from "../layouts/Layout.astro";
+import { href } from "../lib/url";
 
 const steps = [
   {
@@ -64,8 +65,10 @@ const steps = [
       adds context the next one starts with.
     </p>
     <div class="pc-ctas">
-      <a href="/#contact" class="btn-primary">Start a search →</a>
-      <a href="/services" class="btn-ghost">Compare delivery models →</a>
+      <a href={href("/#contact")} class="btn-primary">Start a search →</a>
+      <a href={href("/services")} class="btn-ghost">
+        Compare delivery models →
+      </a>
     </div>
   </section>
 </Layout>

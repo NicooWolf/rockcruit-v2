@@ -2,6 +2,8 @@
 // src/pages/index.astro — Home. Port of prototype index.html (structural refactor, not redesign).
 import Layout from "../layouts/Layout.astro";
 import HireForm from "../components/HireForm.astro";
+
+import { href } from "../lib/url";
 ---
 
 <Layout
@@ -38,8 +40,9 @@ import HireForm from "../components/HireForm.astro";
           without increasing fixed recruiting headcount.
         </p>
         <div class="subhero-ctas">
-          <a href="/#contact" class="btn-primary">Start hiring →</a>
-          <a href="/services" class="btn-ghost-sub">See how we work →</a>
+          <a href={href("/#contact")} class="btn-primary">Start hiring →</a>
+          <a href={href("/services")} class="btn-ghost-sub">See how we work →</a
+          >
         </div>
       </div>
       <div class="subhero-right">
@@ -245,7 +248,9 @@ import HireForm from "../components/HireForm.astro";
           >Very few recruiting partners actually learn how your company hires.</strong
         >
       </p>
-      <a href="/services" class="pos-cta">Explore our delivery models →</a>
+      <a href={href("/services")} class="pos-cta"
+        >Explore our delivery models →</a
+      >
     </div>
   </section>
 
@@ -343,7 +348,7 @@ import HireForm from "../components/HireForm.astro";
           digital hires per year. Continuous sourcing, accumulated context, and
           flexible monthly engagement without per-hire fees.
         </p>
-        <a href="/services#raas" class="st-card-link">See RaaS →</a>
+        <a href={href("/services#raas")} class="st-card-link">See RaaS →</a>
         <div class="st-card-bg">01</div>
       </div>
       <div class="st-card reveal">
@@ -353,7 +358,7 @@ import HireForm from "../components/HireForm.astro";
           A structured headhunting engagement for critical one-off hires where
           precision, speed, and deep vetting matter most.
         </p>
-        <a href="/services#contingency" class="st-card-link"
+        <a href={href("/services#contingency")} class="st-card-link"
           >See Contingency →</a
         >
         <div class="st-card-bg">02</div>

@@ -5,6 +5,7 @@
 // CLAUDE.md animation non-goals — domains render as a static mono list.
 // TODO(team): replace placeholder member slots with real names/photos/roles.
 import Layout from '../layouts/Layout.astro';
+import { href } from '../lib/url';
 ---
 <Layout
   title="Team — Rockcruit"
@@ -67,7 +68,7 @@ import Layout from '../layouts/Layout.astro';
 <!-- CTA -->
 <section class="team-cta reveal">
   <p class="team-cta-line">Want to know who'd run <strong>your</strong> search?</p>
-  <a href="/#contact" class="btn-primary">Start the conversation →</a>
+  <a href={href("/#contact")} class="btn-primary">Start the conversation →</a>
 </section>
 
 </Layout>

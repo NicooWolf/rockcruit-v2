@@ -2,6 +2,7 @@
 // src/pages/blog/index.astro — post list, pre-rendered at build time.
 import Layout from '../../layouts/Layout.astro';
 import { getAllPosts } from '../../lib/wp';
+import { href } from '../../lib/url';
 
 const posts = await getAllPosts(); // build-time only — never runs in a browser
 const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { dateStyle: 'medium' });
@@ -17,10 +18,10 @@ const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { dateStyle: 
 
 <section class="post-list">
   {posts.length === 0 && (
-    <p class="empty reveal">First posts are on the way. <a href="/blog/rss.xml">Grab the RSS feed</a> to catch them.</p>
+    <p class="empty reveal">First posts are on the way. <a href={href('/blog/rss.xml')}>Grab the RSS feed</a> to catch them.</p>
   )}
   {posts.map((post) => (
-    <a class="post-row reveal" href={`/blog/${post.slug}/`}>
+    <a class="post-row reveal" href={href(`/blog/${post.slug}/`)}>
       <time class="post-date" datetime={post.date}>{fmt(post.date)}</time>
       <div>
         <h2 class="post-title">{post.title}</h2>

@@ -2,6 +2,7 @@
 // src/pages/blog/[slug].astro — one static HTML file per published post.
 import Layout from '../../layouts/Layout.astro';
 import { getAllPosts, getPostBySlug } from '../../lib/wp';
+import { href } from '../../lib/url';
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
@@ -19,7 +20,7 @@ const dateLabel = new Date(post.date).toLocaleDateString('en-US', { dateStyle: '
 
 <article class="post">
   <header class="post-header reveal">
-    <a class="post-back" href="/blog">← All posts</a>
+    <a class="post-back" href={href('/blog')}>← All posts</a>
     <h1 class="post-h1">{post.title}</h1>
     <time class="post-meta" datetime={post.date}>{dateLabel}</time>
   </header>
@@ -30,7 +31,7 @@ const dateLabel = new Date(post.date).toLocaleDateString('en-US', { dateStyle: '
 
   <footer class="post-footer reveal">
     <p class="post-cta-line">Hiring for a role like this?</p>
-    <a href="/#contact" class="btn-primary">Talk to us →</a>
+    <a href={href('/#contact')} class="btn-primary">Talk to us →</a>
   </footer>
 </article>
 

@@ -3,6 +3,7 @@
 // Reuses the home page's accordion pattern with faq-* classes. Every answer is
 // grounded in facts already published on the prototypes — nothing invented.
 import Layout from "../layouts/Layout.astro";
+import { href } from "../lib/url";
 
 const faqs = [
   {
@@ -80,7 +81,7 @@ const faqs = [
     <p class="faq-cta-line">
       Still deciding?<br /><strong>Twenty minutes usually settles it.</strong>
     </p>
-    <a href="/#contact" class="btn-primary">Ask us directly →</a>
+    <a href={href("/#contact")} class="btn-primary">Ask us directly →</a>
   </section>
 </Layout>
 

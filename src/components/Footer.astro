@@ -1,28 +1,30 @@
 ---
 // src/components/Footer.astro
+import { href } from "../lib/url";
+
 const year = new Date().getFullYear(); // computed at build time — never stale
 const showBlog = import.meta.env.WP_ENABLED !== "false";
 ---
 
 <footer>
-  <a href="/" class="foot-logo">
+  <a href={href("/")} class="foot-logo">
     <span class="foot-word">ROCKCRUIT</span>
     <div class="foot-dot"></div>
   </a>
   <ul class="foot-links">
-    <li><a href="/">Home</a></li>
-    <li><a href="/services">Services</a></li>
-    <li><a href="/team">Team</a></li>
-    <li><a href="/process">Process</a></li>
-    <li><a href="/faq">FAQ</a></li>
+    <li><a href={href("/")}>Home</a></li>
+    <li><a href={href("/services")}>Services</a></li>
+    <li><a href={href("/team")}>Team</a></li>
+    <li><a href={href("/process")}>Process</a></li>
+    <li><a href={href("/faq")}>FAQ</a></li>
     {
       showBlog && (
         <li>
-          <a href="/blog">Blog</a>
+          <a href={href("/blog")}>Blog</a>
         </li>
       )
     }
-    <li><a href="/#contact">Hire With Us</a></li>
+    <li><a href={href("/#contact")}>Hire With Us</a></li>
   </ul>
   <div class="foot-copy">© {year} Rockcruit · All rights reserved</div>
 </footer>

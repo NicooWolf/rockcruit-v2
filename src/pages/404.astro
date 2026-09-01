@@ -3,12 +3,13 @@
 // `ErrorDocument 404 /404.html` in public/.htaccess.
 // Requires astronaut-not-found.svg in public/ (in the assets zip).
 import Layout from '../layouts/Layout.astro';
+import { href } from '../lib/url';
 ---
 <Layout title="Page not found — Rockcruit" description="This page doesn't exist.">
   <section class="nf">
-    <img src="/astronaut-not-found.svg" alt="" width="220" height="220" />
+    <img src={href('/astronaut-not-found.svg')} alt="" width="220" height="220" />
     <h1>404</h1>
-    <p>This page drifted off. <a href="/">Back to Earth →</a></p>
+    <p>This page drifted off. <a href={href('/')}>Back to Earth →</a></p>
   </section>
 </Layout>
 
