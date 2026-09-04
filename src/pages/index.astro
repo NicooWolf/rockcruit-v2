@@ -122,15 +122,15 @@ import { href } from "../lib/url";
 
     <div class="hero-stats">
       <div class="stat-item reveal">
-        <div class="stat-num g">+10,000</div>
+        <div class="stat-num v">+10,000</div>
         <div class="stat-label">Qualified candidates in our network</div>
       </div>
-      <div class="stat-item featured reveal">
-        <div class="stat-num v">3–5 DAYS</div>
+      <div class="stat-item reveal">
+        <div class="stat-num g">3–5 DAYS</div>
         <div class="stat-label">To first candidate from kickoff</div>
       </div>
       <div class="stat-item reveal">
-        <div class="stat-num g">3–4 WEEKS</div>
+        <div class="stat-num v">3–4 WEEKS</div>
         <div class="stat-label">Average time to fill a role</div>
       </div>
     </div>
@@ -378,51 +378,57 @@ import { href } from "../lib/url";
       </p>
     </div>
     <div class="testi-grid reveal">
-      <div class="testi-viewport">
-        <div class="testi-track">
-          <div class="testi-card">
-            <span class="testi-qmark">"</span><p class="testi-text">
-              The quality of profiles was completely different from what we were
-              used to. They clearly understood our team dynamics — not just the
-              job description.
-            </p><div class="testi-author">
-              <div class="testi-av">
-                <span class="testi-initials">MR</span>
-              </div><div>
-                <div class="testi-name">M. Rodriguez</div><div
-                  class="testi-role"
-                >
-                  Head of People · Magoya
+      <!-- The card is the frame. It never moves. Only the track inside it
+           moves, and the track holds no border and no round corner. -->
+      <div class="testi-card">
+        <div class="testi-viewport">
+          <div class="testi-track">
+            <div class="testi-slide">
+              <span class="testi-qmark">"</span><p class="testi-text">
+                The quality of profiles was completely different from what we
+                were used to. They clearly understood our team dynamics — not
+                just the job description.
+              </p><div class="testi-author">
+                <div class="testi-av">
+                  <span class="testi-initials">MR</span>
+                </div><div>
+                  <div class="testi-name">M. Rodriguez</div><div
+                    class="testi-role"
+                  >
+                    Head of People · Magoya
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="testi-card">
-            <span class="testi-qmark">"</span><p class="testi-text">
-              We'd been trying to fill a senior DevOps role for months.
-              Rockcruit sent 4 candidates in 3 days. We hired one — he's still
-              with us two years later.
-            </p><div class="testi-author">
-              <div class="testi-av">
-                <span class="testi-initials">AL</span>
-              </div><div>
-                <div class="testi-name">A. Lopez</div><div class="testi-role">
-                  CTO · Patagonian
+            <div class="testi-slide">
+              <span class="testi-qmark">"</span><p class="testi-text">
+                We'd been trying to fill a senior DevOps role for months.
+                Rockcruit sent 4 candidates in 3 days. We hired one — he's still
+                with us two years later.
+              </p><div class="testi-author">
+                <div class="testi-av">
+                  <span class="testi-initials">AL</span>
+                </div><div>
+                  <div class="testi-name">A. Lopez</div><div class="testi-role">
+                    CTO · Patagonian
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="testi-card">
-            <span class="testi-qmark">"</span><p class="testi-text">
-              What I value most is that they push back when something doesn't
-              feel right. They're not just closing placements — they actually
-              care about the fit.
-            </p><div class="testi-author">
-              <div class="testi-av">
-                <span class="testi-initials">JP</span>
-              </div><div>
-                <div class="testi-name">J. Pereyra</div><div class="testi-role">
-                  Talent Acquisition · Hiberus
+            <div class="testi-slide">
+              <span class="testi-qmark">"</span><p class="testi-text">
+                What I value most is that they push back when something doesn't
+                feel right. They're not just closing placements — they actually
+                care about the fit.
+              </p><div class="testi-author">
+                <div class="testi-av">
+                  <span class="testi-initials">JP</span>
+                </div><div>
+                  <div class="testi-name">J. Pereyra</div><div
+                    class="testi-role"
+                  >
+                    Talent Acquisition · Hiberus
+                  </div>
                 </div>
               </div>
             </div>
@@ -672,19 +678,6 @@ import { href } from "../lib/url";
   }
   .stat-item:last-child {
     border-right: none;
-  }
-  .stat-item.featured {
-    background: rgba(255, 255, 255, 0.03);
-    border: none;
-    border-right: 1px solid #27272a;
-    position: relative;
-  }
-  .stat-item.featured::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-top: 1px solid rgba(var(--violet-rgb), 0.35);
-    pointer-events: none;
   }
   .stat-num {
     font-family: var(--bebas);
@@ -1122,7 +1115,8 @@ import { href } from "../lib/url";
     right: 2rem;
     font-family: var(--bebas);
     font-size: 8rem;
-    color: rgba(240, 237, 227, 0.025);
+    color: #68655a06;
+    /* color: rgba(240, 237, 227, 0.025); */
     pointer-events: none;
     line-height: 1;
   }
@@ -1146,7 +1140,7 @@ import { href } from "../lib/url";
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--green);
+    color: var(--violet);
     margin-bottom: 1rem;
   }
   .testi-h2 {
@@ -1160,7 +1154,7 @@ import { href } from "../lib/url";
   }
   .testi-h2 em {
     font-style: normal;
-    color: var(--green);
+    color: var(--violet);
   }
   .testi-sub {
     font-size: 0.88rem;
@@ -1171,47 +1165,62 @@ import { href } from "../lib/url";
   .testi-grid {
     position: relative;
   }
-  /* The window that hides the cards on both sides of the visible one. The
-     padding holds the clip edge clear of the card border. The card border is
-     1px wide, and the browser rounds the moved track to whole pixels, so a
-     border on the clip edge disappears and the round corners look cut. The
-     negative margin gives the space back, so the card still lines up with the
-     heading above. */
+  /* The frame of the carousel. It holds the border, the round corners and the
+     background, and it never moves. The browser draws it one time only, so the
+     corners keep their shape while the text moves. */
+  .testi-card {
+    background: var(--paper2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.2rem;
+  }
+  /* The window that hides the text on the two sides of the visible one. It
+     sits inside the frame, so the clip edge touches no border and no corner. */
   .testi-viewport {
     overflow: hidden;
-    padding: 3px;
-    margin: -3px;
     /* The browser keeps the vertical direction and gives the script the
        horizontal one. The page still scrolls under a finger on a card. */
     touch-action: pan-y;
   }
   .testi-track {
     display: flex;
-    /* The gap keeps the next card behind the padding above. It must stay
-       larger than twice that padding. */
+    /* The gap holds the next text behind the edge of the window. */
     gap: 2rem;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* The fade of a text is shorter than this time. See .testi-slide. Change
+       the two times together. */
+    transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .testi-track .testi-card {
-    /* A basis of 100% holds every card at one window width. A basis of auto
-       makes the card as wide as its longest line of text, and flex-shrink: 0
-       then breaks the track on a narrow screen. */
+  .testi-slide {
+    /* A basis of 100% holds every text at one window width. A basis of auto
+       makes the text as wide as its longest line, and flex-shrink: 0 then
+       breaks the track on a narrow screen. */
     flex: 0 0 100%;
     min-width: 0;
-  }
-  .testi-card {
-    background: var(--paper2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2.2rem;
     display: flex;
     flex-direction: column;
+    /* The text that goes out fades away while it moves, and the text that
+       comes in fades up. The time is shorter than the 0.9s of the track, so
+       the new text is complete when the track stops. */
+    transition: opacity 0.75s ease;
+  }
+  /* The script adds is-ready. The three texts stay visible without a script. */
+  .testi-track.is-ready .testi-slide {
+    opacity: 0;
+  }
+  .testi-track.is-ready .testi-slide.is-active {
+    opacity: 1;
+  }
+  /* A finger holds the track. Each text must follow the finger, and each text
+     must stay visible. This rule comes last, so it wins. */
+  .testi-track.is-dragging .testi-slide {
+    opacity: 1;
+    transition: none;
   }
   .testi-qmark {
     font-family: var(--serif);
     font-size: 3rem;
     line-height: 0.8;
-    color: var(--green);
+    color: var(--violet);
     opacity: 0.4;
     display: block;
     margin-bottom: 0.8rem;
@@ -1394,15 +1403,6 @@ import { href } from "../lib/url";
     .stat-item:last-child {
       border-bottom: none;
     }
-    .stat-item.featured {
-      border: none;
-      border-bottom: 1px solid #27272a;
-      background: rgba(255, 255, 255, 0.03);
-    }
-    .stat-item.featured::before {
-      border-top: none;
-      border-left: 3px solid rgba(var(--violet-rgb), 0.5);
-    }
     .diff-item-btn {
       grid-template-columns: 50px 1fr 34px;
       gap: 1rem;
@@ -1432,7 +1432,7 @@ import { href } from "../lib/url";
     const track = document.querySelector<HTMLElement>(".testi-track");
     if (!track) return;
     const cards = Array.from(
-      track.querySelectorAll<HTMLElement>(".testi-card"),
+      track.querySelectorAll<HTMLElement>(".testi-slide"),
     );
     const view = track.parentElement;
     const dots = document.querySelectorAll<HTMLButtonElement>(".testi-dot");
@@ -1440,21 +1440,32 @@ import { href } from "../lib/url";
     if (!view || !count) return;
     let idx = 0;
 
-    // The track moves by a whole number of pixels. A percentage move lands on
-    // a fraction of a pixel, and the card border and the round corners smear.
-    // The measurement also holds the gap between two cards.
+    // The track must put a text exactly on the place of the first text.
+    // offsetLeft gives a whole number, but the real place of a text falls
+    // between two pixels, because the section pads by a percentage.
+    // getBoundingClientRect keeps the fraction, and the distance between two of
+    // these rectangles stays true while the track moves. The measurement also
+    // holds the gap between two texts.
     const stepOf = (i: number) =>
-      Math.round(cards[i].offsetLeft - cards[0].offsetLeft);
+      cards[i].getBoundingClientRect().left -
+      cards[0].getBoundingClientRect().left;
     const move = (px: number) => {
-      track.style.transform = px ? `translateX(${-Math.round(px)}px)` : "";
+      track.style.transform = px ? `translateX(${-px}px)` : "";
     };
     const place = () => move(stepOf(idx));
+    // The visible text carries is-active. The CSS fades the other two away.
+    const paint = () =>
+      cards.forEach((c, j) => c.classList.toggle("is-active", j === idx));
 
     const goTo = (i: number) => {
       idx = (i + count) % count;
       place();
+      paint();
       dots.forEach((d, j) => d.classList.toggle("active", j === idx));
     };
+
+    track.classList.add("is-ready");
+    paint();
 
     document
       .getElementById("tNext")
@@ -1493,6 +1504,7 @@ import { href } from "../lib/url";
         axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
         if (axis !== "x") return;
         track.style.transition = "none";
+        track.classList.add("is-dragging");
         view.setPointerCapture(e.pointerId);
       }
       if (axis !== "x") return;
@@ -1509,6 +1521,7 @@ import { href } from "../lib/url";
       if (e.pointerId !== pointer) return;
       pointer = null;
       track.style.transition = "";
+      track.classList.remove("is-dragging");
       if (axis !== "x") return;
       axis = "";
       const dx = e.clientX - startX;
