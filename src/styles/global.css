@@ -69,10 +69,20 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: max(env(safe-area-inset-top, 0px), 8px);
+  height: env(safe-area-inset-top, 0px);
   background-color: var(--ink);
   z-index: 950;
   pointer-events: none;
+}
+/* The inset is 0 in the portrait view of Safari, and Safari asks for 3px or
+   more. Give the strip a floor of 8px, but on iOS only. A desktop screen has
+   no top bar to color. There, a floor paints a dark line over a light section,
+   because the bar leaves the top edge on the way down the page.
+   -webkit-touch-callout exists on iOS only. */
+@supports (-webkit-touch-callout: none) {
+  .ios-tint {
+    height: max(env(safe-area-inset-top, 0px), 8px);
+  }
 }
 
 /* ── Film-grain noise overlay ── */
