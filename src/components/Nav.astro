@@ -3,6 +3,7 @@
 // Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
 // "Open Positions" → /#contact until its real destination is decided (open ledger).
 import { href } from "../lib/url";
+import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
 
 const path = Astro.url.pathname;
 const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
@@ -10,7 +11,15 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
 
 <nav>
   <a href={href("/")} class="nav-logo">
-    <span class="logo-word">ROCKCRUIT</span>
+    <!-- The width and the height give the size before the style applies. They
+         must hold the same values as .logo-mark. -->
+    <RockcruitWordmark
+      class="logo-mark"
+      width="139"
+      height="16"
+      role="img"
+      aria-label="Rockcruit"
+    />
     <div class="nav-dot"></div>
   </a>
   <ul class="nav-links">
@@ -134,12 +143,17 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     gap: 0.6rem;
     text-decoration: none;
   }
-  .logo-word {
-    font-family: var(--bebas);
-    font-size: 1.6rem;
-    letter-spacing: 0.05em;
-    color: var(--paper);
-    font-weight: normal;
+  /* The mark replaces the old Bebas Neue word. --logo-height is the one knob.
+     The width comes from the ratio of the file, 209 to 24.
+     Do not use width:auto here. An automatic width lets the browser take the
+     size from the width attribute of the file, 209px, and the mark then grows
+     after a client-side navigation. */
+  .logo-mark {
+    --logo-height: 1rem;
+    display: block;
+    height: var(--logo-height);
+    width: calc(var(--logo-height) * 209 / 24);
+    flex: none;
   }
   .nav-dot {
     width: 6px;
