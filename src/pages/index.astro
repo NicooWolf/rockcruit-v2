@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro";
 import HireForm from "../components/HireForm.astro";
 
 import { href } from "../lib/url";
+import { brands } from "../lib/brands";
 ---
 
 <Layout
@@ -137,59 +138,24 @@ import { href } from "../lib/url";
   </section>
 
   <!-- ═══════ TRUSTED BY ═══════ -->
-  <div class="logos">
-    <div class="logos-label">Trusted by</div>
-    <div class="logos-track">
-      {
-        [0, 1].map(() => (
-          <>
-            <>
-              <div class="logo-item">
-                <span class="logo-text">Magoya</span>
+  <div class="brands">
+    <div class="brands-label">Trusted by</div>
+    <div class="brands-marquee">
+      <div class="brands-track">
+        {
+          [0, 1].map(() =>
+            brands.map(({ name, logo: Logo }) => (
+              <div class="brands-items">
+                {Logo ? (
+                  <Logo class="brands-logo" role="img" aria-label={name} />
+                ) : (
+                  <span class="brands-text">{name}</span>
+                )}
               </div>
-              <div class="logo-item">
-                <span class="logo-text">Patagonian</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Sidom</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Hearth</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Hiberus</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Aureum</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Bizland</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Bricks M2V</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Bridgenext</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">EGA</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Wunderkind</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">iplan</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">TGN</span>
-              </div>
-              <div class="logo-item">
-                <span class="logo-text">Eureka Labs</span>
-              </div>
-            </>
-          </>
-        ))
-      }
+            )),
+          )
+        }
+      </div>
     </div>
   </div>
 
@@ -518,6 +484,10 @@ import { href } from "../lib/url";
   }
   h1 {
     font-family: var(--bebas);
+    /* Bebas Neue has one weight. A heading asks for bold, and Safari then
+       paints the glyphs two times with an offset. A transparent color shows
+       that second paint as a ghost. Name the real weight instead. */
+    font-weight: 400;
     font-size: clamp(5.5rem, 13vw, 16rem);
     line-height: 0.86;
     letter-spacing: 0.01em;
@@ -663,7 +633,6 @@ import { href } from "../lib/url";
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     border-top: 1px solid var(--bdark);
-    margin-top: 3rem;
     background: #0b0b0b;
     overflow: hidden;
   }
@@ -698,14 +667,14 @@ import { href } from "../lib/url";
     line-height: 1.5;
   }
 
-  /* LOGOS */
-  .logos {
+  /* BRANDS */
+  .brands {
     overflow: hidden;
     border-bottom: 1px solid var(--bdark);
     padding: 1.5rem 0;
     background: rgba(255, 255, 255, 0.02);
   }
-  .logos-label {
+  .brands-label {
     font-family: var(--mono);
     font-size: 0.6rem;
     letter-spacing: 0.14em;
@@ -714,7 +683,27 @@ import { href } from "../lib/url";
     text-align: center;
     margin-bottom: 1.2rem;
   }
-  .logos-track {
+  /* The mask makes a logo fade away at the two ends, in place of a hard cut. It uses
+     the same values as `.domains-marquee` on the Team page. A mask color gives opacity
+     only. It is not a color of the design. */
+  .brands-marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 min(90px, 15%),
+      #000 calc(100% - min(90px, 15%)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 min(90px, 15%),
+      #000 calc(100% - min(90px, 15%)),
+      transparent 100%
+    );
+  }
+  .brands-track {
     display: flex;
     width: max-content;
     animation: mq 32s linear infinite;
@@ -727,7 +716,7 @@ import { href } from "../lib/url";
       transform: translateX(-50%);
     }
   }
-  .logo-item {
+  .brands-items {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -735,7 +724,7 @@ import { href } from "../lib/url";
     height: 28px;
     border-right: 1px solid var(--bdark);
   }
-  .logo-text {
+  .brands-text {
     font-family: var(--sans);
     font-size: 0.78rem;
     font-weight: 500;
@@ -744,11 +733,24 @@ import { href } from "../lib/url";
     white-space: nowrap;
     transition: opacity 0.2s;
   }
-  .logo-item:hover .logo-text {
+  /* The height is 28px, equal to the height of the viewBox. So the width of the
+     element equals the width of the drawing, and the 2.5rem padding gives the same
+     empty space beside each logo. A viewBox with empty space breaks that balance. */
+  .brands-logo {
+    display: block;
+    height: 28px;
+    width: auto;
+    max-width: 120px;
+    color: var(--paper);
+    opacity: 0.18;
+    transition: opacity 0.2s;
+  }
+  .brands-items:hover .brands-text,
+  .brands-items:hover .brands-logo {
     opacity: 0.5;
   }
   @media (prefers-reduced-motion: reduce) {
-    .logos-track {
+    .brands-track {
       animation: none;
     }
   }
@@ -758,7 +760,7 @@ import { href } from "../lib/url";
     border-bottom: 1px solid var(--bdark);
   }
   .pos-header {
-    padding: 5rem 5% 4rem;
+    padding: 4rem 5% 4rem;
     border-bottom: 1px solid var(--bdark);
   }
   .pos-eyebrow {
@@ -818,6 +820,7 @@ import { href } from "../lib/url";
   }
   .pos-col-title {
     font-family: var(--bebas);
+    font-weight: 400;
     font-size: 1.6rem;
     letter-spacing: 0.03em;
     color: var(--paper);
@@ -875,7 +878,7 @@ import { href } from "../lib/url";
     border-bottom: 1px solid var(--bdark);
   }
   .diff-header {
-    padding: 5rem 5% 3rem;
+    padding: 4rem 5% 3rem;
     border-bottom: 1px solid var(--bdark);
     display: flex;
     align-items: baseline;
@@ -1009,7 +1012,7 @@ import { href } from "../lib/url";
     border-bottom: 1px solid var(--bdark);
   }
   .st-header {
-    padding: 5rem 5% 3.5rem;
+    padding: 4rem 5% 3.5rem;
     border-bottom: 1px solid var(--bdark);
   }
   .st-eyebrow {
@@ -1083,6 +1086,7 @@ import { href } from "../lib/url";
   }
   .st-card-title {
     font-family: var(--bebas);
+    font-weight: 400;
     font-size: clamp(2rem, 3.5vw, 3rem);
     letter-spacing: 0.02em;
     line-height: 0.9;
@@ -1114,6 +1118,7 @@ import { href } from "../lib/url";
     top: 1rem;
     right: 2rem;
     font-family: var(--bebas);
+    font-weight: 400;
     font-size: 8rem;
     color: #68655a06;
     /* color: rgba(240, 237, 227, 0.025); */
@@ -1338,6 +1343,7 @@ import { href } from "../lib/url";
   }
   .fcta-h2 {
     font-family: var(--bebas);
+    font-weight: 400;
     font-size: clamp(4rem, 8vw, 9rem);
     line-height: 0.85;
     letter-spacing: 0.02em;
