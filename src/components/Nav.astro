@@ -744,7 +744,15 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
       const target = document.getElementById(
         decodeURIComponent(url.hash.slice(1)),
       );
-      target?.scrollIntoView({ block: "start" });
+      // Show the target's revealed content now, then land instantly — a jump
+      // must render in one frame, not wait out a multi-second smooth scroll.
+      if (target) {
+        if (target.classList.contains("reveal")) target.classList.add("on");
+        target
+          .querySelectorAll(".reveal:not(.on)")
+          .forEach((el) => el.classList.add("on"));
+        target.scrollIntoView({ behavior: "instant", block: "start" });
+      }
 
       return true;
     };
