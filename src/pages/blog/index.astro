@@ -1,12 +1,11 @@
 ---
 // src/pages/blog/index.astro — post list, pre-rendered at build time.
 import Layout from "../../layouts/Layout.astro";
+import PostCard from "../../components/PostCard.astro";
 import { getAllPosts } from "../../lib/wp";
 import { href } from "../../lib/url";
 
 const posts = await getAllPosts(); // build-time only — never runs in a browser
-const fmt = (d: string) =>
-  new Date(d).toLocaleDateString("en-US", { dateStyle: "medium" });
 ---
 
 <Layout
@@ -35,18 +34,13 @@ const fmt = (d: string) =>
       )
     }
     {
-      posts.map((post) => (
-        <a class="post-row reveal" href={href(`/blog/${post.slug}/`)}>
-          <time class="post-date" datetime={post.date}>
-            {fmt(post.date)}
-          </time>
-          <div>
-            <h2 class="post-title">{post.title}</h2>
-            <div class="post-excerpt" set:html={post.excerpt} />
-          </div>
-          <span class="post-arrow">→</span>
-        </a>
-      ))
+      posts.length > 0 && (
+        <div class="post-grid">
+          {posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      )
     }
   </section>
 </Layout>
@@ -115,69 +109,15 @@ const fmt = (d: string) =>
     color: var(--green);
     text-decoration: none;
   }
-  .post-row {
+  .post-grid {
     display: grid;
-    grid-template-columns: 140px 1fr 40px;
-    gap: 2.5rem;
-    align-items: center;
-    padding: 2.4rem 5%;
-    border-bottom: 1px solid var(--bdark);
-    text-decoration: none;
-    transition: background 0.2s;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.6rem;
+    padding: 3rem 5% 4rem;
   }
-  .post-row:last-child {
-    border-bottom: none;
-  }
-  .post-row:hover {
-    background: rgba(255, 255, 255, 0.02);
-  }
-  .post-date {
-    font-family: var(--mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
-  }
-  .post-title {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: clamp(1.3rem, 2.4vw, 1.9rem);
-    color: var(--paper);
-    letter-spacing: -0.01em;
-    margin-bottom: 0.5rem;
-    transition: color 0.2s;
-  }
-  .post-row:hover .post-title {
-    color: var(--green);
-  }
-  .post-excerpt {
-    font-size: 0.86rem;
-    color: rgba(240, 237, 227, 0.4);
-    line-height: 1.7;
-    max-width: 640px;
-  }
-  .post-excerpt :global(p) {
-    margin: 0;
-  }
-  .post-arrow {
-    font-size: 1.1rem;
-    color: rgba(240, 237, 227, 0.25);
-    transition:
-      color 0.2s,
-      transform 0.2s;
-  }
-  .post-row:hover .post-arrow {
-    color: var(--green);
-    transform: translateX(4px);
-  }
-  @media (max-width: 1024px) {
-    .post-row {
+  @media (max-width: 640px) {
+    .post-grid {
       grid-template-columns: 1fr;
-      gap: 0.6rem;
-    }
-    .post-arrow {
-      display: none;
     }
   }
 </style>

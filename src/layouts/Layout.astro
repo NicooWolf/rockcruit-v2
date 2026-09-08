@@ -69,6 +69,35 @@ const canonical = Astro.site
       crossorigin
     />
 
+    <!-- Show the first screen at once.
+         A .reveal element hides at opacity 0 until the observer below adds
+         .on. The observer runs from a deferred module. On a phone that
+         module loads late, so the first screen stayed grey for about one
+         second, on load and after every navigation. This inline script runs
+         early. It shows the elements that the reader sees first. The observer
+         still animates the rest of the page on scroll.
+         astro:after-swap fires right after a navigation swaps the DOM and
+         before the new page paints, so the logo link no longer flashes grey. -->
+    <script is:inline>
+      (function () {
+        function revealInView() {
+          var vh = window.innerHeight;
+          var els = document.querySelectorAll(".reveal:not(.on)");
+          for (var i = 0; i < els.length; i++) {
+            if (els[i].getBoundingClientRect().top < vh) {
+              els[i].classList.add("on");
+            }
+          }
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", revealInView);
+        } else {
+          revealInView();
+        }
+        document.addEventListener("astro:after-swap", revealInView);
+      })();
+    </script>
+
     <ClientRouter />
   </head>
   <body>
@@ -102,6 +131,24 @@ const canonical = Astro.site
         readerMoved = false;
       };
 
+      // ── Instant reveal for a jump target.
+      // A .reveal element sits at opacity 0 until the IntersectionObserver
+      // adds .on, and the observer only fires once the scroll reaches it. A
+      // jump to a far section (e.g. /#contact from the top of a long page)
+      // therefore left its text and form blank until the scroll arrived —
+      // seconds later. When a section is the jump target, show its content
+      // now, so it renders the instant we land rather than at scroll's end.
+      const revealSection = (id: string) => {
+        if (!id) return null;
+        const target = document.getElementById(id);
+        if (!target) return null;
+        if (target.classList.contains("reveal")) target.classList.add("on");
+        target
+          .querySelectorAll(".reveal:not(.on)")
+          .forEach((el) => el.classList.add("on"));
+        return target;
+      };
+
       // ClientRouter owns scroll restoration, so the browser does not jump to
       // the section on a reload. Do that jump here.
       document.addEventListener("astro:page-load", () => {
@@ -110,7 +157,7 @@ const canonical = Astro.site
         const id = decodeURIComponent(window.location.hash.slice(1));
         if (!id) return;
 
-        const target = document.getElementById(id);
+        const target = revealSection(id);
         if (!target) return;
 
         requestAnimationFrame(() => {
@@ -119,8 +166,54 @@ const canonical = Astro.site
         });
       });
 
+      // Same-page hash links (the CTAs, "Hire With Us", "Open Positions") are
+      // plain anchors: the browser jumps natively and CSS scroll-behavior makes
+      // that a multi-second smooth glide down the page, with the target only
+      // revealing at the end. Intercept them — reveal the target and jump to it
+      // instantly — so any navigation lands rendered in one frame.
+      document.addEventListener("click", (event) => {
+        if (event.defaultPrevented) return;
+        if (
+          event.button ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        )
+          return;
+
+        const link = (event.target as Element)?.closest?.("a[href]") as
+          | HTMLAnchorElement
+          | null;
+        if (!link || link.target === "_blank") return;
+
+        let url: URL;
+        try {
+          url = new URL(link.href);
+        } catch {
+          return;
+        }
+        if (url.origin !== window.location.origin) return;
+        if (url.pathname !== window.location.pathname) return; // cross-page: let the router handle it
+        if (!url.hash || url.hash === "#") return;
+
+        const id = decodeURIComponent(url.hash.slice(1));
+        const target = revealSection(id);
+        if (!target) return;
+
+        event.preventDefault();
+        if (window.location.hash !== url.hash) {
+          history.pushState(history.state, "", url.pathname + url.search + url.hash);
+        }
+        target.scrollIntoView({ behavior: "instant", block: "start" });
+        startJump();
+      });
+
       // A click on a same-page link also jumps, and CSS makes that jump smooth.
-      window.addEventListener("hashchange", startJump);
+      window.addEventListener("hashchange", () => {
+        revealSection(decodeURIComponent(window.location.hash.slice(1)));
+        startJump();
+      });
 
       const trimHashAtEnds = () => {
         if (!window.location.hash) return;

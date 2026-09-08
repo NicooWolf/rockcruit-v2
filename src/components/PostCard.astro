@@ -1,0 +1,174 @@
+---
+// src/components/PostCard.astro — one post as a card.
+// MVP goal: show the ACF data pull works. Keep the markup small.
+import { href } from "../lib/url";
+import type { Post } from "../lib/wp";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const f = post.postFields;
+
+// The author relation returns a list. Take the first author.
+const author = f?.author?.nodes?.[0]?.authorFields;
+const authorName = [author?.name, author?.lastName]
+  .filter(Boolean)
+  .join(" ");
+
+const image = f?.postImage?.node;
+const photo = author?.profilePhoto?.node;
+
+const fmt = (d: string) =>
+  new Date(d).toLocaleDateString("en-US", { dateStyle: "medium" });
+---
+
+<a class="card reveal" href={href(`/blog/${post.slug}/`)}>
+  {
+    image?.sourceUrl && (
+      <div class="card-media">
+        <img src={image.sourceUrl} alt={image.altText ?? post.title} loading="lazy" />
+      </div>
+    )
+  }
+
+  <div class="card-body">
+    <div class="card-meta">
+      <time datetime={post.date}>{fmt(post.date)}</time>
+      {f?.readingTime && <span>{f.readingTime} min read</span>}
+    </div>
+
+    <h2 class="card-title">{post.title}</h2>
+    {f?.subtitle && <p class="card-subtitle">{f.subtitle}</p>}
+    {f?.description && <p class="card-desc">{f.description}</p>}
+
+    {
+      authorName && (
+        <div class="card-author">
+          {photo?.sourceUrl && (
+            <img
+              class="card-author-photo"
+              src={photo.sourceUrl}
+              alt={authorName}
+              loading="lazy"
+            />
+          )}
+          <span class="card-author-text">
+            <span class="card-author-name">{authorName}</span>
+            {author?.role && <span class="card-author-role">{author.role}</span>}
+          </span>
+        </div>
+      )
+    }
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--bdark);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      transform 0.2s;
+  }
+  .card:hover {
+    border-color: rgba(var(--green-rgb), 0.4);
+    transform: translateY(-4px);
+  }
+
+  .card-media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: rgba(var(--green-rgb), 0.05);
+  }
+  .card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .card:hover .card-media img {
+    transform: scale(1.03);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.5rem;
+  }
+  .card-meta {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+  }
+
+  .card-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--paper);
+    transition: color 0.2s;
+  }
+  .card:hover .card-title {
+    color: var(--green);
+  }
+  .card-subtitle {
+    font-size: 0.9rem;
+    color: rgba(240, 237, 227, 0.55);
+    line-height: 1.5;
+  }
+  .card-desc {
+    font-size: 0.84rem;
+    color: rgba(240, 237, 227, 0.4);
+    line-height: 1.7;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-author {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bdark);
+  }
+  .card-author-photo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .card-author-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .card-author-name {
+    font-size: 0.8rem;
+    color: var(--paper);
+  }
+  .card-author-role {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(240, 237, 227, 0.3);
+  }
+</style>
