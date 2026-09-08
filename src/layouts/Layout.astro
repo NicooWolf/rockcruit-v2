@@ -99,6 +99,33 @@ const canonical = Astro.site
     </script>
 
     <ClientRouter />
+
+    <script is:inline>
+      (function () {
+        function revealInDoc(doc) {
+          var vh = window.innerHeight;
+          var els = doc.querySelectorAll(".reveal:not(.on)");
+          for (var i = 0; i < els.length; i++) {
+            if (els[i].getBoundingClientRect().top < vh) {
+              els[i].classList.add("on");
+            }
+          }
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function () {
+            revealInDoc(document);
+          });
+        } else {
+          revealInDoc(document);
+        }
+
+        // Mutate incoming DOM tree BEFORE snapshot generation
+        document.addEventListener("astro:before-swap", function (e) {
+          revealInDoc(e.newDocument);
+        });
+      })();
+    </script>
   </head>
   <body>
     <!-- Safari fills its top bar with the color of a fixed element that touches
@@ -182,9 +209,9 @@ const canonical = Astro.site
         )
           return;
 
-        const link = (event.target as Element)?.closest?.("a[href]") as
-          | HTMLAnchorElement
-          | null;
+        const link = (event.target as Element)?.closest?.(
+          "a[href]",
+        ) as HTMLAnchorElement | null;
         if (!link || link.target === "_blank") return;
 
         let url: URL;
@@ -203,7 +230,11 @@ const canonical = Astro.site
 
         event.preventDefault();
         if (window.location.hash !== url.hash) {
-          history.pushState(history.state, "", url.pathname + url.search + url.hash);
+          history.pushState(
+            history.state,
+            "",
+            url.pathname + url.search + url.hash,
+          );
         }
         target.scrollIntoView({ behavior: "instant", block: "start" });
         startJump();
