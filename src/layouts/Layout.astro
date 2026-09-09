@@ -72,6 +72,8 @@ const canonical = Astro.site
     <!-- Above-The-Fold Reveal & WebKit View Transition Sync -->
     <script is:inline>
       (function () {
+        let activeTransition = null;
+
         function revealATF(doc) {
           const vh = window.innerHeight;
           const els = doc.querySelectorAll(".reveal:not(.on)");
@@ -93,6 +95,37 @@ const canonical = Astro.site
         } else {
           revealATF(document);
         }
+
+        document.addEventListener("astro:before-swap", function (event) {
+          const transition = event.viewTransition;
+          activeTransition = transition;
+
+          const finishTransition = function () {
+            if (activeTransition === transition) {
+              activeTransition = null;
+            }
+            requestAnimationFrame(function () {
+              document.dispatchEvent(
+                new CustomEvent("rockcruit:transition-end"),
+              );
+            });
+          };
+
+          transition.finished.then(finishTransition, finishTransition);
+        });
+
+        function stopSnapshotForInteraction() {
+          if (activeTransition) {
+            activeTransition.skipTransition();
+          }
+        }
+
+        window.addEventListener("touchstart", stopSnapshotForInteraction, {
+          passive: true,
+        });
+        window.addEventListener("wheel", stopSnapshotForInteraction, {
+          passive: true,
+        });
 
         // Measure the live DOM after the swap and before the new snapshot.
         // The transition gate prevents reveal motion during this operation.
@@ -191,7 +224,17 @@ const canonical = Astro.site
         }
         if (url.origin !== window.location.origin) return;
         if (url.pathname !== window.location.pathname) return; // cross-page: let router handle
-        if (!url.hash || url.hash === "#") return;
+        if (url.search !== window.location.search) return;
+
+        if (!url.hash || url.hash === "#") {
+          event.preventDefault();
+          if (window.location.hash) {
+            history.pushState(history.state, "", url.pathname + url.search);
+          }
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          startJump();
+          return;
+        }
 
         const id = decodeURIComponent(url.hash.slice(1));
         const target = revealSection(id);
@@ -265,18 +308,34 @@ const canonical = Astro.site
             const visible = entries
               .filter((entry) => entry.isIntersecting)
               .sort(
-                (a, b) =>
-                  a.boundingClientRect.top - b.boundingClientRect.top,
+                (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
               );
 
-            visible.forEach((entry, i) => {
-              (entry.target as HTMLElement).style.setProperty(
-                "--reveal-index",
-                String(i),
-              );
-              entry.target.classList.add("on");
+            visible.forEach((entry) => {
               io.unobserve(entry.target);
             });
+
+            const revealVisible = () => {
+              visible.forEach((entry, i) => {
+                (entry.target as HTMLElement).style.setProperty(
+                  "--reveal-index",
+                  String(i),
+                );
+                entry.target.classList.add("on");
+              });
+            };
+
+            if (
+              document.documentElement.hasAttribute("data-astro-transition")
+            ) {
+              document.addEventListener(
+                "rockcruit:transition-end",
+                revealVisible,
+                { once: true },
+              );
+            } else {
+              revealVisible();
+            }
           },
           { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
         );
