@@ -47,20 +47,20 @@
   src: url("../assets/fonts/dm-mono-500.woff2") format("woff2");
 }
 
-/* ── 1. Page-Level View Transitions (WebKit GPU Composited Crossfade) ── */
+/* ── 1. Page-Level View Transitions ── */
 ::view-transition-image-pair(root) {
   isolation: isolate;
 }
 
 ::view-transition-old(root) {
-  animation: 140ms cubic-bezier(0.4, 0, 1, 1) both page-out;
+  animation: 320ms ease both page-out;
   mix-blend-mode: normal !important;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 ::view-transition-new(root) {
-  animation: 220ms cubic-bezier(0, 0, 0.2, 1) both page-in;
+  animation: 480ms ease both page-in;
   mix-blend-mode: normal !important;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -69,22 +69,18 @@
 @keyframes page-out {
   from {
     opacity: 1;
-    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(-6px);
   }
 }
 
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -196,13 +192,13 @@ body::after {
 /* ── 3. Scroll-Reveal Animations ── */
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(8px);
   contain: layout paint style;
   will-change: opacity, transform;
   transition:
-    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: calc(var(--reveal-index, 0) * 35ms);
+    opacity 0.82s cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 0.82s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition-delay: calc(var(--reveal-index, 0) * 80ms);
 }
 
 .reveal.on {

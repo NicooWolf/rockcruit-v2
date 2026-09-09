@@ -75,10 +75,13 @@ const canonical = Astro.site
         function revealATF(doc) {
           const vh = window.innerHeight;
           const els = doc.querySelectorAll(".reveal:not(.on)");
+          let revealIndex = 0;
           for (let i = 0; i < els.length; i++) {
-            if (els[i].getBoundingClientRect().top < vh) {
-              els[i].style.setProperty("--reveal-index", i);
+            const rect = els[i].getBoundingClientRect();
+            if (rect.bottom > 0 && rect.top < vh) {
+              els[i].style.setProperty("--reveal-index", revealIndex);
               els[i].classList.add("on");
+              revealIndex++;
             }
           }
         }
@@ -91,13 +94,12 @@ const canonical = Astro.site
           revealATF(document);
         }
 
-        // Mutate incoming DOM tree BEFORE snapshot generation on navigation
-        document.addEventListener("astro:before-swap", function (e) {
-          revealATF(e.newDocument);
-        });
-
-        // Force WebKit GPU compositor pass after DOM swap
+        // Measure the live DOM after the swap and before the new snapshot.
+        // The transition gate prevents reveal motion during this operation.
         document.addEventListener("astro:after-swap", function () {
+          revealATF(document);
+
+          // Force a WebKit compositor pass after the DOM swap.
           const root = document.documentElement;
           root.style.transform = "translateZ(0)";
           void root.offsetHeight;
@@ -260,14 +262,23 @@ const canonical = Astro.site
       document.addEventListener("astro:page-load", () => {
         const io = new IntersectionObserver(
           (entries) => {
-            entries.forEach((entry, i) => {
-              if (entry.isIntersecting) {
-                setTimeout(() => entry.target.classList.add("on"), i * 60);
-                io.unobserve(entry.target);
-              }
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              .sort(
+                (a, b) =>
+                  a.boundingClientRect.top - b.boundingClientRect.top,
+              );
+
+            visible.forEach((entry, i) => {
+              (entry.target as HTMLElement).style.setProperty(
+                "--reveal-index",
+                String(i),
+              );
+              entry.target.classList.add("on");
+              io.unobserve(entry.target);
             });
           },
-          { threshold: 0.06 },
+          { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
         );
         document
           .querySelectorAll(".reveal:not(.on)")
