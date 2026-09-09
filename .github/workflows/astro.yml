@@ -89,9 +89,14 @@ jobs:
           path: ${{ github.ref_name == 'dev' && 'dist_upload' || 'dist' }}
 
   deploy:
+    if: github.ref_name == 'dev'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     needs: build
     runs-on: ubuntu-latest
     name: Deploy
