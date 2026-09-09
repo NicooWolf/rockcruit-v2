@@ -69,44 +69,15 @@ const canonical = Astro.site
       crossorigin
     />
 
-    <!-- Show the first screen at once.
-         A .reveal element hides at opacity 0 until the observer below adds
-         .on. The observer runs from a deferred module. On a phone that
-         module loads late, so the first screen stayed grey for about one
-         second, on load and after every navigation. This inline script runs
-         early. It shows the elements that the reader sees first. The observer
-         still animates the rest of the page on scroll.
-         astro:after-swap fires right after a navigation swaps the DOM and
-         before the new page paints, so the logo link no longer flashes grey. -->
+    <!-- Above-The-Fold Reveal & WebKit View Transition Sync -->
     <script is:inline>
       (function () {
-        function revealInView() {
-          var vh = window.innerHeight;
-          var els = document.querySelectorAll(".reveal:not(.on)");
-          for (var i = 0; i < els.length; i++) {
+        function revealATF(doc) {
+          const vh = window.innerHeight;
+          const els = doc.querySelectorAll(".reveal:not(.on)");
+          for (let i = 0; i < els.length; i++) {
             if (els[i].getBoundingClientRect().top < vh) {
-              els[i].classList.add("on");
-            }
-          }
-        }
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", revealInView);
-        } else {
-          revealInView();
-        }
-        document.addEventListener("astro:after-swap", revealInView);
-      })();
-    </script>
-
-    <ClientRouter />
-
-    <script is:inline>
-      (function () {
-        function revealInDoc(doc) {
-          var vh = window.innerHeight;
-          var els = doc.querySelectorAll(".reveal:not(.on)");
-          for (var i = 0; i < els.length; i++) {
-            if (els[i].getBoundingClientRect().top < vh) {
+              els[i].style.setProperty("--reveal-index", i);
               els[i].classList.add("on");
             }
           }
@@ -114,18 +85,28 @@ const canonical = Astro.site
 
         if (document.readyState === "loading") {
           document.addEventListener("DOMContentLoaded", function () {
-            revealInDoc(document);
+            revealATF(document);
           });
         } else {
-          revealInDoc(document);
+          revealATF(document);
         }
 
-        // Mutate incoming DOM tree BEFORE snapshot generation
+        // Mutate incoming DOM tree BEFORE snapshot generation on navigation
         document.addEventListener("astro:before-swap", function (e) {
-          revealInDoc(e.newDocument);
+          revealATF(e.newDocument);
+        });
+
+        // Force WebKit GPU compositor pass after DOM swap
+        document.addEventListener("astro:after-swap", function () {
+          const root = document.documentElement;
+          root.style.transform = "translateZ(0)";
+          void root.offsetHeight;
+          root.style.transform = "";
         });
       })();
     </script>
+
+    <ClientRouter />
   </head>
   <body>
     <!-- Safari fills its top bar with the color of a fixed element that touches
@@ -140,10 +121,6 @@ const canonical = Astro.site
 
     <script>
       // ── Scroll depth and the section hash.
-      // A hash jump moves the page by itself. Only a move that the reader
-      // makes may drop the hash, so the code waits for the jump to settle and
-      // then for a real change of the scroll depth. Touch and mouse raise the
-      // same scroll event, so one rule serves mobile and desktop.
       const END_ZONE = 8; // px, absorbs sub-pixel and elastic scroll values
       const SETTLE_TIME = 900; // ms, the wait for a jump to start
       const IDLE_TIME = 250; // ms without a scroll event ends a jump
@@ -159,12 +136,6 @@ const canonical = Astro.site
       };
 
       // ── Instant reveal for a jump target.
-      // A .reveal element sits at opacity 0 until the IntersectionObserver
-      // adds .on, and the observer only fires once the scroll reaches it. A
-      // jump to a far section (e.g. /#contact from the top of a long page)
-      // therefore left its text and form blank until the scroll arrived —
-      // seconds later. When a section is the jump target, show its content
-      // now, so it renders the instant we land rather than at scroll's end.
       const revealSection = (id: string) => {
         if (!id) return null;
         const target = document.getElementById(id);
@@ -193,11 +164,7 @@ const canonical = Astro.site
         });
       });
 
-      // Same-page hash links (the CTAs, "Hire With Us", "Open Positions") are
-      // plain anchors: the browser jumps natively and CSS scroll-behavior makes
-      // that a multi-second smooth glide down the page, with the target only
-      // revealing at the end. Intercept them — reveal the target and jump to it
-      // instantly — so any navigation lands rendered in one frame.
+      // Intercept same-page hash links for instant rendered jumps.
       document.addEventListener("click", (event) => {
         if (event.defaultPrevented) return;
         if (
@@ -221,7 +188,7 @@ const canonical = Astro.site
           return;
         }
         if (url.origin !== window.location.origin) return;
-        if (url.pathname !== window.location.pathname) return; // cross-page: let the router handle it
+        if (url.pathname !== window.location.pathname) return; // cross-page: let router handle
         if (!url.hash || url.hash === "#") return;
 
         const id = decodeURIComponent(url.hash.slice(1));
@@ -240,7 +207,6 @@ const canonical = Astro.site
         startJump();
       });
 
-      // A click on a same-page link also jumps, and CSS makes that jump smooth.
       window.addEventListener("hashchange", () => {
         revealSection(decodeURIComponent(window.location.hash.slice(1)));
         startJump();
@@ -251,8 +217,6 @@ const canonical = Astro.site
 
         const depth = window.scrollY;
 
-        // The jump still runs: it owns every move, and it sets the landing.
-        // A smooth jump takes many frames, so each move holds the jump open.
         const now = performance.now();
         if (now < settleUntil) {
           landingDepth = depth;
@@ -292,14 +256,13 @@ const canonical = Astro.site
         { passive: true },
       );
 
-      // ── Scroll reveals: fresh observer per page entry.
-      // astro:page-load fires on initial load AND after every navigation.
+      // ── Below-The-Fold Scroll reveals: fresh observer per page entry.
       document.addEventListener("astro:page-load", () => {
         const io = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry, i) => {
               if (entry.isIntersecting) {
-                setTimeout(() => entry.target.classList.add("on"), i * 70);
+                setTimeout(() => entry.target.classList.add("on"), i * 60);
                 io.unobserve(entry.target);
               }
             });

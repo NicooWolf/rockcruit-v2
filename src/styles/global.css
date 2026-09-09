@@ -8,7 +8,7 @@
   font-family: "Bebas Neue";
   font-style: normal;
   font-weight: 400;
-  font-display: optional; /* Prevents font metric swap repaints during route transitions */
+  font-display: optional; /* Prevents font metric layout shift during page swaps */
   src: url("../assets/fonts/bebas-neue-400.woff2") format("woff2");
 }
 @font-face {
@@ -47,47 +47,54 @@
   src: url("../assets/fonts/dm-mono-500.woff2") format("woff2");
 }
 
-/* ── WebKit View Transition Ghosting & Timing Fixes ── */
+/* ── 1. Page-Level View Transitions (WebKit GPU Composited Crossfade) ── */
 ::view-transition-image-pair(root) {
   isolation: isolate;
 }
 
-/* Neutralize WebKit default plus-lighter blend mode bug */
-::view-transition-old(root),
-::view-transition-new(root) {
+::view-transition-old(root) {
+  animation: 140ms cubic-bezier(0.4, 0, 1, 1) both page-out;
   mix-blend-mode: normal !important;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-::view-transition-group(root) {
-  animation-duration: 150ms;
-  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+::view-transition-new(root) {
+  animation: 220ms cubic-bezier(0, 0, 0.2, 1) both page-in;
+  mix-blend-mode: normal !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* Prevent text elements from running CSS transitions while Astro swaps pages */
+@keyframes page-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 2. Transition Isolation Gate ──
+     Freezes element-level CSS transitions strictly while Astro swaps pages (150ms).
+     Prevents double-rendering text flashes on WebKit snapshot capture. */
 :root[data-astro-transition] .reveal,
 :root[data-astro-transition-fallback="old"] .reveal,
 :root[data-astro-transition-fallback="new"] .reveal {
   transition: none !important;
-}
-
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 :root {
@@ -186,20 +193,21 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
 }
 
-/* ── Scroll-reveal ── */
+/* ── 3. Scroll-Reveal Animations ── */
 .reveal {
   opacity: 0;
+  transform: translateY(18px);
   contain: layout paint style;
   will-change: opacity, transform;
-  transform: translateY(18px);
   transition:
-    opacity 0.55s ease,
-    transform 0.55s ease;
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--reveal-index, 0) * 35ms);
 }
 
 .reveal.on {
   opacity: 1;
-  transform: none;
+  transform: translateY(0);
   will-change: auto;
 }
 
