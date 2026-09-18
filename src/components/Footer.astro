@@ -15,25 +15,27 @@ const year = new Date().getFullYear(); // computed at build time — never stale
          must hold the same values as .foot-mark. -->
     <RockcruitWordmark
       class="foot-mark"
-      width="111"
-      height="13"
+      width="139"
+      height="16"
       role="img"
       aria-label="Rockcruit"
     />
     <div class="foot-dot"></div>
   </a>
-  <ul class="foot-links">
-    <li><a href={href("/services")}>Services</a></li>
-    <li><a href={href("/faq")}>FAQ</a></li>
-    <li><a href={href("/#contact")}>Hire With Us</a></li>
-    <li class="foot-social">
+  <div class="foot-actions">
+    <ul class="foot-links">
+      <li><a href={href("/services")}>Services</a></li>
+      <li><a href={href("/faq")}>FAQ</a></li>
+      <li><a href={href("/#contact")}>Hire With Us</a></li>
+    </ul>
+    <div class="foot-social" aria-label="Social media">
       <a
         href="https://www.instagram.com/rockcruit/"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Instagram"
       >
-        <InstagramIcon width="18" height="18" role="img" aria-hidden="true" />
+        <InstagramIcon width="21" height="21" role="img" aria-hidden="true" />
       </a>
       <a
         href="https://www.linkedin.com/company/rockcruit"
@@ -41,13 +43,13 @@ const year = new Date().getFullYear(); // computed at build time — never stale
         rel="noopener noreferrer"
         aria-label="LinkedIn"
       >
-        <LinkedinIcon width="18" height="18" role="img" aria-hidden="true" />
+        <LinkedinIcon width="21" height="21" role="img" aria-hidden="true" />
       </a>
       <a href="mailto:info@rockcruit.com" aria-label="Mail">
-        <MailIcon width="18" height="18" role="img" aria-hidden="true" />
+        <MailIcon width="21" height="21" role="img" aria-hidden="true" />
       </a>
-    </li>
-  </ul>
+    </div>
+  </div>
   <div class="foot-copy">© {year} Rockcruit · All rights reserved</div>
 </footer>
 
@@ -55,9 +57,8 @@ const year = new Date().getFullYear(); // computed at build time — never stale
   footer {
     padding: 2.5rem 5%;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
     flex-wrap: wrap;
+    align-items: center;
     gap: 1.5rem;
     border-top: 1px solid var(--bdark);
   }
@@ -73,7 +74,7 @@ const year = new Date().getFullYear(); // computed at build time — never stale
      width:auto. An automatic width lets the browser take the 209px size of the
      file, and the mark then grows after a client-side navigation. */
   .foot-mark {
-    --logo-height: 0.8rem;
+    --logo-height: 1rem;
     display: block;
     height: var(--logo-height);
     width: calc(var(--logo-height) * 209 / 24);
@@ -85,16 +86,22 @@ const year = new Date().getFullYear(); // computed at build time — never stale
     border-radius: 50%;
     background: var(--green);
   }
+  .foot-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-left: auto;
+  }
   .foot-links {
     display: flex;
-    gap: 2.5rem;
+    gap: 2rem;
     list-style: none;
     flex-wrap: wrap;
     margin: 0;
     padding: 0;
   }
   .foot-links a {
-    font-size: 0.77rem;
+    font-size: 0.85rem;
     color: rgba(240, 237, 227, 0.35);
     text-decoration: none;
     transition: color 0.2s;
@@ -122,7 +129,31 @@ const year = new Date().getFullYear(); // computed at build time — never stale
     display: block;
   }
   .foot-copy {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: rgba(240, 237, 227, 0.2);
+    margin-left: auto;
+  }
+
+  @media (max-width: 800px) {
+    footer {
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: flex-start;
+      row-gap: 1.5rem;
+      padding-block: 2.5rem;
+    }
+    .foot-actions {
+      display: contents;
+    }
+    .foot-links,
+    .foot-social,
+    .foot-copy {
+      grid-column: 1;
+      justify-self: start;
+      margin-left: 0;
+    }
+    .foot-links {
+      column-gap: 1.5rem;
+    }
   }
 </style>
