@@ -80,7 +80,19 @@
      Prevents double-rendering text flashes on WebKit snapshot capture. */
 :root[data-astro-transition] .reveal,
 :root[data-astro-transition-fallback="old"] .reveal,
-:root[data-astro-transition-fallback="new"] .reveal {
+:root[data-astro-transition-fallback="new"] .reveal,
+:root[data-astro-transition] .mask-inner,
+:root[data-astro-transition-fallback="old"] .mask-inner,
+:root[data-astro-transition-fallback="new"] .mask-inner,
+:root[data-astro-transition] .slide-left,
+:root[data-astro-transition-fallback="old"] .slide-left,
+:root[data-astro-transition-fallback="new"] .slide-left,
+:root[data-astro-transition] .slide-right,
+:root[data-astro-transition-fallback="old"] .slide-right,
+:root[data-astro-transition-fallback="new"] .slide-right,
+:root[data-astro-transition] .cascade-in,
+:root[data-astro-transition-fallback="old"] .cascade-in,
+:root[data-astro-transition-fallback="new"] .cascade-in {
   transition: none !important;
 }
 
@@ -219,6 +231,101 @@ body::after {
   }
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* ── Cinematic typography mask reveal ──
+   The wrapper clips the line. The inner span carries the motion. The
+   .mask-line node joins the same .reveal engine in Layout.astro: the JS adds
+   .on and sets --reveal-index the same way for both classes. */
+.mask-line {
+  display: block;
+  overflow: hidden;
+}
+.mask-inner {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: calc(var(--reveal-index, 0) * 90ms);
+  will-change: transform;
+}
+.mask-line.on .mask-inner {
+  transform: translateY(0);
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mask-inner {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ── Side-in reveal ──
+   Same .reveal engine in Layout.astro, adds .on the same way. The card keeps
+   its own side on every layout, mobile included, so a stacked card still
+   answers to the side it came from on a wide screen. */
+.slide-left,
+.slide-right {
+  opacity: 0;
+  contain: layout paint style;
+  will-change: opacity, transform;
+  transition:
+    opacity 1.4s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: calc(var(--reveal-index, 0) * 100ms);
+}
+.slide-left {
+  transform: translateX(-90px);
+}
+.slide-right {
+  transform: translateX(90px);
+}
+.slide-left.on,
+.slide-right.on {
+  opacity: 1;
+  transform: translateX(0);
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-left,
+  .slide-right {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ── Horizontal relay cascade ──
+   Same .reveal engine, for the opacity/transform values and the .on switch
+   only. The card slides in from the left, not up.
+   The --reveal-index delay below is a fallback for a lone user of this
+   class. It is NOT reliable for a strict 1 → 2 → 3 order among siblings
+   that get revealed in the same batch: IntersectionObserver does not
+   guarantee left-to-right delivery order for same-row elements, which is
+   why the .pos-col cards (src/pages/index.astro) instead pin their delay
+   with a plain :nth-child rule and ignore --reveal-index entirely. */
+.cascade-in {
+  opacity: 0;
+  transform: translateX(-60px);
+  will-change: opacity, transform;
+  transition:
+    opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: calc(var(--reveal-index, 0) * 0.6s);
+}
+.cascade-in.on {
+  opacity: 1;
+  transform: translateX(0);
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cascade-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
 
