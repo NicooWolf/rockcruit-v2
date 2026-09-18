@@ -23,7 +23,6 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     <div class="nav-dot"></div>
   </a>
   <ul class="nav-links">
-    <li><a href={href("/")} class={isActive("/") ? "active" : ""}>Home</a></li>
     <li class="nav-dropdown">
       <a href={href("/services")} class={isActive("/services") ? "active" : ""}>
         Services <span class="nav-dropdown-arrow">▾</span>
