@@ -21,10 +21,18 @@ import { brands } from "../lib/brands";
 
     <div class="hero-h1-wrap reveal">
       <h1>
-        <span class="hl-ink">FAST-GROWING</span>
-        <span class="hl-green">TEAMS NEED</span>
-        <span class="hl-ink">BETTER HIRING</span>
-        <span class="hl-muted">PARTNERS.</span>
+        <span class="hl-ink mask-line"
+          ><span class="mask-inner">FAST-GROWING</span></span
+        >
+        <span class="hl-green mask-line"
+          ><span class="mask-inner">TEAMS NEED</span></span
+        >
+        <span class="hl-ink mask-line"
+          ><span class="mask-inner">BETTER HIRING</span></span
+        >
+        <span class="hl-muted mask-line"
+          ><span class="mask-inner">PARTNERS.</span></span
+        >
       </h1>
     </div>
 
@@ -164,12 +172,16 @@ import { brands } from "../lib/brands";
     <div class="pos-header reveal">
       <div class="pos-eyebrow">Why companies switch to Rockcruit</div>
       <h2 class="pos-h2">
-        Most recruiting firms restart from zero <em>every search.</em> We don't.
+        <span class="mask-line"
+          ><span class="mask-inner"
+            >Most recruiting firms restart from zero <em>every search.</em> We don't.</span
+          ></span
+        >
       </h2>
     </div>
 
     <div class="pos-cols">
-      <div class="pos-col reveal">
+      <div class="pos-col cascade-in">
         <div class="pos-col-num">01</div>
         <div class="pos-col-title">Embedded, not external</div>
         <p class="pos-col-body">
@@ -178,7 +190,7 @@ import { brands } from "../lib/brands";
           recruiting function with external flexibility.
         </p>
       </div>
-      <div class="pos-col reveal">
+      <div class="pos-col cascade-in">
         <div class="pos-col-num">02</div>
         <div class="pos-col-title">Context compounds over time</div>
         <p class="pos-col-body">
@@ -187,7 +199,7 @@ import { brands } from "../lib/brands";
           actually succeed long term.
         </p>
       </div>
-      <div class="pos-col reveal">
+      <div class="pos-col cascade-in">
         <div class="pos-col-num">03</div>
         <div class="pos-col-title">Elastic recruiting capacity</div>
         <p class="pos-col-body">
@@ -214,7 +226,11 @@ import { brands } from "../lib/brands";
   <section class="diff">
     <div class="diff-header">
       <h2 class="diff-h2 reveal">
-        What you'll actually feel<br />working with <em>us.</em>
+        <span class="mask-line"
+          ><span class="mask-inner"
+            >What you'll actually feel<br />working with <em>us.</em></span
+          ></span
+        >
       </h2>
       <p class="diff-sub reveal">
         Not buzzwords. Operational differences that change how hiring moves.
@@ -282,13 +298,19 @@ import { brands } from "../lib/brands";
   <section class="services-teaser">
     <div class="st-header reveal">
       <div class="st-eyebrow">Delivery models</div>
-      <h2 class="st-h2">Two ways to<br />work with <em>us.</em></h2>
+      <h2 class="st-h2">
+        <span class="mask-line"
+          ><span class="mask-inner"
+            >Two ways to<br />work with <em>us.</em></span
+          ></span
+        >
+      </h2>
       <p class="st-intro">
         The right model depends mostly on one thing:<br />how often you hire.
       </p>
     </div>
     <div class="st-cards">
-      <div class="st-card reveal">
+      <div class="st-card slide-left">
         <div class="st-card-num">01</div>
         <div class="st-card-title">For companies<br />hiring continuously.</div>
         <p class="st-card-body">
@@ -299,7 +321,7 @@ import { brands } from "../lib/brands";
         <a href={href("/services#raas")} class="st-card-link">See RaaS →</a>
         <div class="st-card-bg">01</div>
       </div>
-      <div class="st-card reveal">
+      <div class="st-card slide-right">
         <div class="st-card-num">02</div>
         <div class="st-card-title">For focused,<br />isolated searches.</div>
         <p class="st-card-body">
@@ -319,7 +341,12 @@ import { brands } from "../lib/brands";
     <div class="testi-top">
       <div>
         <div class="testi-eyebrow reveal">Client reviews</div>
-        <h2 class="testi-h2 reveal">What our<br /><em>clients say.</em></h2>
+        <h2 class="testi-h2 reveal">
+          <span class="mask-line"
+            ><span class="mask-inner">What our<br /><em>clients say.</em></span
+            ></span
+          >
+        </h2>
       </div>
       <p class="testi-sub reveal">
         Real feedback from leaders hiring digital talent under pressure.
@@ -410,11 +437,21 @@ import { brands } from "../lib/brands";
       <div class="fcta-left reveal">
         <div class="fcta-eyebrow">Let's work together</div>
         <h2 class="fcta-h2">
-          <span>YOUR TEAM IS</span>
-          <span class="green">GROWING.</span>
-          <span>LET'S BUILD</span>
-          <span>HIRING TO</span>
-          <span class="green">MATCH.</span>
+          <span class="mask-line"
+            ><span class="mask-inner">YOUR TEAM IS</span></span
+          >
+          <span class="green mask-line"
+            ><span class="mask-inner">GROWING.</span></span
+          >
+          <span class="mask-line"
+            ><span class="mask-inner">LET'S BUILD</span></span
+          >
+          <span class="mask-line"
+            ><span class="mask-inner">HIRING TO</span></span
+          >
+          <span class="green mask-line"
+            ><span class="mask-inner">MATCH.</span></span
+          >
         </h2>
       </div>
       <div class="fcta-right reveal">
@@ -786,7 +823,12 @@ import { brands } from "../lib/brands";
   .pos-col {
     background: var(--ink);
     padding: 3rem 5%;
-    transition: background 0.2s;
+    /* Keep the transition here because this scoped rule overrides global.css. */
+    transition:
+      background 0.2s,
+      opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition-delay: 0s;
   }
   .pos-col:hover {
     background: rgba(255, 255, 255, 0.02);
@@ -1035,7 +1077,17 @@ import { brands } from "../lib/brands";
     gap: 1.8rem;
     position: relative;
     overflow: hidden;
-    transition: background 0.2s;
+    /* This scoped rule beats the unscoped .slide-left/.slide-right rule in
+       global.css on specificity (Astro adds a data-astro-cid attribute to
+       every scoped selector), so the side-in reveal transition must live
+       here too, or it silently loses the opacity/transform transition. */
+    transition:
+      background 0.2s,
+      opacity 1.4s cubic-bezier(0.25, 1, 0.5, 1),
+      transform 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay:
+      0s, calc(var(--reveal-index, 0) * 100ms),
+      calc(var(--reveal-index, 0) * 100ms);
   }
   .st-card:hover {
     background: rgba(255, 255, 255, 0.025);
@@ -1376,6 +1428,19 @@ import { brands } from "../lib/brands";
     }
   }
 
+  /* Start each card when the prior card reaches 80% of its transition. */
+  @media (min-width: 1025px) {
+    .pos-col:nth-child(1) {
+      transition-delay: 0s, 0s, 0s;
+    }
+    .pos-col:nth-child(2) {
+      transition-delay: 0s, 0.15s, 0.15s;
+    }
+    .pos-col:nth-child(3) {
+      transition-delay: 0s, 0.35s, 0.35s;
+    }
+  }
+
   @media (max-width: 1024px) {
     .subhero-grid {
       grid-template-columns: 1fr;
@@ -1429,6 +1494,34 @@ import { brands } from "../lib/brands";
 </style>
 
 <script>
+  import Lenis from "lenis";
+
+  // Lenis smooth scroll — Home page only. A fresh Lenis instance starts on
+  // each entry to this page and stops before the router swaps to another
+  // page, so every other page keeps native scroll untouched. Layout.astro
+  // reads window.__lenis to route hash jumps through it when it is running.
+  document.addEventListener("astro:page-load", () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const lenis = new Lenis({ lerp: 0.1 });
+    (window as { __lenis?: Lenis }).__lenis = lenis;
+
+    let rafId = requestAnimationFrame(function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    });
+
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        cancelAnimationFrame(rafId);
+        lenis.destroy();
+        delete (window as { __lenis?: Lenis }).__lenis;
+      },
+      { once: true },
+    );
+  });
+
   // Accordion — event delegation (survives ClientRouter navigations, never double-binds).
   document.addEventListener("click", (e) => {
     const btn = (e.target as Element).closest?.(".diff-item-btn");

@@ -76,7 +76,9 @@ const canonical = Astro.site
 
         function revealATF(doc) {
           const vh = window.innerHeight;
-          const els = doc.querySelectorAll(".reveal:not(.on)");
+          const els = doc.querySelectorAll(
+            ".reveal:not(.on), .mask-line:not(.on), .slide-left:not(.on), .slide-right:not(.on), .cascade-in:not(.on)",
+          );
           let revealIndex = 0;
           for (let i = 0; i < els.length; i++) {
             const rect = els[i].getBoundingClientRect();
@@ -163,6 +165,10 @@ const canonical = Astro.site
       let settleUntil = 0;
       let landingDepth = 0;
       let readerMoved = false;
+      let revealObserver: IntersectionObserver | null = null;
+
+      const REVEAL_SELECTOR =
+        ".reveal, .mask-line, .slide-left, .slide-right, .cascade-in";
 
       const startJump = () => {
         settleUntil = performance.now() + SETTLE_TIME;
@@ -170,14 +176,39 @@ const canonical = Astro.site
         readerMoved = false;
       };
 
+      // ── Jump to a target. Lenis owns the scroll on a page that runs it, so
+      // hand the jump to Lenis there. Every other page keeps the native jump.
+      // The type below names only the one method this file calls; the Home
+      // page script (src/pages/index.astro) owns the real Lenis instance.
+      interface LenisLike {
+        scrollTo: (
+          target: Element | number,
+          opts?: { immediate?: boolean },
+        ) => void;
+      }
+      const jumpToTarget = (target: Element) => {
+        const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+        if (lenis) lenis.scrollTo(target, { immediate: true });
+        else target.scrollIntoView({ behavior: "instant", block: "start" });
+      };
+
       // ── Instant reveal for a jump target.
       const revealSection = (id: string) => {
         if (!id) return null;
         const target = document.getElementById(id);
         if (!target) return null;
-        if (target.classList.contains("reveal")) target.classList.add("on");
+        if (
+          target.classList.contains("reveal") ||
+          target.classList.contains("mask-line") ||
+          target.classList.contains("slide-left") ||
+          target.classList.contains("slide-right") ||
+          target.classList.contains("cascade-in")
+        )
+          target.classList.add("on");
         target
-          .querySelectorAll(".reveal:not(.on)")
+          .querySelectorAll(
+            ".reveal:not(.on), .mask-line:not(.on), .slide-left:not(.on), .slide-right:not(.on), .cascade-in:not(.on)",
+          )
           .forEach((el) => el.classList.add("on"));
         return target;
       };
@@ -194,7 +225,7 @@ const canonical = Astro.site
         if (!target) return;
 
         requestAnimationFrame(() => {
-          target.scrollIntoView({ behavior: "instant", block: "start" });
+          jumpToTarget(target);
           startJump();
         });
       });
@@ -231,7 +262,10 @@ const canonical = Astro.site
           if (window.location.hash) {
             history.pushState(history.state, "", url.pathname + url.search);
           }
-          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+          if (lenis) lenis.scrollTo(0, { immediate: true });
+          else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          resetBelowFoldReveals();
           startJump();
           return;
         }
@@ -248,7 +282,7 @@ const canonical = Astro.site
             url.pathname + url.search + url.hash,
           );
         }
-        target.scrollIntoView({ behavior: "instant", block: "start" });
+        jumpToTarget(target);
         startJump();
       });
 
@@ -301,9 +335,31 @@ const canonical = Astro.site
         { passive: true },
       );
 
-      // ── Below-The-Fold Scroll reveals: fresh observer per page entry.
+      const observePendingReveals = () => {
+        document
+          .querySelectorAll<HTMLElement>(REVEAL_SELECTOR)
+          .forEach((el) => {
+            if (!el.classList.contains("on")) revealObserver?.observe(el);
+          });
+      };
+
+      const resetBelowFoldReveals = () => {
+        const fold = window.innerHeight;
+        document
+          .querySelectorAll<HTMLElement>(REVEAL_SELECTOR)
+          .forEach((el) => {
+            const documentTop = el.getBoundingClientRect().top + window.scrollY;
+            if (documentTop < fold) return;
+            el.classList.remove("on");
+            el.style.removeProperty("--reveal-index");
+          });
+        observePendingReveals();
+      };
+
+      // Create one observer for each page entry.
       document.addEventListener("astro:page-load", () => {
-        const io = new IntersectionObserver(
+        revealObserver?.disconnect();
+        revealObserver = new IntersectionObserver(
           (entries) => {
             const visible = entries
               .filter((entry) => entry.isIntersecting)
@@ -312,7 +368,7 @@ const canonical = Astro.site
               );
 
             visible.forEach((entry) => {
-              io.unobserve(entry.target);
+              revealObserver?.unobserve(entry.target);
             });
 
             const revealVisible = () => {
@@ -339,9 +395,7 @@ const canonical = Astro.site
           },
           { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
         );
-        document
-          .querySelectorAll(".reveal:not(.on)")
-          .forEach((el) => io.observe(el));
+        observePendingReveals();
       });
     </script>
   </body>
