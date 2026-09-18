@@ -3,9 +3,10 @@
 // Built in the established design system; copy grounded in v1's AboutUs section
 // ("Specialized Knowledge" + domain list). The typewriter effect is dropped per
 // CLAUDE.md animation non-goals — domains render as a static mono list.
-// TODO(team): add the photos of the members. The names and the roles are real.
 import Layout from "../layouts/Layout.astro";
 import { href } from "../lib/url";
+import profileJulieta from "../assets/images/profile_julieta.jpeg";
+import profileAgustina from "../assets/images/profile_agustina.png";
 ---
 
 <Layout
@@ -56,6 +57,51 @@ import { href } from "../lib/url";
             </>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  <!-- Members -->
+  <section class="members">
+    <div class="members-glow"></div>
+    <div class="members-header reveal">
+      <div class="d-eyebrow">The team</div>
+      <h2 class="d-h2">People, not <em>pipelines.</em></h2>
+    </div>
+    <div class="members-grid">
+      <div class="member-card reveal">
+        <div class="member-av">
+          <img src={profileJulieta.src} alt="Julieta Wolf" />
+        </div>
+        <div class="member-name">Julieta Wolf</div>
+        <div class="member-role">Co-Founder</div>
+        <p class="member-bio">
+          Julieta is an expert in client partnership, search strategy, and
+          talent positioning. She leads commercial strategy, discovery, role
+          definition, and sourcing direction.
+        </p>
+        <p class="member-bio">
+          She works closely with clients to understand what they truly need,
+          what will work, and how to design a search process that attracts the
+          right talent.
+        </p>
+      </div>
+      <div class="member-card reveal">
+        <div class="member-av">
+          <img src={profileAgustina.src} alt="Agustina Valverde" />
+        </div>
+        <div class="member-name">Agustina Valverde</div>
+        <div class="member-role">Co-Founder</div>
+        <p class="member-bio">
+          Agustina specializes in strategic recruiting for commercial,
+          technical, and leadership roles. She has experience building teams for
+          startups and tech companies across multiple markets.
+        </p>
+        <p class="member-bio">
+          Within Rockcruit, she leads operations, process design, quality, and
+          candidate experience, ensuring every search runs with structure,
+          clarity, and consistency.
+        </p>
       </div>
     </div>
   </section>
@@ -123,49 +169,6 @@ import { href } from "../lib/url";
             <li>We work as an extension of each client's team.</li>
           </ul>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Members -->
-  <section class="members">
-    <div class="members-glow"></div>
-    <div class="members-header reveal">
-      <div class="d-eyebrow">The team</div>
-      <h2 class="d-h2">People, not <em>pipelines.</em></h2>
-    </div>
-    <!-- TODO(team): photos. Swap the .member-av span for
-       <img src="/team/<name>.webp" alt="" /> when the photos exist. -->
-    <div class="members-grid">
-      <div class="member-card reveal">
-        <div class="member-av"><span>JW</span></div>
-        <div class="member-name">Julieta Wolf</div>
-        <div class="member-role">Co-Founder</div>
-        <p class="member-bio">
-          Julieta is an expert in client partnership, search strategy, and
-          talent positioning. She leads commercial strategy, discovery, role
-          definition, and sourcing direction.
-        </p>
-        <p class="member-bio">
-          She works closely with clients to understand what they truly need,
-          what will work, and how to design a search process that attracts the
-          right talent.
-        </p>
-      </div>
-      <div class="member-card reveal">
-        <div class="member-av"><span>AV</span></div>
-        <div class="member-name">Agustina Valverde</div>
-        <div class="member-role">Co-Founder</div>
-        <p class="member-bio">
-          Agustina specializes in strategic recruiting for commercial,
-          technical, and leadership roles. She has experience building teams for
-          startups and tech companies across multiple markets.
-        </p>
-        <p class="member-bio">
-          Within Rockcruit, she leads operations, process design, quality, and
-          candidate experience, ensuring every search runs with structure,
-          clarity, and consistency.
-        </p>
       </div>
     </div>
   </section>
@@ -526,18 +529,24 @@ import { href } from "../lib/url";
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: rgba(var(--violet-light-rgb), 0.1);
     border: 1px solid rgba(var(--violet-light-rgb), 0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin-bottom: 1rem;
+    overflow: hidden;
   }
-  .member-av span {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--violet-light);
+  .member-av img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.65);
+    transition: filter 0.4s ease;
   }
+
+  .member-card:hover .member-av img {
+    filter: brightness(1);
+  }
+
   .member-name {
     font-family: var(--bebas);
     font-weight: 400;
