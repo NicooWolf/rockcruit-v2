@@ -151,6 +151,13 @@ section {
   contain: layout paint;
 }
 
+/* The form sits in a reveal box. Paint containment clips the category panel
+   before it can sit over the submit control. The section still clips paint,
+   so the panel cannot leave the contact block. */
+section.final-cta .reveal {
+  contain: none;
+}
+
 /* ── The strip that gives the phone top bar its color ── */
 .ios-tint {
   position: fixed;

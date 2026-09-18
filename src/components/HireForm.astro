@@ -209,12 +209,20 @@ const categories = [
 
        The rows read their own two values. The first open uses the full
        cascade. Every open after a choice uses .is-quick, because the reader
-       already knows the list. The panel keeps its slide in both cases. */
+       already knows the list. The panel keeps its slide in both cases.
+
+       --menu-row is one item: vertical padding plus the line. --menu-chrome
+       is the panel padding and the border. Eight rows plus chrome must fit
+       inside max-height, or the last visible row is cut. */
     --cascade-step: 132ms;
     --cascade-fade: 180ms;
     --cascade-span: calc(7 * var(--cascade-step) + var(--cascade-fade));
     --row-step: var(--cascade-step);
     --row-fade: var(--cascade-fade);
+    --menu-item-y: 0.7rem;
+    --menu-row: calc(var(--menu-item-y) * 2 + 0.82rem * 1.35);
+    --menu-chrome: calc(0.7rem + 2px);
+    --menu-max: calc(8 * var(--menu-row) + var(--menu-chrome));
   }
   .f-select-wrap.is-quick {
     --row-step: 12ms;
@@ -270,9 +278,10 @@ const categories = [
 
   /* ── The category menu ──
      The panel follows the nav dropdown: dark card, hairline border, rows that
-     light up. The list is long, so the panel scrolls and one group opens at a
-     time. The panel always opens below the field. The script writes the free
-     space to --menu-space, and the panel cuts its height there. */
+     light up. The list is long, so the panel scrolls. The panel always opens
+     below the field. The script writes the free space inside the section to
+     --menu-space. That space does not use the screen edge, so scroll does
+     not change the height. A gap keeps the panel off the footer. */
   .f-menu {
     position: absolute;
     z-index: 400;
@@ -283,8 +292,7 @@ const categories = [
     border: 1px solid #3f3f46;
     border-radius: 8px;
     padding: 0.35rem 0;
-    /* --menu-space is the free space above the footer. The script writes it. */
-    max-height: min(320px, 50vh, var(--menu-space, 50vh));
+    max-height: min(var(--menu-max), var(--menu-space, var(--menu-max)));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -363,7 +371,7 @@ const categories = [
     align-items: center;
     justify-content: space-between;
     gap: 0.6rem;
-    padding: 0.7rem 1rem;
+    padding: var(--menu-item-y) 1rem;
     border: 0;
     background: transparent;
     color: rgba(240, 237, 227, 0.5);
@@ -476,11 +484,8 @@ const categories = [
       flex-direction: column;
     }
     /* A finger needs a larger row than a pointer. */
-    .f-menu {
-      max-height: min(300px, 45vh, var(--menu-space, 45vh));
-    }
-    .f-menu-item {
-      padding: 0.8rem 1rem;
+    .f-select-wrap {
+      --menu-item-y: 0.8rem;
     }
   }
 </style>
@@ -545,24 +550,42 @@ const categories = [
     const isOpen = () => trigger.getAttribute("aria-expanded") === "true";
 
     // ── The height of the panel ──
-    // The panel always opens below the field, and it always takes its full
-    // height. The footer gives the only limit: the panel must never cover it.
-    // That distance stays the same at every scroll position, so the place of
-    // the screen edge changes nothing. The script writes the free space to
-    // --menu-space, and the CSS keeps the other limits.
-    const MENU_GAP = 8; // between the field and the panel
-    const EDGE_GAP = 16; // between the panel and the footer
+    // The panel always opens below the field. The section and the footer set
+    // the limit. Their distance from the field does not change when the page
+    // scrolls, so the height stays the same. EDGE_GAP keeps the panel off the
+    // footer. The script snaps the height to whole rows, so the last row is
+    // not cut.
+    const MENU_GAP = 8;
+    const EDGE_GAP = 16;
 
     const placeMenu = () => {
-      const box = trigger.getBoundingClientRect();
-      const footer = document.querySelector("footer");
-      const top = box.bottom + MENU_GAP;
-      // A page without a footer gives no limit. 10000px stands for that.
-      const toFooter = footer
-        ? footer.getBoundingClientRect().top - EDGE_GAP - top
-        : 10000;
+      const saved = menu.style.animation;
+      menu.style.animation = "none";
 
-      wrap.style.setProperty("--menu-space", `${Math.max(toFooter, 0)}px`);
+      const box = trigger.getBoundingClientRect();
+      const section = form.closest("section");
+      const footer = document.querySelector("footer");
+      const sectionBottom = section
+        ? section.getBoundingClientRect().bottom
+        : Number.POSITIVE_INFINITY;
+      const footerTop = footer
+        ? footer.getBoundingClientRect().top
+        : Number.POSITIVE_INFINITY;
+      const limit = Math.min(sectionBottom, footerTop);
+      const space = limit - EDGE_GAP - (box.bottom + MENU_GAP);
+
+      const row = items[0]?.offsetHeight ?? 40;
+      const style = getComputedStyle(menu);
+      const chrome =
+        parseFloat(style.paddingTop) +
+        parseFloat(style.paddingBottom) +
+        parseFloat(style.borderTopWidth) +
+        parseFloat(style.borderBottomWidth);
+      const rows =
+        row > 0 ? Math.max(1, Math.floor((Math.max(space, 0) - chrome) / row)) : 1;
+
+      wrap.style.setProperty("--menu-space", `${rows * row + chrome}px`);
+      menu.style.animation = saved;
     };
 
     // ── The cascade ──
@@ -713,10 +736,6 @@ const categories = [
       const target = event.target;
       if (target instanceof Node && wrap.contains(target)) return;
       close();
-    });
-
-    window.addEventListener("resize", () => {
-      if (wrap.isConnected && isOpen()) placeMenu();
     });
 
     form.addEventListener("reset", () => {
