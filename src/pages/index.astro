@@ -166,16 +166,6 @@ import { brands } from "../lib/brands";
       <h2 class="pos-h2">
         Most recruiting firms restart from zero <em>every search.</em> We don't.
       </h2>
-      <div class="pos-intro">
-        <p>Traditional recruiting works transaction by transaction.</p>
-        <p>But scaling teams don't hire that way.</p>
-        <p>
-          Every new search forces external recruiters to relearn your culture,
-          your hiring standards, your interview process, and what actually makes
-          someone succeed inside your company. That creates friction, slow
-          ramp-up time, and inconsistent candidate quality.
-        </p>
-      </div>
     </div>
 
     <div class="pos-cols">
@@ -285,14 +275,6 @@ import { brands } from "../lib/brands";
           status, market feedback, and where searches stand.
         </div>
       </div>
-    </div>
-
-    <div class="diff-footer reveal">
-      <p class="diff-closing">
-        The goal isn't sending more candidates.<br /><strong
-          >It's reducing hiring mistakes.</strong
-        >
-      </p>
     </div>
   </section>
 
@@ -780,7 +762,6 @@ import { brands } from "../lib/brands";
     letter-spacing: -0.02em;
     color: var(--paper);
     max-width: 700px;
-    margin-bottom: 2.5rem;
   }
   .pos-h2 em {
     font-style: normal;
@@ -855,12 +836,12 @@ import { brands } from "../lib/brands";
   }
   .pos-cta {
     font-size: 0.83rem;
-    color: rgba(240, 237, 227, 0.35);
+    color: var(--green);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    border: 1px solid var(--bdark);
+    border: 1px solid var(--green);
     border-radius: 4px;
     padding: 0.7rem 1.4rem;
     transition:
@@ -869,8 +850,8 @@ import { brands } from "../lib/brands";
     white-space: nowrap;
   }
   .pos-cta:hover {
-    border-color: var(--green);
-    color: var(--green);
+    border-color: var(--bdark);
+    color: rgba(240, 237, 227, 0.35);
   }
 
   /* DIFFERENTIATORS */
@@ -976,7 +957,7 @@ import { brands } from "../lib/brands";
   .di-body {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.45s ease;
+    transition: max-height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .di-body-inner {
     padding: 0.5rem 5% 2rem calc(5% + 80px + 2rem);
@@ -988,10 +969,7 @@ import { brands } from "../lib/brands";
   .diff-item.open .di-body {
     max-height: 200px;
   }
-  .diff-footer {
-    padding: 3rem 5%;
-    border-top: 1px solid var(--bdark);
-  }
+
   .diff-closing {
     font-family: var(--serif);
     font-style: italic;
@@ -1359,6 +1337,7 @@ import { brands } from "../lib/brands";
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding: 0.2rem;
   }
   .fcta-intro-p {
     font-size: 0.92rem;
@@ -1367,6 +1346,36 @@ import { brands } from "../lib/brands";
   }
 
   /* RESPONSIVE */
+  @media (min-width: 1025px) {
+    h1 {
+      font-size: clamp(5.1765rem, 13vw, 15.0588rem);
+    }
+    .subhero-title {
+      font-size: clamp(1.4118rem, 2.8vw, 2.2588rem);
+    }
+    .stat-num {
+      font-size: clamp(2.2588rem, 4vw, 3.2rem);
+    }
+    .pos-col-title {
+      font-size: 1.5059rem;
+    }
+    .pos-h2,
+    .diff-h2,
+    .st-h2,
+    .testi-h2 {
+      font-size: clamp(2.0706rem, 4.5vw, 3.7647rem);
+    }
+    .st-card-title {
+      font-size: clamp(1.8824rem, 3.5vw, 2.8235rem);
+    }
+    .st-step-bg {
+      font-size: 7.5294rem;
+    }
+    .fcta-h2 {
+      font-size: clamp(3.7647rem, 8vw, 8.4706rem);
+    }
+  }
+
   @media (max-width: 1024px) {
     .subhero-grid {
       grid-template-columns: 1fr;
