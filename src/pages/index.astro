@@ -935,7 +935,7 @@ import { brands } from "../lib/brands";
   }
   .diff-item-btn {
     width: 100%;
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     display: grid;
@@ -945,9 +945,13 @@ import { brands } from "../lib/brands";
     padding: 2rem 5%;
     text-align: left;
     transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .diff-item-btn:hover {
-    background: rgba(255, 255, 255, 0.03);
+  /* Touch keeps :hover after a tap. Hover paint is for a fine pointer only. */
+  @media (hover: hover) and (pointer: fine) {
+    .diff-item-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
   .diff-item.open .diff-item-btn {
     background: rgba(255, 255, 255, 0.04);
@@ -1523,15 +1527,23 @@ import { brands } from "../lib/brands";
   });
 
   // Accordion — event delegation (survives ClientRouter navigations, never double-binds).
+  // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
   document.addEventListener("click", (e) => {
-    const btn = (e.target as Element).closest?.(".diff-item-btn");
-    if (!btn) return;
-    const item = btn.closest(".diff-item");
-    const wasOpen = item?.classList.contains("open");
+    const target = e.target as Element;
+    const btn = target.closest?.(".diff-item-btn");
+    if (btn) {
+      const item = btn.closest(".diff-item");
+      const wasOpen = item?.classList.contains("open");
+      document
+        .querySelectorAll(".diff-item")
+        .forEach((i) => i.classList.remove("open"));
+      if (!wasOpen) item?.classList.add("open");
+      return;
+    }
+    if (target.closest?.(".diff-item.open")) return;
     document
-      .querySelectorAll(".diff-item")
+      .querySelectorAll(".diff-item.open")
       .forEach((i) => i.classList.remove("open"));
-    if (!wasOpen) item?.classList.add("open");
   });
 
   // Carousel — fresh state per page entry (astro:page-load pattern).

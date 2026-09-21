@@ -149,7 +149,7 @@ const faqs = [
   }
   .faq-btn {
     width: 100%;
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     display: grid;
@@ -159,9 +159,13 @@ const faqs = [
     padding: 2rem 5%;
     text-align: left;
     transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .faq-btn:hover {
-    background: rgba(255, 255, 255, 0.03);
+  /* Touch keeps :hover after a tap. Hover paint is for a fine pointer only. */
+  @media (hover: hover) and (pointer: fine) {
+    .faq-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
   .faq-item.open .faq-btn {
     background: rgba(255, 255, 255, 0.04);
@@ -271,14 +275,22 @@ const faqs = [
 
 <script>
   // FAQ accordion — same delegation pattern as the home page (ClientRouter-safe).
+  // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
   document.addEventListener("click", (e) => {
-    const btn = (e.target as Element).closest?.(".faq-btn");
-    if (!btn) return;
-    const item = btn.closest(".faq-item");
-    const wasOpen = item?.classList.contains("open");
+    const target = e.target as Element;
+    const btn = target.closest?.(".faq-btn");
+    if (btn) {
+      const item = btn.closest(".faq-item");
+      const wasOpen = item?.classList.contains("open");
+      document
+        .querySelectorAll(".faq-item")
+        .forEach((i) => i.classList.remove("open"));
+      if (!wasOpen) item?.classList.add("open");
+      return;
+    }
+    if (target.closest?.(".faq-item.open")) return;
     document
-      .querySelectorAll(".faq-item")
+      .querySelectorAll(".faq-item.open")
       .forEach((i) => i.classList.remove("open"));
-    if (!wasOpen) item?.classList.add("open");
   });
 </script>

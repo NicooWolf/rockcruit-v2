@@ -361,7 +361,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   }
   .story-item-btn {
     width: 100%;
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     display: grid;
@@ -371,9 +371,13 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     padding: 2rem 5%;
     text-align: left;
     transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .story-item-btn:hover {
-    background: rgba(255, 255, 255, 0.03);
+  /* Touch keeps :hover after a tap. Hover paint is for a fine pointer only. */
+  @media (hover: hover) and (pointer: fine) {
+    .story-item-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
   .story-item.open .story-item-btn {
     background: rgba(255, 255, 255, 0.04);
@@ -617,14 +621,22 @@ import profileAgustina from "../assets/images/profile_agustina.png";
 
 <script>
   // Accordion — event delegation. It mirrors the Home "diff" section.
+  // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
   document.addEventListener("click", (e) => {
-    const btn = (e.target as Element).closest?.(".story-item-btn");
-    if (!btn) return;
-    const item = btn.closest(".story-item");
-    const wasOpen = item?.classList.contains("open");
+    const target = e.target as Element;
+    const btn = target.closest?.(".story-item-btn");
+    if (btn) {
+      const item = btn.closest(".story-item");
+      const wasOpen = item?.classList.contains("open");
+      document
+        .querySelectorAll(".story-item")
+        .forEach((i) => i.classList.remove("open"));
+      if (!wasOpen) item?.classList.add("open");
+      return;
+    }
+    if (target.closest?.(".story-item.open")) return;
     document
-      .querySelectorAll(".story-item")
+      .querySelectorAll(".story-item.open")
       .forEach((i) => i.classList.remove("open"));
-    if (!wasOpen) item?.classList.add("open");
   });
 </script>
