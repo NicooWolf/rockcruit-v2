@@ -194,6 +194,14 @@ section.final-cta .reveal {
   }
 }
 
+/* Lock the page behind the mobile nav. The panel sheet keeps its own scroll.
+   Do not pin the body. A fixed body jumps to the hash when the menu closes. */
+html[data-nav-open],
+html[data-nav-open] body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 /* ── Film-grain noise overlay ── */
 body::after {
   content: "";
