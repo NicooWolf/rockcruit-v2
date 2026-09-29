@@ -2,6 +2,7 @@
 // src/pages/blog/index.astro — post list, pre-rendered at build time.
 import Layout from "../../layouts/Layout.astro";
 import PostCard from "../../components/PostCard.astro";
+import BlogStage from "../../components/BlogStage.astro";
 import { getAllPosts } from "../../lib/wp";
 import { href } from "../../lib/url";
 
@@ -12,19 +13,27 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
   title="Blog — Rockcruit"
   description="Hiring insights from the Rockcruit team: tech recruiting, LATAM talent markets, and building teams under pressure."
 >
-  <div class="page-hero reveal">
-    <div class="page-hero-glow"></div>
-    <div class="page-hero-label">Notes from the field</div>
-    <h1 class="page-hero-h">
-      <span>HIRING,</span><span class="dim">WRITTEN DOWN.</span>
-    </h1>
-    <p class="page-hero-sub">
-      What we learn running searches every week — talent markets, process, and
-      the mistakes that cost companies their best candidates.
-    </p>
-  </div>
+  {/* The stage needs one or more posts. With no post, the page keeps the hero. */}
+  {
+    posts.length > 0 ? (
+      <BlogStage posts={posts} />
+    ) : (
+      <div class="page-hero reveal">
+        <div class="page-hero-glow" />
+        <div class="page-hero-label">Notes from the field</div>
+        <h1 class="page-hero-h">
+          <span>HIRING,</span>
+          <span class="dim">WRITTEN DOWN.</span>
+        </h1>
+        <p class="page-hero-sub">
+          What we learn running searches every week — talent markets, process,
+          and the mistakes that cost companies their best candidates.
+        </p>
+      </div>
+    )
+  }
 
-  <section class="post-list">
+  <section class="post-list" id="posts">
     {
       posts.length === 0 && (
         <p class="empty reveal">
