@@ -24,6 +24,8 @@ const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
 // The author relation returns a list. Take the first author.
 const author = post.postFields?.author?.nodes?.[0]?.authorFields;
 const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
+
+const image = post.postFields?.postImage?.node;
 ---
 
 <Layout title={`${post.title} — Rockcruit`} description={metaDescription}>
@@ -36,17 +38,26 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
 
     <div class="post-content reveal">
       <div class="post-content-header">
-        <h2>{post.postFields?.subtitle}</h2>
-        <p>{post.postFields?.description}</p>
-        {
-          authorName && (
-            <span class="post-content-author">
-              <span class="post-content-author-label">Written by</span>
-              <span class="post-content-author-name">{authorName}</span>
-            </span>
-          )
-        }
+        {post.postFields?.subtitle && <h2>{post.postFields.subtitle}</h2>}
+        {post.postFields?.description && <p>{post.postFields.description}</p>}
       </div>
+      {
+        image?.sourceUrl && (
+          <figure class="post-figure">
+            <img src={image.sourceUrl} alt={image.altText ?? ""} decoding="async" />
+          </figure>
+        )
+      }
+      {/* The owner writes this HTML in the WordPress CMS. */}
+      {post.content && <div class="post-body" set:html={post.content} />}
+      {
+        authorName && (
+          <span class="post-content-author">
+            <span class="post-content-author-label">Written by</span>
+            <span class="post-content-author-name">{authorName}</span>
+          </span>
+        )
+      }
     </div>
 
     <footer class="post-footer reveal">
@@ -128,6 +139,33 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
     font-style: italic;
     font-size: 1.15rem;
     color: var(--paper);
+  }
+  .post-figure {
+    margin: 2.5rem 0 1rem;
+  }
+  .post-figure img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  /* WordPress HTML can carry inline colors and fonts. These rules replace
+     them with the brand fonts and colors. */
+  .post-body :global([style]),
+  .post-body :global(font) {
+    color: inherit !important;
+    background-color: transparent !important;
+    font-family: inherit !important;
+  }
+  .post-body :global(h2[style]) {
+    font-family: var(--serif) !important;
+  }
+  .post-body :global(h3[style]) {
+    font-family: var(--bebas) !important;
+  }
+  .post-body :global(a[style]) {
+    color: var(--green) !important;
   }
   /* WP content arrives unscoped-able — :global() lets scoped CSS style it */
   .post-content :global(h2) {
