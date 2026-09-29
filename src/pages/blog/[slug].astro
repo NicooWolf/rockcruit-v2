@@ -82,10 +82,11 @@ const image = post.postFields?.postImage?.node;
 
   .post-back {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.65rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.35);
+    color: color-mix(in srgb, var(--paper) 35%, transparent);
     text-decoration: none;
     transition: color 0.2s;
   }
@@ -104,17 +105,18 @@ const image = post.postFields?.postImage?.node;
   }
   .post-meta {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.68rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
   .post-content {
     margin-top: 2rem;
     margin-bottom: 6rem;
     font-size: 0.98rem;
     line-height: 1.9;
-    color: rgba(240, 237, 227, 0.7);
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
   }
   /* Author byline. It sits after the content, aligned to the bottom right. */
   .post-content-author {
@@ -129,14 +131,16 @@ const image = post.postFields?.postImage?.node;
   }
   .post-content-author-label {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.62rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
   .post-content-author-name {
     font-family: var(--serif);
     font-style: italic;
+    font-weight: 400;
     font-size: 1.15rem;
     color: var(--paper);
   }
@@ -210,16 +214,17 @@ const image = post.postFields?.postImage?.node;
     padding-left: 1.2rem;
     font-family: var(--serif);
     font-style: italic;
-    color: rgba(240, 237, 227, 0.55);
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
     margin: 1.8rem 0;
   }
   .post-content :global(pre) {
-    background: #0b0b0b;
+    background: var(--bg-base);
     border: 1px solid var(--bdark);
     border-radius: 8px;
     padding: 1.2rem;
     overflow-x: auto;
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.82rem;
     margin: 1.5rem 0;
   }
@@ -236,8 +241,9 @@ const image = post.postFields?.postImage?.node;
   .post-cta-line {
     font-family: var(--serif);
     font-style: italic;
+    font-weight: 400;
     font-size: 1.2rem;
-    color: rgba(240, 237, 227, 0.5);
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
   }
   .btn-primary {
     background: var(--green);

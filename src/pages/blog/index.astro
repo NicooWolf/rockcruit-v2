@@ -74,6 +74,7 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
   }
   .page-hero-label {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -96,11 +97,11 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
     display: block;
   }
   .page-hero-h .dim {
-    color: rgba(240, 237, 227, 0.2);
+    color: color-mix(in srgb, var(--paper) 20%, transparent);
   }
   .page-hero-sub {
     font-size: 0.95rem;
-    color: #a1a1aa;
+    color: color-mix(in srgb, var(--paper) 65%, transparent);
     line-height: 1.8;
     max-width: 540px;
   }
@@ -112,7 +113,7 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
   .empty {
     padding: 4rem 5%;
     font-size: 0.95rem;
-    color: rgba(240, 237, 227, 0.45);
+    color: color-mix(in srgb, var(--paper) 45%, transparent);
   }
   .empty a {
     color: var(--green);

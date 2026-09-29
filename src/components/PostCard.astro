@@ -107,10 +107,11 @@ const fmt = (d: string) =>
     display: flex;
     gap: 1rem;
     font-family: var(--mono);
+    font-weight: 400; /* DM Mono loads 400 and 500 only */
     font-size: 0.64rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
 
   .card-title {
@@ -128,12 +129,12 @@ const fmt = (d: string) =>
   }
   .card-subtitle {
     font-size: 0.9rem;
-    color: rgba(240, 237, 227, 0.55);
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
     line-height: 1.5;
   }
   .card-desc {
     font-size: 0.84rem;
-    color: rgba(240, 237, 227, 0.4);
+    color: color-mix(in srgb, var(--paper) 40%, transparent);
     line-height: 1.7;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -166,9 +167,10 @@ const fmt = (d: string) =>
   }
   .card-author-role {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.62rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
 </style>
