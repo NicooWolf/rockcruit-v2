@@ -129,10 +129,17 @@ const canonical = Astro.site
           passive: true,
         });
 
-        // Measure the live DOM after the swap and before the new snapshot.
-        // The transition gate prevents reveal motion during this operation.
+        // Reveal the above-the-fold content of the new page after the page
+        // fade ends. The transition gate stops all reveal motion during the
+        // swap, so a reveal during the swap shows the titles with no motion.
         document.addEventListener("astro:after-swap", function () {
-          revealATF(document);
+          document.addEventListener(
+            "rockcruit:transition-end",
+            function () {
+              revealATF(document);
+            },
+            { once: true },
+          );
 
           // Force a WebKit compositor pass after the DOM swap.
           const root = document.documentElement;
