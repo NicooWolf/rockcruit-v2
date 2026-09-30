@@ -12,16 +12,27 @@ import HireForm from "../components/HireForm.astro";
 >
   <div class="services-page">
     <!-- ═══════ PAGE HERO ═══════ -->
-    <div class="page-hero reveal">
+    <div class="page-hero">
       <div class="page-hero-glow"></div>
-      <div class="page-hero-label">Our delivery models</div>
-      <h1 class="page-hero-h">
-        <span>THE WAY YOU <span class="g">HIRE</span></span>
-        <span>SHOULD <span class="g1">DEFINE</span></span>
-        <span>THE <span class="g2">RECRUITING</span></span>
-        <span class="dim">MODEL.</span>
+      <div class="page-hero-label reveal">Our delivery models</div>
+      <h1 class="page-hero-h reveal">
+        <span class="mask-line"
+          ><span class="mask-inner"
+            >THE WAY YOU <span class="g">HIRE</span></span
+          ></span
+        >
+        <span class="mask-line"
+          ><span class="mask-inner">SHOULD <span class="g1">DEFINE</span></span
+          ></span
+        >
+        <span class="mask-line"
+          ><span class="mask-inner">THE <span class="g2">RECRUITING</span></span
+          ></span
+        >
+        <span class="dim mask-line"><span class="mask-inner">MODEL.</span></span
+        >
       </h1>
-      <p class="page-hero-sub">
+      <p class="page-hero-sub reveal">
         Different hiring patterns require different recruiting structures. Most
         companies default to the same model regardless — and pay for that
         mismatch in time, quality, and cost.<br /><br />We operate two distinct
@@ -35,10 +46,15 @@ import HireForm from "../components/HireForm.astro";
     <section class="decision">
       <div class="decision-header reveal">
         <div class="decision-label">Self-selection</div>
-        <h2 class="decision-h">Which model <em>fits you?</em></h2>
+        <h2 class="decision-h">
+          <span class="mask-line"
+            ><span class="mask-inner">Which model <em>fits you?</em></span
+            ></span
+          >
+        </h2>
       </div>
       <div class="decision-cols">
-        <div class="decision-col reveal">
+        <div class="decision-col slide-left">
           <div class="decision-col-head">
             <span class="dc-badge cont">Contingency</span>
             <span class="dc-title">Contingency Recruiting</span>
@@ -49,7 +65,7 @@ import HireForm from "../components/HireForm.astro";
           </p>
           <a href="#contingency" class="dc-cta v">See Contingency details →</a>
         </div>
-        <div class="decision-col decision-col-r reveal">
+        <div class="decision-col decision-col-r slide-right">
           <div class="decision-col-head">
             <span class="dc-badge raas">RaaS</span>
             <span class="dc-title">Recruiting as a Service</span>
@@ -66,12 +82,17 @@ import HireForm from "../components/HireForm.astro";
 
     <!-- ═══════ CONTINGENCY ═══════ -->
     <section class="cont" id="contingency">
-      <div class="cont-hero reveal">
-        <div>
+      <div class="cont-hero">
+        <div class="reveal">
           <div class="cont-label">
             01 — Surgical execution for critical hires.
           </div>
-          <h2 class="cont-h">Contingency <em>Recruiting</em></h2>
+          <h2 class="cont-h">
+            <span class="mask-line"
+              ><span class="mask-inner">Contingency <em>Recruiting</em></span
+              ></span
+            >
+          </h2>
           <p class="cont-body">
             Our core model. For companies making a specific, high-stakes hire
             where precision matters more than volume.<br /><br />Proactive
@@ -84,28 +105,28 @@ import HireForm from "../components/HireForm.astro";
           </p>
         </div>
         <div class="hero-facts">
-          <div class="hero-fact v">
+          <div class="hero-fact v reveal">
             <div class="hero-fact-num">Quality over volume</div>
             <div class="hero-fact-label">Every candidate deeply vetted</div>
           </div>
-          <div class="hero-fact v">
+          <div class="hero-fact v reveal">
             <div class="hero-fact-num">3–5 days</div>
             <div class="hero-fact-label">To your first candidate</div>
           </div>
-          <div class="hero-fact v">
+          <div class="hero-fact v reveal">
             <div class="hero-fact-num">Search-by-search</div>
             <div class="hero-fact-label">No monthly retainer required</div>
           </div>
         </div>
       </div>
 
-      <div class="raas-when reveal">
-        <div class="raas-when-header">
+      <div class="raas-when">
+        <div class="raas-when-header reveal">
           <div class="raas-when-label v">Activation scenarios</div>
           <div class="raas-when-h">WHEN CONTINGENCY MAKES SENSE</div>
         </div>
         <div class="raas-when-cols">
-          <div class="rwc cwc reveal">
+          <div class="rwc cwc cascade-in soft">
             <div class="rwc-num">01</div>
             <div class="rwc-title">One critical seat</div>
             <p class="rwc-body">
@@ -119,7 +140,7 @@ import HireForm from "../components/HireForm.astro";
               >
             </div>
           </div>
-          <div class="rwc cwc reveal">
+          <div class="rwc cwc cascade-in soft">
             <div class="rwc-num">02</div>
             <div class="rwc-title">When discretion matters</div>
             <p class="rwc-body">
@@ -133,7 +154,7 @@ import HireForm from "../components/HireForm.astro";
               >
             </div>
           </div>
-          <div class="rwc cwc reveal">
+          <div class="rwc cwc cascade-in soft">
             <div class="rwc-num">03</div>
             <div class="rwc-title">Flexibility without commitment</div>
             <p class="rwc-body">
@@ -153,12 +174,17 @@ import HireForm from "../components/HireForm.astro";
 
     <!-- ═══════ RAAS ═══════ -->
     <section class="raas" id="raas">
-      <div class="raas-hero reveal">
-        <div>
+      <div class="raas-hero">
+        <div class="reveal">
           <div class="raas-hero-label">
             02 — An embedded recruiting layer for companies in growth mode.
           </div>
-          <h2 class="raas-hero-h">Recruiting as a <em>Service</em></h2>
+          <h2 class="raas-hero-h">
+            <span class="mask-line"
+              ><span class="mask-inner">Recruiting as a <em>Service</em></span
+              ></span
+            >
+          </h2>
           <p class="raas-hero-body">
             RaaS is designed for companies navigating growth, hiring spikes, or
             continuous digital hiring. Instead of restarting every search with a
@@ -171,30 +197,30 @@ import HireForm from "../components/HireForm.astro";
           </p>
         </div>
         <div class="hero-facts">
-          <div class="hero-fact">
+          <div class="hero-fact reveal">
             <div class="hero-fact-num">Dedicated Recruiter</div>
             <div class="hero-fact-label">Embedded inside your workflow</div>
           </div>
-          <div class="hero-fact">
+          <div class="hero-fact reveal">
             <div class="hero-fact-num">Full team support</div>
             <div class="hero-fact-label">
               Weekly calibration + strategic input
             </div>
           </div>
-          <div class="hero-fact">
+          <div class="hero-fact reveal">
             <div class="hero-fact-num">Up to 3 searches</div>
             <div class="hero-fact-label">Running at the same time</div>
           </div>
         </div>
       </div>
 
-      <div class="raas-when reveal">
-        <div class="raas-when-header">
+      <div class="raas-when">
+        <div class="raas-when-header reveal">
           <div class="raas-when-label g">Activation scenarios</div>
           <div class="raas-when-h">WHEN RAAS MAKES SENSE</div>
         </div>
         <div class="raas-when-cols">
-          <div class="rwc reveal">
+          <div class="rwc cascade-in soft">
             <div class="rwc-num">01</div>
             <div class="rwc-title">During hiring spikes</div>
             <p class="rwc-body">
@@ -208,7 +234,7 @@ import HireForm from "../components/HireForm.astro";
               >
             </div>
           </div>
-          <div class="rwc reveal">
+          <div class="rwc cascade-in soft">
             <div class="rwc-num">02</div>
             <div class="rwc-title">When hiring never fully stops</div>
             <p class="rwc-body">
@@ -222,7 +248,7 @@ import HireForm from "../components/HireForm.astro";
               >
             </div>
           </div>
-          <div class="rwc reveal">
+          <div class="rwc cascade-in soft">
             <div class="rwc-num">03</div>
             <div class="rwc-title">When flexibility matters</div>
             <p class="rwc-body">
@@ -242,14 +268,14 @@ import HireForm from "../components/HireForm.astro";
 
     <!-- ═══════ STANDARD OF SERVICE — SHARED ═══════ -->
     <section class="raas pillars-section">
-      <div class="raas-when raas-when-open reveal">
-        <div class="raas-when-header">
+      <div class="raas-when raas-when-open">
+        <div class="raas-when-header reveal">
           <div class="raas-when-label">Standard of service</div>
           <div class="raas-when-h">WHAT YOU GET — WITH EITHER MODEL</div>
         </div>
       </div>
-      <div class="pillars-list reveal">
-        <div class="pillars-row">
+      <div class="pillars-list">
+        <div class="pillars-row cascade-in soft">
           <div class="pillars-row-num">01</div>
           <div class="pillars-row-title">Weekly Hiring Calibration</div>
           <p class="pillars-row-body">
@@ -257,7 +283,7 @@ import HireForm from "../components/HireForm.astro";
             blockers — no re-briefing, no lag.
           </p>
         </div>
-        <div class="pillars-row">
+        <div class="pillars-row cascade-in soft">
           <div class="pillars-row-num">02</div>
           <div class="pillars-row-title">Strategic Hiring Support</div>
           <p class="pillars-row-body">
@@ -265,7 +291,7 @@ import HireForm from "../components/HireForm.astro";
             market competitiveness — not just execution.
           </p>
         </div>
-        <div class="pillars-row">
+        <div class="pillars-row cascade-in soft">
           <div class="pillars-row-num">03</div>
           <div class="pillars-row-title">Continuous Alignment</div>
           <p class="pillars-row-body">
@@ -273,7 +299,7 @@ import HireForm from "../components/HireForm.astro";
             and decision-making patterns.
           </p>
         </div>
-        <div class="pillars-row">
+        <div class="pillars-row cascade-in soft">
           <div class="pillars-row-num">04</div>
           <div class="pillars-row-title">Real Market Visibility</div>
           <p class="pillars-row-body">
@@ -290,8 +316,13 @@ import HireForm from "../components/HireForm.astro";
         <div class="reveal">
           <div class="fcta-label">Let's work together</div>
           <h2 class="fcta-h">
-            The wrong recruiting model<br />creates hiring friction <em
-              >fast.</em
+            <span class="mask-line"
+              ><span class="mask-inner">The wrong recruiting model</span></span
+            >
+            <span class="mask-line"
+              ><span class="mask-inner"
+                >creates hiring friction <em>fast.</em></span
+              ></span
             >
           </h2>
           <p class="fcta-body">
@@ -677,7 +708,32 @@ import HireForm from "../components/HireForm.astro";
     flex-direction: column;
     justify-content: space-between;
     min-height: 250px;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    /* This scoped rule beats the global .cascade-in.soft rule, so the reveal
+       transition (opacity, translate) must live here too. The hover
+       properties keep their short time. */
+    transition:
+      background 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 1s cubic-bezier(0.25, 1, 0.5, 1),
+      translate 1.1s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay:
+      0s, 0s, 0s, 0s, calc(var(--reveal-index, 0) * 120ms),
+      calc(var(--reveal-index, 0) * 120ms);
+  }
+  /* The three cards share one row on a wide screen. The observer does not
+     give a left-to-right order for one row, so pin the order here. */
+  @media (min-width: 1025px) {
+    .rwc:nth-child(1) {
+      transition-delay: 0s, 0s, 0s, 0s, 0s, 0s;
+    }
+    .rwc:nth-child(2) {
+      transition-delay: 0s, 0s, 0s, 0s, 0.12s, 0.12s;
+    }
+    .rwc:nth-child(3) {
+      transition-delay: 0s, 0s, 0s, 0s, 0.24s, 0.24s;
+    }
   }
   .rwc:hover {
     background: #18181c;
@@ -738,7 +794,15 @@ import HireForm from "../components/HireForm.astro";
     align-items: center;
     padding: 1.9rem 5%;
     border-bottom: 1px solid var(--bdark);
-    transition: background 0.2s;
+    /* Keep the reveal transition here because this scoped rule overrides
+       global.css. */
+    transition:
+      background 0.2s,
+      opacity 1s cubic-bezier(0.25, 1, 0.5, 1),
+      translate 1.1s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay:
+      0s, calc(var(--reveal-index, 0) * 120ms),
+      calc(var(--reveal-index, 0) * 120ms);
   }
   .pillars-row:hover {
     background: rgba(255, 255, 255, 0.02);
