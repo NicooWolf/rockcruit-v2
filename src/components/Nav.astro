@@ -930,13 +930,10 @@ const showBlog = WP_ENABLED;
       const target = document.getElementById(
         decodeURIComponent(url.hash.slice(1)),
       );
-      // Show the target's revealed content now, then land instantly — a jump
-      // must render in one frame, not wait out a multi-second smooth scroll.
+      // Land instantly — a jump must not wait out a multi-second smooth
+      // scroll. The reveal observer in Layout.astro then reveals the section
+      // in the same staggered order as a scroll.
       if (target) {
-        if (target.classList.contains("reveal")) target.classList.add("on");
-        target
-          .querySelectorAll(".reveal:not(.on)")
-          .forEach((el) => el.classList.add("on"));
         target.scrollIntoView({ behavior: "instant", block: "start" });
       }
 

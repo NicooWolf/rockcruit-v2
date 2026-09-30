@@ -722,19 +722,6 @@ import HireForm from "../components/HireForm.astro";
       0s, 0s, 0s, 0s, calc(var(--reveal-index, 0) * 120ms),
       calc(var(--reveal-index, 0) * 120ms);
   }
-  /* The three cards share one row on a wide screen. The observer does not
-     give a left-to-right order for one row, so pin the order here. */
-  @media (min-width: 1025px) {
-    .rwc:nth-child(1) {
-      transition-delay: 0s, 0s, 0s, 0s, 0s, 0s;
-    }
-    .rwc:nth-child(2) {
-      transition-delay: 0s, 0s, 0s, 0s, 0.12s, 0.12s;
-    }
-    .rwc:nth-child(3) {
-      transition-delay: 0s, 0s, 0s, 0s, 0.24s, 0.24s;
-    }
-  }
   .rwc:hover {
     background: #18181c;
     border-color: rgba(var(--green-rgb), 0.3);
