@@ -150,6 +150,19 @@ const canonical = Astro.site
       })();
     </script>
 
+    <!-- Use the router fallback fade on every browser. WebKit paints broken
+         frames while it takes the native View Transition snapshot: the old
+         page, a stale image of the mobile menu, and the new page alternate
+         for a few frames. The router checks this API once, when it loads, so
+         this script must run before <ClientRouter />. -->
+    <script is:inline>
+      try {
+        Object.defineProperty(document, "startViewTransition", {
+          value: undefined,
+          configurable: true,
+        });
+      } catch (e) {}
+    </script>
     <ClientRouter />
   </head>
   <body>
