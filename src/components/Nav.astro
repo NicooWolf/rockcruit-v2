@@ -380,6 +380,11 @@ const showBlog = WP_ENABLED;
   nav.is-open .nav-mobile-toggle span:last-child {
     transform: translateY(-3.5px) rotate(-45deg);
   }
+  /* The leave to another page turns the close mark back into the menu mark
+     during the cascade, so the new page arrives with no icon jump. */
+  nav.is-open.is-leaving .nav-mobile-toggle span {
+    transform: none;
+  }
   .nav-mobile-panel {
     position: fixed;
     inset: 0;
@@ -392,6 +397,7 @@ const showBlog = WP_ENABLED;
        Do not put this filter on the bar. The bar must stay solid ink. */
     background: color-mix(in srgb, var(--ink) 72%, transparent);
     backdrop-filter: blur(18px);
+    --webkit-backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     color: var(--paper);
     overflow: hidden;
@@ -750,6 +756,18 @@ const showBlog = WP_ENABLED;
     lenis?.start?.();
   };
 
+  // A page change ends the lock. Do not restore the scroll position or touch
+  // the old page: it stays on screen until the swap, and a reset there shows
+  // the old page and the menu again for one frame.
+  const releasePageLock = () => {
+    if (!pageLocked) return;
+    pageLocked = false;
+    document.removeEventListener("touchmove", blockPageScroll);
+    document.removeEventListener("wheel", blockPageScroll);
+    document.documentElement.removeAttribute("data-nav-open");
+    (window as unknown as { __lenis?: LenisLike }).__lenis?.start?.();
+  };
+
   const initializeNav = () => {
     const nav = document.querySelector<HTMLElement>("nav");
     if (!nav || nav.dataset.initialized === "true") return;
@@ -1005,6 +1023,9 @@ const showBlog = WP_ENABLED;
     });
 
     mobileNavToggle?.addEventListener("click", () => {
+      // Safari does not focus a button on a click. Without focus in the bar,
+      // the Escape key below never reaches it.
+      mobileNavToggle.focus({ preventScroll: true });
       setMobileNavOpen(
         mobileNavToggle.getAttribute("aria-expanded") !== "true",
       );
@@ -1096,6 +1117,8 @@ const showBlog = WP_ENABLED;
 
   const closeLiveMobileNav = () => {
     const bar = document.querySelector<HTMLElement>("nav");
+    // The menu leave keeps the old page as it is. See releasePageLock.
+    if (bar?.classList.contains("is-leaving")) return;
     const panel = bar?.querySelector<HTMLElement>(".nav-mobile-panel");
     const toggle = bar?.querySelector<HTMLButtonElement>(".nav-mobile-toggle");
     const mobile = bar?.querySelector<HTMLElement>(".nav-mobile");
@@ -1149,6 +1172,7 @@ const showBlog = WP_ENABLED;
     window.addEventListener("hashchange", holdBar);
     window.addEventListener("rockcruit:show-bar", holdBar);
     document.addEventListener("astro:before-swap", closeLiveMobileNav);
+    document.addEventListener("astro:after-swap", releasePageLock);
     document.addEventListener("astro:page-load", () => {
       initializeNav();
       showBar();
