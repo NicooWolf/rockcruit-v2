@@ -12,13 +12,18 @@ import { href } from "../lib/url";
 >
   <section class="nf">
     <img
+      class="reveal"
       src={href("/astronaut-not-found.svg")}
       alt=""
       width="220"
       height="220"
     />
-    <h1>404</h1>
-    <p>This page drifted off. <a href={href("/")}>Back to Earth →</a></p>
+    <h1 class="reveal">
+      <span class="mask-line"><span class="mask-inner">404</span></span>
+    </h1>
+    <p class="reveal">
+      This page drifted off. <a href={href("/")}>Back to Earth →</a>
+    </p>
   </section>
 </Layout>
 

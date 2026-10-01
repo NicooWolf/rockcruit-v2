@@ -129,10 +129,17 @@ const canonical = Astro.site
           passive: true,
         });
 
-        // Measure the live DOM after the swap and before the new snapshot.
-        // The transition gate prevents reveal motion during this operation.
+        // Reveal the above-the-fold content of the new page after the page
+        // fade ends. The transition gate stops all reveal motion during the
+        // swap, so a reveal during the swap shows the titles with no motion.
         document.addEventListener("astro:after-swap", function () {
-          revealATF(document);
+          document.addEventListener(
+            "rockcruit:transition-end",
+            function () {
+              revealATF(document);
+            },
+            { once: true },
+          );
 
           // Force a WebKit compositor pass after the DOM swap.
           const root = document.documentElement;
@@ -143,6 +150,19 @@ const canonical = Astro.site
       })();
     </script>
 
+    <!-- Use the router fallback fade on every browser. WebKit paints broken
+         frames while it takes the native View Transition snapshot: the old
+         page, a stale image of the mobile menu, and the new page alternate
+         for a few frames. The router checks this API once, when it loads, so
+         this script must run before <ClientRouter />. -->
+    <script is:inline>
+      try {
+        Object.defineProperty(document, "startViewTransition", {
+          value: undefined,
+          configurable: true,
+        });
+      } catch (e) {}
+    </script>
     <ClientRouter />
   </head>
   <body>
@@ -192,26 +212,11 @@ const canonical = Astro.site
         else target.scrollIntoView({ behavior: "instant", block: "start" });
       };
 
-      // ── Instant reveal for a jump target.
-      const revealSection = (id: string) => {
-        if (!id) return null;
-        const target = document.getElementById(id);
-        if (!target) return null;
-        if (
-          target.classList.contains("reveal") ||
-          target.classList.contains("mask-line") ||
-          target.classList.contains("slide-left") ||
-          target.classList.contains("slide-right") ||
-          target.classList.contains("cascade-in")
-        )
-          target.classList.add("on");
-        target
-          .querySelectorAll(
-            ".reveal:not(.on), .mask-line:not(.on), .slide-left:not(.on), .slide-right:not(.on), .cascade-in:not(.on)",
-          )
-          .forEach((el) => el.classList.add("on"));
-        return target;
-      };
+      // ── The target of a jump. Do not reveal the section here. The observer
+      // reveals it after the landing, in the same staggered order as a
+      // scroll. After a page change the observer waits for the page fade.
+      const findSection = (id: string) =>
+        id ? document.getElementById(id) : null;
 
       // ClientRouter owns scroll restoration, so the browser does not jump to
       // the section on a reload. Do that jump here.
@@ -221,7 +226,7 @@ const canonical = Astro.site
         const id = decodeURIComponent(window.location.hash.slice(1));
         if (!id) return;
 
-        const target = revealSection(id);
+        const target = findSection(id);
         if (!target) return;
 
         requestAnimationFrame(() => {
@@ -273,7 +278,7 @@ const canonical = Astro.site
         }
 
         const id = decodeURIComponent(url.hash.slice(1));
-        const target = revealSection(id);
+        const target = findSection(id);
         if (!target) return;
 
         event.preventDefault();
@@ -289,10 +294,7 @@ const canonical = Astro.site
         startJump();
       });
 
-      window.addEventListener("hashchange", () => {
-        revealSection(decodeURIComponent(window.location.hash.slice(1)));
-        startJump();
-      });
+      window.addEventListener("hashchange", startJump);
 
       const trimHashAtEnds = () => {
         if (!window.location.hash) return;
@@ -366,8 +368,15 @@ const canonical = Astro.site
           (entries) => {
             const visible = entries
               .filter((entry) => entry.isIntersecting)
+              // Top to bottom. Blocks on one row keep the page order, left
+              // to right, because the observer gives no order for them.
               .sort(
-                (a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
+                (a, b) =>
+                  a.boundingClientRect.top - b.boundingClientRect.top ||
+                  (a.target.compareDocumentPosition(b.target) &
+                  Node.DOCUMENT_POSITION_FOLLOWING
+                    ? -1
+                    : 1),
               );
 
             visible.forEach((entry) => {

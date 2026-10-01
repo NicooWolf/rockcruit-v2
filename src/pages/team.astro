@@ -13,15 +13,19 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   title="Team — Rockcruit"
   description="The people behind Rockcruit — tech headhunters with years of experience identifying and attracting top technical talent across LATAM."
 >
-  <div class="page-hero reveal">
+  <div class="page-hero">
     <div class="page-hero-glow"></div>
-    <div class="page-hero-label">Who you'll work with</div>
-    <h1 class="page-hero-h">
-      <span>RECRUITERS WHO</span>
-      <span>ACTUALLY KNOW</span>
-      <span class="dim">TECH.</span>
+    <div class="page-hero-label reveal">Who you'll work with</div>
+    <h1 class="page-hero-h reveal">
+      <span class="mask-line"
+        ><span class="mask-inner">RECRUITERS WHO</span></span
+      >
+      <span class="mask-line"
+        ><span class="mask-inner">ACTUALLY KNOW</span></span
+      >
+      <span class="dim mask-line"><span class="mask-inner">TECH.</span></span>
     </h1>
-    <p class="page-hero-sub">
+    <p class="page-hero-sub reveal">
       With years of experience in the tech industry, we have honed our expertise
       in identifying and attracting top technical talent across various domains. <strong
         >Small team, senior judgment, zero hand-offs to juniors.</strong
@@ -34,7 +38,12 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     <div class="domains-header reveal">
       <div class="d-eyebrow">Specialized knowledge</div>
       <h2 class="d-h2">
-        We recruit across<br /><em>every digital domain.</em>
+        <span class="mask-line"
+          ><span class="mask-inner">We recruit across</span></span
+        >
+        <span class="mask-line"
+          ><span class="mask-inner"><em>every digital domain.</em></span></span
+        >
       </h2>
     </div>
     <!-- The track holds the list two times. The animation moves it by one half,
@@ -66,10 +75,14 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     <div class="members-glow"></div>
     <div class="members-header reveal">
       <div class="d-eyebrow">The team</div>
-      <h2 class="d-h2">People, not <em>pipelines.</em></h2>
+      <h2 class="d-h2">
+        <span class="mask-line"
+          ><span class="mask-inner">People, not <em>pipelines.</em></span></span
+        >
+      </h2>
     </div>
     <div class="members-grid">
-      <div class="member-card reveal">
+      <div class="member-card slide-left soft">
         <div class="member-av">
           <img src={profileJulieta.src} alt="Julieta Wolf" />
         </div>
@@ -86,7 +99,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
           right talent.
         </p>
       </div>
-      <div class="member-card reveal">
+      <div class="member-card slide-right soft">
         <div class="member-av">
           <img src={profileAgustina.src} alt="Agustina Valverde" />
         </div>
@@ -110,7 +123,9 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   <section class="story">
     <div class="story-header">
       <h2 class="story-h2 reveal">
-        Who we <em>are.</em>
+        <span class="mask-line"
+          ><span class="mask-inner">Who we <em>are.</em></span></span
+        >
       </h2>
       <p class="story-sub reveal">
         Two founders. Senior judgment. Zero hand-offs.
@@ -174,11 +189,15 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   </section>
 
   <!-- CTA -->
-  <section class="team-cta reveal">
-    <p class="team-cta-line">
+  <section class="team-cta">
+    <p class="team-cta-line reveal">
       Want to know who'd run <strong>your</strong> search?
     </p>
-    <a href={href("/#contact")} class="btn-primary">Start the conversation →</a>
+    <div class="reveal">
+      <a href={href("/#contact")} class="btn-primary"
+        >Start the conversation →</a
+      >
+    </div>
   </section>
 </Layout>
 
@@ -521,9 +540,16 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     border: 1px solid var(--bdark);
     border-radius: 12px;
     padding: 1.5rem 1.8rem;
+    /* This scoped rule beats the global .slide-left.soft rule, so the reveal
+       transition (opacity, translate) must live here too. */
     transition:
       border-color 0.3s,
-      transform 0.3s;
+      transform 0.3s,
+      opacity 1.4s cubic-bezier(0.25, 1, 0.5, 1),
+      translate 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay:
+      0s, 0s, calc(var(--reveal-index, 0) * 100ms),
+      calc(var(--reveal-index, 0) * 100ms);
   }
   .member-card:hover {
     border-color: rgba(var(--violet-light-rgb), 0.3);
