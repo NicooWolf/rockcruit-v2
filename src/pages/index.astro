@@ -1505,6 +1505,9 @@ import { brands } from "../lib/brands";
   // page, so every other page keeps native scroll untouched. Layout.astro
   // reads window.__lenis to route hash jumps through it when it is running.
   document.addEventListener("astro:page-load", () => {
+    // This listener stays after the router leaves Home. Start Lenis only on
+    // the Home page, which is the only page with the testimonial track.
+    if (!document.querySelector(".testi-track")) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const lenis = new Lenis({ lerp: 0.1 });
