@@ -1,7 +1,6 @@
 ---
 // src/pages/blog/[slug].astro — one static HTML file per published post.
 import Layout from "../../layouts/Layout.astro";
-import PostPlaceholder from "../../components/PostPlaceholder.astro";
 import { getAllPosts, getPostBySlug } from "../../lib/wp";
 import { href } from "../../lib/url";
 import { decodeEntities } from "../../lib/text";
@@ -27,7 +26,6 @@ const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
 const author = post.postFields?.author?.nodes?.[0]?.authorFields;
 const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
 
-const image = post.postFields?.postImage?.node;
 ---
 
 <Layout title={`${title} — Rockcruit`} description={metaDescription}>
@@ -39,7 +37,18 @@ const image = post.postFields?.postImage?.node;
       <h1 class="post-h1 reveal">
         <span class="mask-line"><span class="mask-inner">{title}</span></span>
       </h1>
-      <time class="post-meta reveal" datetime={post.date}>{dateLabel}</time>
+      <!-- The date on the left, the author on the right, on one line. -->
+      <div class="post-meta-row reveal">
+        <time class="post-meta" datetime={post.date}>{dateLabel}</time>
+        {
+          authorName && (
+            <span class="post-author">
+              <span class="post-author-label">Written by</span>
+              <span class="post-author-name">{authorName}</span>
+            </span>
+          )
+        }
+      </div>
     </header>
 
     <div class="post-content reveal soft">
@@ -47,27 +56,8 @@ const image = post.postFields?.postImage?.node;
         {post.postFields?.subtitle && <h2>{post.postFields.subtitle}</h2>}
         {post.postFields?.description && <p>{post.postFields.description}</p>}
       </div>
-      <figure class="post-figure">
-        {
-          image?.sourceUrl ? (
-            <img src={image.sourceUrl} alt={image.altText ?? ""} decoding="async" />
-          ) : (
-            <div class="post-figure-art">
-              <PostPlaceholder seed={post.slug} />
-            </div>
-          )
-        }
-      </figure>
       {/* The owner writes this HTML in the WordPress CMS. */}
       {post.content && <div class="post-body" set:html={post.content} />}
-      {
-        authorName && (
-          <span class="post-content-author">
-            <span class="post-content-author-label">Written by</span>
-            <span class="post-content-author-name">{authorName}</span>
-          </span>
-        )
-      }
     </div>
 
     <footer class="post-footer">
@@ -134,18 +124,21 @@ const image = post.postFields?.postImage?.node;
     line-height: 1.9;
     color: color-mix(in srgb, var(--paper) 70%, transparent);
   }
-  /* Author byline. It sits after the content, aligned to the bottom right. */
-  .post-content-author {
+  /* Date and author share one line. The author sits on the right. On a
+     narrow screen the author wraps below the date. */
+  .post-meta-row {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.2rem;
-    margin-top: 2.5rem;
-    padding-top: 1.4rem;
-    border-top: 1px solid var(--bdark);
-    text-align: right;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem 1.5rem;
   }
-  .post-content-author-label {
+  .post-author {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .post-author-label {
     font-family: var(--mono);
     font-weight: 400;
     font-size: 0.62rem;
@@ -153,26 +146,12 @@ const image = post.postFields?.postImage?.node;
     text-transform: uppercase;
     color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
-  .post-content-author-name {
+  .post-author-name {
     font-family: var(--serif);
     font-style: italic;
     font-weight: 400;
     font-size: 1.15rem;
     color: var(--paper);
-  }
-  .post-figure {
-    margin: 2.5rem 0 1rem;
-  }
-  .post-figure img,
-  .post-figure-art {
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-  .post-figure-art {
-    overflow: hidden;
   }
   /* WordPress HTML can carry inline colors and fonts. These rules replace
      them with the brand fonts and colors. */
@@ -265,12 +244,19 @@ const image = post.postFields?.postImage?.node;
     font-size: 1.2rem;
     color: color-mix(in srgb, var(--paper) 50%, transparent);
   }
+  /* inline-flex gives the link a real box. A plain inline link puts its
+     padding outside the line box, and the .reveal wrapper (contain: paint)
+     then clips the top and the bottom of the button. */
   .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0 1.2rem;
     background: var(--green);
     color: var(--ink);
     font-size: 0.88rem;
     font-weight: 500;
-    padding: 0.85rem 2rem;
     border-radius: 4px;
     text-decoration: none;
     transition:
