@@ -3,6 +3,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { getAllPosts, getPostBySlug } from "../../lib/wp";
 import { href } from "../../lib/url";
+import { decodeEntities } from "../../lib/text";
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
@@ -13,8 +14,8 @@ const { slug } = Astro.params;
 const post = await getPostBySlug(slug!);
 if (!post) throw new Error(`Post not found at build time: ${slug}`);
 
-const metaDescription = post.excerpt
-  .replace(/<[^>]+>/g, "")
+const title = decodeEntities(post.title);
+const metaDescription = decodeEntities(post.excerpt.replace(/<[^>]+>/g, ""))
   .trim()
   .slice(0, 160);
 const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
@@ -28,15 +29,19 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
 const image = post.postFields?.postImage?.node;
 ---
 
-<Layout title={`${post.title} — Rockcruit`} description={metaDescription}>
+<Layout title={`${title} — Rockcruit`} description={metaDescription}>
   <article class="post">
-    <header class="post-header reveal">
-      <a class="post-back" href={href("/blog")}>← All posts</a>
-      <h1 class="post-h1">{post.title}</h1>
-      <time class="post-meta" datetime={post.date}>{dateLabel}</time>
+    <header class="post-header">
+      <div class="reveal">
+        <a class="post-back" href={href("/blog")}>← All posts</a>
+      </div>
+      <h1 class="post-h1 reveal">
+        <span class="mask-line"><span class="mask-inner">{title}</span></span>
+      </h1>
+      <time class="post-meta reveal" datetime={post.date}>{dateLabel}</time>
     </header>
 
-    <div class="post-content reveal">
+    <div class="post-content reveal soft">
       <div class="post-content-header">
         {post.postFields?.subtitle && <h2>{post.postFields.subtitle}</h2>}
         {post.postFields?.description && <p>{post.postFields.description}</p>}
@@ -60,9 +65,11 @@ const image = post.postFields?.postImage?.node;
       }
     </div>
 
-    <footer class="post-footer reveal">
-      <p class="post-cta-line">Hiring for a role like this?</p>
-      <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+    <footer class="post-footer">
+      <p class="post-cta-line reveal">Hiring for a role like this?</p>
+      <div class="reveal">
+        <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+      </div>
     </footer>
   </article>
 </Layout>
@@ -102,6 +109,10 @@ const image = post.postFields?.postImage?.node;
     letter-spacing: -0.02em;
     color: var(--paper);
     margin: 1.5rem 0 1rem;
+  }
+  /* The mask clips the line box. This padding keeps the italic descenders. */
+  .post-h1 .mask-inner {
+    padding-bottom: 0.1em;
   }
   .post-meta {
     font-family: var(--mono);
