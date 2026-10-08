@@ -1,6 +1,7 @@
 ---
 // src/pages/blog/[slug].astro — one static HTML file per published post.
 import Layout from "../../layouts/Layout.astro";
+import PostPlaceholder from "../../components/PostPlaceholder.astro";
 import { getAllPosts, getPostBySlug } from "../../lib/wp";
 import { href } from "../../lib/url";
 import { decodeEntities } from "../../lib/text";
@@ -46,13 +47,17 @@ const image = post.postFields?.postImage?.node;
         {post.postFields?.subtitle && <h2>{post.postFields.subtitle}</h2>}
         {post.postFields?.description && <p>{post.postFields.description}</p>}
       </div>
-      {
-        image?.sourceUrl && (
-          <figure class="post-figure">
+      <figure class="post-figure">
+        {
+          image?.sourceUrl ? (
             <img src={image.sourceUrl} alt={image.altText ?? ""} decoding="async" />
-          </figure>
-        )
-      }
+          ) : (
+            <div class="post-figure-art">
+              <PostPlaceholder seed={post.slug} />
+            </div>
+          )
+        }
+      </figure>
       {/* The owner writes this HTML in the WordPress CMS. */}
       {post.content && <div class="post-body" set:html={post.content} />}
       {
@@ -158,12 +163,16 @@ const image = post.postFields?.postImage?.node;
   .post-figure {
     margin: 2.5rem 0 1rem;
   }
-  .post-figure img {
+  .post-figure img,
+  .post-figure-art {
     display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 8px;
+  }
+  .post-figure-art {
+    overflow: hidden;
   }
   /* WordPress HTML can carry inline colors and fonts. These rules replace
      them with the brand fonts and colors. */

@@ -2,6 +2,7 @@
 // src/components/PostCard.astro — one post as a card.
 // `featured` gives the large card at the top of the blog page. On a wide
 // screen it puts the image and the text side by side.
+import PostPlaceholder from "./PostPlaceholder.astro";
 import { href } from "../lib/url";
 import { decodeEntities } from "../lib/text";
 import type { Post } from "../lib/wp";
@@ -46,13 +47,15 @@ const fmt = (d: string) =>
   data-categories={categories.map((c) => c.slug).join(" ")}
 >
   {featured && <span class="card-ghost" aria-hidden="true">01</span>}
-  {
-    image?.sourceUrl && (
-      <div class="card-media">
+  <div class="card-media">
+    {
+      image?.sourceUrl ? (
         <img src={image.sourceUrl} alt={image.altText ?? title} loading="lazy" />
-      </div>
-    )
-  }
+      ) : (
+        <PostPlaceholder seed={post.slug} />
+      )
+    }
+  </div>
 
   <div class="card-body">
     <div class="card-meta">
@@ -118,13 +121,15 @@ const fmt = (d: string) =>
     overflow: hidden;
     background: rgba(var(--green-rgb), 0.05);
   }
-  .card-media img {
+  .card-media img,
+  .card-media :global(svg) {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s;
   }
-  .card:hover .card-media img {
+  .card:hover .card-media img,
+  .card:hover .card-media :global(svg) {
     transform: scale(1.03);
   }
 
