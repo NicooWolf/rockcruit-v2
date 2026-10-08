@@ -58,7 +58,7 @@ for (const post of latest) {
     </div>
     {
       posts.length > 0 && (
-        <aside class="hero-aside reveal">
+        <aside class="hero-aside slide-right soft">
           {authors.size > 0 && (
             <>
               <div class="hero-aside-label">Written by the founders</div>
@@ -145,11 +145,13 @@ for (const post of latest) {
     }
   </section>
 
-  <section class="blog-cta reveal">
-    <p class="blog-cta-line">
+  <section class="blog-cta">
+    <p class="blog-cta-line reveal">
       Hiring for a role like the ones <strong>we write about?</strong>
     </p>
-    <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+    <div class="reveal">
+      <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+    </div>
   </section>
 </Layout>
 

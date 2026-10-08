@@ -380,6 +380,11 @@ const showBlog = WP_ENABLED;
   nav.is-open .nav-mobile-toggle span:last-child {
     transform: translateY(-3.5px) rotate(-45deg);
   }
+  /* The leave to another page turns the close mark back into the menu mark
+     during the cascade, so the new page arrives with no icon jump. */
+  nav.is-open.is-leaving .nav-mobile-toggle span {
+    transform: none;
+  }
   .nav-mobile-panel {
     position: fixed;
     inset: 0;
@@ -392,9 +397,25 @@ const showBlog = WP_ENABLED;
        Do not put this filter on the bar. The bar must stay solid ink. */
     background: color-mix(in srgb, var(--ink) 72%, transparent);
     backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
     color: var(--paper);
     overflow: hidden;
+    transition: background-color 260ms ease;
+  }
+  /* A menu link to another page is on its way. WebKit does not keep the
+     backdrop blur in the page transition snapshot, so the old page shows
+     through the sheet during the fade. A solid sheet hides the old page. */
+  nav.is-leaving .nav-mobile-panel {
+    background: var(--ink);
+  }
+  /* The leave to another page: the sheet turns solid and stays, the rows go
+     out one by one, and the new page then fades in over the empty sheet.
+     The rows go out a little faster than they come in. */
+  nav.is-leaving {
+    --cascade-step: 45ms;
+    --cascade-fade: 260ms;
+  }
+  nav.is-leaving .nav-mobile-panel.is-closing:not([hidden]) {
+    animation: none;
   }
   .nav-mobile-sheet {
     flex: 1 1 auto;
@@ -662,6 +683,13 @@ const showBlog = WP_ENABLED;
     ) => void;
   }
 
+  // GitHub Pages serves "/services/", but href() writes "/services". Compare
+  // the two paths without the end slash, so a link to the current page stays
+  // on that page.
+  const isCurrentPage = (url: URL) =>
+    url.pathname.replace(/\/+$/, "") ===
+    window.location.pathname.replace(/\/+$/, "");
+
   const pageLockSiblings = () =>
     document.body.querySelectorAll<HTMLElement>(
       ":scope > :not(nav):not(.ios-tint)",
@@ -724,6 +752,18 @@ const showBlog = WP_ENABLED;
     }
     lenis?.scrollTo?.(lockedScrollY, { immediate: true });
     lenis?.start?.();
+  };
+
+  // A page change ends the lock. Do not restore the scroll position or touch
+  // the old page: it stays on screen until the swap, and a reset there shows
+  // the old page and the menu again for one frame.
+  const releasePageLock = () => {
+    if (!pageLocked) return;
+    pageLocked = false;
+    document.removeEventListener("touchmove", blockPageScroll);
+    document.removeEventListener("wheel", blockPageScroll);
+    document.documentElement.removeAttribute("data-nav-open");
+    (window as unknown as { __lenis?: LenisLike }).__lenis?.start?.();
   };
 
   const initializeNav = () => {
@@ -891,6 +931,26 @@ const showBlog = WP_ENABLED;
       finishClose();
     };
 
+    // A link to another page. Do not close the menu the normal way: that
+    // hides the sheet, shows the old page again, and the page fade then runs
+    // a second time. Keep the sheet, make it solid, and send the rows out.
+    // Then navigate. The new page fades in over the empty sheet, and
+    // astro:before-swap closes the menu. The page loads during the cascade.
+    const leaveTo = (url: URL) => {
+      const to = url.pathname + url.search + url.hash;
+      nav.classList.add("is-leaving");
+      if (!mobilePanel || reducedMotion.matches) {
+        void navigate(to);
+        return;
+      }
+      // Warm the browser cache. The page then loads during the cascade.
+      void fetch(to).catch(() => {});
+      stopCascade(mobilePanel);
+      setCascadeOrder(mobilePanel);
+      mobilePanel.classList.add("is-closing");
+      window.setTimeout(() => void navigate(to), cascadeLength(mobilePanel));
+    };
+
     const closeDropdown = (dropdown: HTMLElement) => {
       dropdown.classList.remove("is-open");
       clearSelection(dropdown);
@@ -900,13 +960,13 @@ const showBlog = WP_ENABLED;
     // hash gives no hashchange event. Write the hash and jump in both cases.
     const jumpToSection = (link: HTMLAnchorElement) => {
       const url = new URL(link.href);
-      if (url.pathname !== window.location.pathname) return false;
+      if (!isCurrentPage(url)) return false;
 
       if (window.location.hash !== url.hash) {
         history.pushState(
           history.state,
           "",
-          url.pathname + url.search + url.hash,
+          window.location.pathname + url.search + url.hash,
         );
       }
 
@@ -917,13 +977,10 @@ const showBlog = WP_ENABLED;
       const target = document.getElementById(
         decodeURIComponent(url.hash.slice(1)),
       );
-      // Show the target's revealed content now, then land instantly — a jump
-      // must render in one frame, not wait out a multi-second smooth scroll.
+      // Land instantly — a jump must not wait out a multi-second smooth
+      // scroll. The reveal observer in Layout.astro then reveals the section
+      // in the same staggered order as a scroll.
       if (target) {
-        if (target.classList.contains("reveal")) target.classList.add("on");
-        target
-          .querySelectorAll(".reveal:not(.on)")
-          .forEach((el) => el.classList.add("on"));
         target.scrollIntoView({ behavior: "instant", block: "start" });
       }
 
@@ -964,6 +1021,9 @@ const showBlog = WP_ENABLED;
     });
 
     mobileNavToggle?.addEventListener("click", () => {
+      // Safari does not focus a button on a click. Without focus in the bar,
+      // the Escape key below never reaches it.
+      mobileNavToggle.focus({ preventScroll: true });
       setMobileNavOpen(
         mobileNavToggle.getAttribute("aria-expanded") !== "true",
       );
@@ -979,6 +1039,12 @@ const showBlog = WP_ENABLED;
         return;
 
       event.preventDefault();
+
+      const url = new URL(link.href);
+      if (!isCurrentPage(url)) {
+        leaveTo(url);
+        return;
+      }
       setMobileNavOpen(false, true, () => followLink(link));
     });
 
@@ -1049,12 +1115,14 @@ const showBlog = WP_ENABLED;
 
   const closeLiveMobileNav = () => {
     const bar = document.querySelector<HTMLElement>("nav");
+    // The menu leave keeps the old page as it is. See releasePageLock.
+    if (bar?.classList.contains("is-leaving")) return;
     const panel = bar?.querySelector<HTMLElement>(".nav-mobile-panel");
     const toggle = bar?.querySelector<HTMLButtonElement>(".nav-mobile-toggle");
     const mobile = bar?.querySelector<HTMLElement>(".nav-mobile");
     toggle?.setAttribute("aria-expanded", "false");
     toggle?.setAttribute("aria-label", "Open navigation menu");
-    bar?.classList.remove("is-open");
+    bar?.classList.remove("is-open", "is-leaving");
     mobile?.classList.remove("is-open");
     if (panel) {
       panel.classList.remove("is-closing");
@@ -1102,6 +1170,7 @@ const showBlog = WP_ENABLED;
     window.addEventListener("hashchange", holdBar);
     window.addEventListener("rockcruit:show-bar", holdBar);
     document.addEventListener("astro:before-swap", closeLiveMobileNav);
+    document.addEventListener("astro:after-swap", releasePageLock);
     document.addEventListener("astro:page-load", () => {
       initializeNav();
       showBar();

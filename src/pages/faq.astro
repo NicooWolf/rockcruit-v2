@@ -45,14 +45,14 @@ const faqs = [
   title="FAQ — Rockcruit"
   description="Common questions about working with Rockcruit: speed to first candidate, Contingency vs RaaS, pricing model, roles covered, and how to start."
 >
-  <div class="page-hero reveal">
+  <div class="page-hero">
     <div class="page-hero-glow"></div>
-    <div class="page-hero-label">Questions, answered straight</div>
-    <h1 class="page-hero-h">
-      <span>BEFORE YOU</span>
-      <span class="dim">ASK.</span>
+    <div class="page-hero-label reveal">Questions, answered straight</div>
+    <h1 class="page-hero-h reveal">
+      <span class="mask-line"><span class="mask-inner">BEFORE YOU</span></span>
+      <span class="dim mask-line"><span class="mask-inner">ASK.</span></span>
     </h1>
-    <p class="page-hero-sub">
+    <p class="page-hero-sub reveal">
       The things every company asks in the first call — answered here so your
       first call can go deeper. <strong
         >Anything missing? The first conversation is free.</strong
@@ -77,11 +77,13 @@ const faqs = [
     }
   </section>
 
-  <section class="faq-cta reveal">
-    <p class="faq-cta-line">
+  <section class="faq-cta">
+    <p class="faq-cta-line reveal">
       Still deciding?<br /><strong>Twenty minutes usually settles it.</strong>
     </p>
-    <a href={href("/#contact")} class="btn-primary">Ask us directly →</a>
+    <div class="reveal">
+      <a href={href("/#contact")} class="btn-primary">Ask us directly →</a>
+    </div>
   </section>
 </Layout>
 
