@@ -1,41 +1,94 @@
 ---
 // src/pages/blog/index.astro — post list, pre-rendered at build time.
+// Layout: hero with the author panel, the featured post, the latest posts
+// with topic filters, and a contact line. The source is the owner's
+// blog proposal (propuesta-blog.html).
 import Layout from "../../layouts/Layout.astro";
 import PostCard from "../../components/PostCard.astro";
-import BlogStage from "../../components/BlogStage.astro";
-import { getAllPosts } from "../../lib/wp";
+import { getAllPosts, type Category } from "../../lib/wp";
 import { href } from "../../lib/url";
 
 const posts = await getAllPosts(); // build-time only — never runs in a browser
+const [featured, ...latest] = posts;
+
+// The author panel lists each post author one time, in post order.
+const authors = new Map<
+  string,
+  { name: string; role?: string; photo?: string }
+>();
+for (const post of posts) {
+  const a = post.postFields?.author?.nodes?.[0]?.authorFields;
+  const name = [a?.name, a?.lastName].filter(Boolean).join(" ");
+  if (!name || authors.has(name)) continue;
+  authors.set(name, {
+    name,
+    role: a?.role,
+    photo: a?.profilePhoto?.node?.sourceUrl,
+  });
+}
+
+// The filters use the categories of the latest posts, in post order.
+// Fewer than two categories gives no useful filter, so the row hides.
+const topics = new Map<string, Category>();
+for (const post of latest) {
+  for (const c of post.categories?.nodes ?? []) {
+    if (!topics.has(c.slug)) topics.set(c.slug, c);
+  }
+}
 ---
 
 <Layout
   title="Blog — Rockcruit"
   description="Hiring insights from the Rockcruit team: tech recruiting, LATAM talent markets, and building teams under pressure."
 >
-  {/* The stage needs one or more posts. With no post, the page keeps the hero. */}
-  {
-    posts.length > 0 ? (
-      <BlogStage posts={posts} />
-    ) : (
-      <div class="page-hero reveal">
-        <div class="page-hero-glow" />
-        <div class="page-hero-label">Notes from the field</div>
-        <h1 class="page-hero-h">
-          <span>HIRING,</span>
-          <span class="dim">WRITTEN DOWN.</span>
-        </h1>
-        <p class="page-hero-sub">
-          What we learn running searches every week — talent markets, process,
-          and the mistakes that cost companies their best candidates.
-        </p>
-      </div>
-    )
-  }
-
-  <section class="post-list" id="posts">
+  <div class="page-hero">
+    <div class="page-hero-glow"></div>
+    <div class="page-hero-main">
+      <div class="page-hero-label reveal">Notes from the field</div>
+      <h1 class="page-hero-h reveal">
+        <span class="mask-line"><span class="mask-inner">HIRING,</span></span>
+        <span class="dim mask-line">
+          <span class="mask-inner">WRITTEN DOWN.</span>
+        </span>
+      </h1>
+      <p class="page-hero-sub reveal">
+        What we learn running searches every week — talent markets, process, and
+        the mistakes that cost companies their best candidates.
+      </p>
+    </div>
     {
-      posts.length === 0 && (
+      posts.length > 0 && (
+        <aside class="hero-aside reveal">
+          {authors.size > 0 && (
+            <>
+              <div class="hero-aside-label">Written by the founders</div>
+              <ul class="hero-authors">
+                {[...authors.values()].map((a) => (
+                  <li class="hero-author">
+                    {a.photo && <img src={a.photo} alt="" loading="lazy" />}
+                    <span>
+                      <span class="hero-author-name">{a.name}</span>
+                      {a.role && <span class="hero-author-role">{a.role}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          <div class="hero-aside-meta">
+            {posts.length} {posts.length === 1 ? "post" : "posts"} so far
+          </div>
+          <a class="hero-aside-rss" href={href("/blog/rss.xml")}>
+            Follow via RSS →
+          </a>
+        </aside>
+      )
+    }
+  </div>
+
+  <section class="post-list">
+    {
+      !featured && (
         <p class="empty reveal">
           First posts are on the way.{" "}
           <a href={href("/blog/rss.xml")}>Grab the RSS feed</a> to catch them.
@@ -43,23 +96,78 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
       )
     }
     {
-      posts.length > 0 && (
-        <div class="post-grid">
-          {posts.map((post) => (
-            <PostCard post={post} />
-          ))}
-        </div>
+      featured && (
+        <>
+          <div class="list-label reveal">Featured</div>
+          <PostCard post={featured} featured />
+        </>
       )
     }
+    {
+      latest.length > 0 && (
+        <>
+          <div class="list-head reveal">
+            <div class="list-label">Latest posts</div>
+            {topics.size > 1 && (
+              <div
+                class="filters"
+                role="group"
+                aria-label="Filter posts by topic"
+              >
+                <button
+                  class="filter-pill"
+                  type="button"
+                  data-filter="all"
+                  aria-pressed="true"
+                >
+                  All
+                </button>
+                {[...topics.values()].map((t) => (
+                  <button
+                    class="filter-pill"
+                    type="button"
+                    data-filter={t.slug}
+                    aria-pressed="false"
+                  >
+                    {t.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div class="post-grid">
+            {latest.map((post) => (
+              <PostCard post={post} />
+            ))}
+          </div>
+        </>
+      )
+    }
+  </section>
+
+  <section class="blog-cta reveal">
+    <p class="blog-cta-line">
+      Hiring for a role like the ones <strong>we write about?</strong>
+    </p>
+    <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
   </section>
 </Layout>
 
 <style>
+  /* ── Hero ── */
   .page-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 2.5rem;
     padding: 6.5rem 5% 4rem;
     border-bottom: 1px solid var(--bdark);
-    position: relative;
     overflow: hidden;
+  }
+  .page-hero-main,
+  .hero-aside {
+    position: relative;
   }
   .page-hero-glow {
     position: absolute;
@@ -106,12 +214,90 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
     max-width: 540px;
   }
 
+  /* ── Author panel ── */
+  .hero-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    max-width: 380px;
+    padding: 0.4rem 0 0.4rem 1.6rem;
+    border-left: 1px solid var(--bdark);
+  }
+  .hero-aside-label {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 35%, transparent);
+  }
+  .hero-authors {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    list-style: none;
+  }
+  .hero-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-author img {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--bdark);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .hero-author > span {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .hero-author-name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: var(--paper);
+  }
+  .hero-author-role {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
+  }
+  .hero-aside-meta {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
+  }
+  .hero-aside-rss {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    text-decoration: none;
+  }
+
+  /* ── Post list ── */
   .post-list {
-    border-bottom: 1px solid var(--bdark);
     min-height: 30vh;
+    padding: 3rem 5% 4rem;
+    border-bottom: 1px solid var(--bdark);
   }
   .empty {
-    padding: 4rem 5%;
+    padding: 1rem 0;
     font-size: 0.95rem;
     color: color-mix(in srgb, var(--paper) 45%, transparent);
   }
@@ -119,15 +305,165 @@ const posts = await getAllPosts(); // build-time only — never runs in a browse
     color: var(--green);
     text-decoration: none;
   }
+  .list-label {
+    margin-bottom: 1.2rem;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .list-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem 2rem;
+    margin: 3.5rem 0 1.4rem;
+  }
+  .list-head .list-label {
+    margin: 0;
+  }
+
+  /* ── Topic filters ── */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .filter-pill {
+    min-height: 44px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--bdark);
+    border-radius: 4px;
+    background: none;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+    cursor: pointer;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+  /* Hover only on a real pointer. A tap must not leave the hover color. */
+  @media (hover: hover) {
+    .filter-pill:hover {
+      color: var(--paper);
+    }
+  }
+  .filter-pill[aria-pressed="true"] {
+    color: var(--green);
+    border-color: rgba(var(--green-rgb), 0.5);
+  }
+  .filter-pill:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+
   .post-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: 1fr;
     gap: 1.6rem;
-    padding: 3rem 5% 4rem;
   }
-  @media (max-width: 640px) {
+  /* The card sets its own display. This rule lets a filter hide it. */
+  .post-grid > :global(.card[hidden]) {
+    display: none;
+  }
+
+  /* ── Contact line ── */
+  .blog-cta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.4rem;
+    padding: 3rem 5%;
+    border-top: 1px solid var(--bdark);
+    text-align: center;
+  }
+  .blog-cta-line {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+  }
+  .blog-cta-line strong {
+    font-weight: 400;
+    color: var(--paper);
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0 1.2rem;
+    border-radius: 4px;
+    background: var(--green);
+    color: var(--ink);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background 0.2s,
+      transform 0.2s;
+  }
+  .btn-primary:hover {
+    background: var(--green-light);
+    transform: translateY(-2px);
+  }
+
+  @media (width >= 48em) {
     .post-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .blog-cta {
+      flex-direction: row;
+      gap: 1.8rem;
+    }
+  }
+  @media (width >= 64em) {
+    .page-hero {
+      grid-template-columns: 1.4fr 1fr;
+      gap: 4rem;
+    }
+    .page-hero-h {
+      font-size: clamp(4rem, 7.5vw, 9rem);
+    }
+    .post-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>
+
+<script>
+  // Topic filters. The module runs one time, so this delegated listener
+  // binds one time and works after each ClientRouter navigation.
+  document.addEventListener("click", (event) => {
+    const pill = (event.target as Element | null)?.closest?.<HTMLElement>(
+      ".filter-pill",
+    );
+    if (!pill) return;
+    const filter = pill.dataset.filter ?? "all";
+
+    pill
+      .closest(".filters")
+      ?.querySelectorAll(".filter-pill")
+      .forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
+
+    document
+      .querySelectorAll<HTMLElement>(".post-grid > .card")
+      .forEach((card) => {
+        const show =
+          filter === "all" ||
+          (card.dataset.categories ?? "").split(" ").includes(filter);
+        card.hidden = !show;
+        // A card that was hidden at load has no reveal yet. Show it now.
+        if (show) card.classList.add("on");
+      });
+  });
+</script>

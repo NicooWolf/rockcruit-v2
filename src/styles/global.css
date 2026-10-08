@@ -347,21 +347,6 @@ body::after {
 .label-tag.g {
   color: var(--green);
 }
-
-/* ── Visually hidden utility ──
-   Screen readers read the element. The screen does not show it. */
-.visually-hidden {
-  position: absolute !important;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
 .label-tag.v {
   color: var(--violet-light);
 }
