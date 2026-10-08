@@ -22,7 +22,7 @@ const founders = [
 ];
 
 // The filters use the categories of the latest posts, in post order.
-// Fewer than two categories gives no useful filter, so the row hides.
+// The row shows "All" plus one button for each category.
 const topics = new Map<string, Category>();
 for (const post of latest) {
   for (const c of post.categories?.nodes ?? []) {
@@ -103,7 +103,7 @@ for (const post of latest) {
         <>
           <div class="list-head reveal">
             <div class="list-label">Latest posts</div>
-            {topics.size > 1 && (
+            {topics.size > 0 && (
               <div
                 class="filters"
                 role="group"
@@ -131,8 +131,8 @@ for (const post of latest) {
             )}
           </div>
           <div class="post-grid">
-            {latest.map((post) => (
-              <PostCard post={post} />
+            {latest.map((post, i) => (
+              <PostCard post={post} accent={i % 2 ? "violet" : "green"} />
             ))}
           </div>
         </>
@@ -452,6 +452,8 @@ for (const post of latest) {
       ?.querySelectorAll(".filter-pill")
       .forEach((b) => b.setAttribute("aria-pressed", String(b === pill)));
 
+    // The accents alternate over the visible cards: green, violet, green.
+    let visible = 0;
     document
       .querySelectorAll<HTMLElement>(".post-grid > .card")
       .forEach((card) => {
@@ -459,8 +461,10 @@ for (const post of latest) {
           filter === "all" ||
           (card.dataset.categories ?? "").split(" ").includes(filter);
         card.hidden = !show;
+        if (!show) return;
+        card.dataset.accent = visible++ % 2 ? "violet" : "green";
         // A card that was hidden at load has no reveal yet. Show it now.
-        if (show) card.classList.add("on");
+        card.classList.add("on");
       });
   });
 </script>

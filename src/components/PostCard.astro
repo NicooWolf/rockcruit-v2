@@ -10,9 +10,12 @@ import type { Post } from "../lib/wp";
 interface Props {
   post: Post;
   featured?: boolean;
+  // The grid alternates green and violet. The blog filter script updates
+  // this value on the visible cards.
+  accent?: "green" | "violet";
 }
 
-const { post, featured = false } = Astro.props;
+const { post, featured = false, accent = "green" } = Astro.props;
 const f = post.postFields;
 const title = decodeEntities(post.title);
 
@@ -45,6 +48,7 @@ const fmt = (d: string) =>
   ]}
   href={href(`/blog/${post.slug}/`)}
   data-categories={categories.map((c) => c.slug).join(" ")}
+  data-accent={accent}
 >
   {featured && <span class="card-ghost" aria-hidden="true">01</span>}
   <div class="card-media">
@@ -231,12 +235,12 @@ const fmt = (d: string) =>
     translate: 0 0;
   }
   /* Every second card in the grid uses the violet accent. */
-  :global(.post-grid) > .card:nth-child(2n):hover {
+  .card[data-accent="violet"]:hover {
     border-color: rgba(var(--violet-light-rgb), 0.4);
   }
-  :global(.post-grid) > .card:nth-child(2n):hover .card-title,
-  :global(.post-grid) > .card:nth-child(2n) .card-arrow,
-  :global(.post-grid) > .card:nth-child(2n) .card-cat {
+  .card[data-accent="violet"]:hover .card-title,
+  .card[data-accent="violet"] .card-arrow,
+  .card[data-accent="violet"] .card-cat {
     color: var(--violet-light);
   }
 
