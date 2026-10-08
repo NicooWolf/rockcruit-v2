@@ -3,29 +3,23 @@
 // Layout: hero with the author panel, the featured post, the latest posts
 // with topic filters, and a contact line. The source is the owner's
 // blog proposal (propuesta-blog.html).
+import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 import PostCard from "../../components/PostCard.astro";
 import { getAllPosts, type Category } from "../../lib/wp";
 import { href } from "../../lib/url";
+import profileJulieta from "../../assets/images/profile_julieta.jpeg";
+import profileAgustina from "../../assets/images/profile_agustina.png";
 
 const posts = await getAllPosts(); // build-time only — never runs in a browser
 const [featured, ...latest] = posts;
 
-// The author panel lists each post author one time, in post order.
-const authors = new Map<
-  string,
-  { name: string; role?: string; photo?: string }
->();
-for (const post of posts) {
-  const a = post.postFields?.author?.nodes?.[0]?.authorFields;
-  const name = [a?.name, a?.lastName].filter(Boolean).join(" ");
-  if (!name || authors.has(name)) continue;
-  authors.set(name, {
-    name,
-    role: a?.role,
-    photo: a?.profilePhoto?.node?.sourceUrl,
-  });
-}
+// The author panel shows the two founders, as the proposal does. The names,
+// the role, and the photos are the same as on the Team page.
+const founders = [
+  { name: "Julieta Wolf", role: "Co-Founder", photo: profileJulieta },
+  { name: "Agustina Valverde", role: "Co-Founder", photo: profileAgustina },
+];
 
 // The filters use the categories of the latest posts, in post order.
 // Fewer than two categories gives no useful filter, so the row hides.
@@ -56,34 +50,35 @@ for (const post of latest) {
         the mistakes that cost companies their best candidates.
       </p>
     </div>
-    {
-      posts.length > 0 && (
-        <aside class="hero-aside slide-right soft">
-          {authors.size > 0 && (
-            <>
-              <div class="hero-aside-label">Written by the founders</div>
-              <ul class="hero-authors">
-                {[...authors.values()].map((a) => (
-                  <li class="hero-author">
-                    {a.photo && <img src={a.photo} alt="" loading="lazy" />}
-                    <span>
-                      <span class="hero-author-name">{a.name}</span>
-                      {a.role && <span class="hero-author-role">{a.role}</span>}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
+    <aside class="hero-aside slide-right soft">
+      <div class="hero-aside-label">Written by the founders</div>
+      <ul class="hero-authors">
+        {
+          founders.map((f) => (
+            <li class="hero-author">
+              {/* The source photos are 1–2 MB. Build an 88px copy: two times
+                  the 44px avatar. */}
+              <Image src={f.photo} width={88} alt="" />
+
+              <span>
+                <span class="hero-author-name">{f.name}</span>
+                <span class="hero-author-role">{f.role}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        posts.length > 0 && (
           <div class="hero-aside-meta">
             {posts.length} {posts.length === 1 ? "post" : "posts"} so far
           </div>
-          <a class="hero-aside-rss" href={href("/blog/rss.xml")}>
-            Follow via RSS →
-          </a>
-        </aside>
-      )
-    }
+        )
+      }
+      <a class="hero-aside-rss" href={href("/blog/rss.xml")}>
+        Follow via RSS →
+      </a>
+    </aside>
   </div>
 
   <section class="post-list">
