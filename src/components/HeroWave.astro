@@ -9,17 +9,76 @@
     height: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0;
   }
 
   canvas {
     display: block;
     width: 100%;
     height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+
+  canvas.is-on {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    canvas {
+      transition: none;
+    }
   }
 </style>
 
 <script>
+  import { createWave, type WaveColors, type WaveSize } from "../lib/heroWave";
+
+  interface WaveControl {
+    resize: (size: WaveSize) => void;
+    run: (running: boolean) => void;
+    still: () => void;
+    dispose: () => void;
+  }
+
+  // Draw in a worker when the browser can move the canvas there. A slow frame
+  // in the worker cannot delay the Lenis scroll or the title reveal.
+  function connect(
+    canvas: HTMLCanvasElement,
+    colors: WaveColors,
+  ): WaveControl | undefined {
+    if ("transferControlToOffscreen" in canvas) {
+      let worker: Worker | undefined;
+      try {
+        worker = new Worker(
+          new URL("../lib/heroWave.worker.ts", import.meta.url),
+          { type: "module" },
+        );
+        const offscreen = canvas.transferControlToOffscreen();
+        worker.postMessage({ type: "init", canvas: offscreen, colors }, [
+          offscreen,
+        ]);
+        const target = worker;
+        return {
+          resize: (size) => target.postMessage({ type: "resize", size }),
+          run: (running) => target.postMessage({ type: "run", running }),
+          still: () => target.postMessage({ type: "still" }),
+          dispose: () => target.terminate(),
+        };
+      } catch {
+        // The canvas stays on the main thread. Use the fallback below.
+        worker?.terminate();
+      }
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const wave = createWave(context, colors, {
+      request: (callback) => requestAnimationFrame(callback),
+      cancel: (handle) => cancelAnimationFrame(handle),
+    });
+    return { ...wave, dispose: () => wave.run(false) };
+  }
+
   let cleanup: (() => void) | undefined;
 
   function initWave() {
@@ -29,38 +88,42 @@
     const layer = document.querySelector<HTMLElement>("[data-hero-wave]");
     const hero = layer?.closest<HTMLElement>(".hero");
     const support = hero?.querySelector<HTMLElement>(".subhero-grid");
+    const supportLeft = support?.querySelector<HTMLElement>(".subhero-left");
+    const supportRight = support?.querySelector<HTMLElement>(".subhero-right");
     const stats = hero?.querySelector<HTMLElement>(".hero-stats");
     const title = hero?.querySelector<HTMLElement>(".hero-h1-wrap");
     const canvas = layer?.querySelector("canvas");
-    if (!layer || !hero || !support || !stats || !title || !canvas) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
+    if (
+      !layer ||
+      !hero ||
+      !support ||
+      !supportLeft ||
+      !supportRight ||
+      !stats ||
+      !title ||
+      !canvas
+    )
+      return;
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const palette = getComputedStyle(layer);
-    const green = palette.getPropertyValue("--green").trim();
-    const violet = palette.getPropertyValue("--violet").trim();
-    const abort = new AbortController();
-    let width = 0;
-    let height = 0;
-    let titleBottom = 0;
-    let visible = false;
-    let frame = 0;
-    let previousTime = 0;
-    let elapsed = 0;
-    let entrance = 0;
-    let disposed = false;
-    let particles: {
-      x: number;
-      row: number;
-      jitter: number;
-      radius: number;
-    }[] = [];
+    const wave = connect(canvas, {
+      green: palette.getPropertyValue("--green").trim(),
+      violet: palette.getPropertyValue("--violet").trim(),
+    });
+    if (!wave) return;
 
-    const clamp = (value: number) => Math.max(0, Math.min(1, value));
+    const abort = new AbortController();
+    let height = 0;
+    let visible = false;
+    let started = false;
+    let running = false;
+    let stillDrawn = false;
+    let opacity = "";
+    let disposed = false;
+
     const smooth = (value: number) => {
-      const t = clamp(value);
+      const t = Math.max(0, Math.min(1, value));
       return t * t * (3 - 2 * t);
     };
 
@@ -68,124 +131,89 @@
       return 1 - smooth(window.scrollY / Math.max(1, height * 0.75));
     }
 
-    function setOpacity() {
-      layer!.style.opacity = String(
-        motion.matches ? 1 : smooth(entrance) * scrollOpacity(),
-      );
-    }
-
-    function draw() {
-      if (!width || !height) return;
-      context!.clearRect(0, 0, width, height);
-      const phase = elapsed * 0.00016;
-      const levels = 24;
-      const paths = Array.from({ length: levels * 2 }, () => new Path2D());
-
-      for (const particle of particles) {
-        const u = particle.x;
-        const depth = particle.row;
-        const x = u * width;
-        const center =
-          0.49 +
-          Math.sin(u * Math.PI * 2 - 0.9 + phase) * 0.19 +
-          Math.sin(u * Math.PI * 3.4 + phase * 0.6) * 0.045;
-        const spread = 0.2 + Math.sin(u * Math.PI + phase * 0.4) * 0.06;
-        const y =
-          (center +
-            depth * spread +
-            Math.sin(u * 13 + depth * 3 + phase) * 0.022 +
-            particle.jitter * 0.004) *
-          height;
-        const v = y / height;
-        const edge =
-          smooth(u / 0.13) *
-          smooth((1 - u) / 0.13) *
-          smooth(v / 0.22) *
-          smooth((1 - v) / 0.25);
-        const ribbon = 1 - smooth(Math.abs(depth));
-        // Keep the brightest particles to the right of the title.
-        const textDimming =
-          y < titleBottom ? 0.55 + smooth((u - 0.65) / 0.3) * 0.45 : 0.8;
-        const opacity = edge * (0.18 + ribbon * 0.62) * textDimming;
-        const level = Math.round((opacity / 0.8) * (levels - 1));
-        if (!level) continue;
-        const color = depth + Math.sin(u * 5 + phase * 0.3) * 0.35 > 0 ? 1 : 0;
-        const path = paths[color * levels + level];
-        path.moveTo(x + particle.radius, y);
-        path.arc(x, y, particle.radius, 0, Math.PI * 2);
+    function update() {
+      if (disposed) return;
+      const fade = scrollOpacity();
+      const nextOpacity = String(motion.matches ? 1 : fade);
+      if (nextOpacity !== opacity) {
+        opacity = nextOpacity;
+        layer!.style.opacity = opacity;
       }
-      // Draw particles with shared colors and opacity in one operation.
-      for (let color = 0; color < 2; color++) {
-        context!.fillStyle = color ? violet : green;
-        for (let level = 1; level < levels; level++) {
-          context!.globalAlpha = (level / (levels - 1)) * 0.8;
-          context!.fill(paths[color * levels + level]);
-        }
+
+      const active = started && visible && !document.hidden;
+      const nextRunning = active && !motion.matches && fade > 0;
+      if (nextRunning !== running) {
+        running = nextRunning;
+        wave!.run(running);
       }
-      context!.globalAlpha = 1;
+      if (active && motion.matches && !stillDrawn) {
+        stillDrawn = true;
+        wave!.still();
+      }
     }
 
-    function stop() {
-      cancelAnimationFrame(frame);
-      frame = 0;
-      previousTime = 0;
+    function start() {
+      if (disposed || started) return;
+      started = true;
+      canvas!.classList.add("is-on");
+      update();
     }
 
-    function tick(time: number) {
-      frame = 0;
-      if (disposed || !visible || document.hidden || motion.matches) return;
-      const delta = previousTime ? Math.min(time - previousTime, 50) : 0;
-      previousTime = time;
-      elapsed += delta;
-      entrance = Math.min(1, entrance + delta / 1000);
-      setOpacity();
-      if (scrollOpacity() === 0) {
-        previousTime = 0;
+    // The reveal engine adds .on to the title. The fade then starts after the
+    // --reveal-index delay. Give true when a title transition is past its
+    // delay, or when the reveal is already complete.
+    function titleRevealStarted() {
+      if (!title!.classList.contains("on")) return false;
+      const animations = title!.getAnimations({ subtree: true });
+      if (!animations.length) return true;
+      return animations.some((animation) => {
+        const delay = Number(animation.effect?.getTiming().delay ?? 0);
+        return Number(animation.currentTime ?? 0) >= delay;
+      });
+    }
+
+    // Start the wave when the title starts to fade in. The worker draws the
+    // wave, so the wave and the title do not compete for the main thread.
+    function startWithTitle() {
+      if (motion.matches || titleRevealStarted()) {
+        start();
         return;
       }
-      draw();
-      frame = requestAnimationFrame(tick);
+      // The event bubbles from the title lines. It also comes when the reveal
+      // waits for a page transition.
+      title!.addEventListener("transitionstart", start, {
+        once: true,
+        signal: abort.signal,
+      });
+      // A safety limit, if the reveal never comes.
+      const timer = window.setTimeout(start, 4000);
+      abort.signal.addEventListener("abort", () => clearTimeout(timer));
     }
 
-    function resume() {
-      if (disposed || !visible || document.hidden) return;
-      setOpacity();
-      if (motion.matches) {
-        draw();
-      } else if (!frame && scrollOpacity() > 0) {
-        frame = requestAnimationFrame(tick);
-      }
+    // The subhero columns stack on a narrow screen. The cards then push the
+    // stats far down, and the wave moves too low. End the wave at the bottom
+    // of the subhero text there.
+    function waveHeight() {
+      const stacked = supportRight!.offsetTop > supportLeft!.offsetTop;
+      if (!stacked) return stats!.offsetTop;
+      return (
+        support!.offsetTop + supportLeft!.offsetTop + supportLeft!.offsetHeight
+      );
     }
 
     function resize() {
       if (disposed) return;
-      width = hero!.clientWidth;
-      height = stats!.offsetTop;
-      titleBottom = title!.offsetTop + title!.offsetHeight;
+      const width = hero!.clientWidth;
+      height = waveHeight();
       hero!.style.setProperty("--hero-support-top", `${support!.offsetTop}px`);
       layer!.style.height = `${height}px`;
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
-      canvas!.width = Math.round(width * ratio);
-      canvas!.height = Math.round(height * ratio);
-      context!.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-      const rows = width <= 640 ? 38 : 64;
-      const columns = Math.min(240, Math.ceil(width / (width <= 640 ? 5 : 7)));
-      particles = [];
-      for (let row = 0; row < rows; row++) {
-        for (let column = 0; column < columns; column++) {
-          const seed = Math.sin(row * 127.1 + column * 311.7) * 43758.5453;
-          const jitter = seed - Math.floor(seed);
-          particles.push({
-            x: (column + jitter * 0.65) / columns,
-            row: (row / (rows - 1)) * 2 - 1,
-            jitter: jitter - 0.5,
-            radius: 0.65 + jitter * 0.85,
-          });
-        }
-      }
-      draw();
-      resume();
+      wave!.resize({
+        width,
+        height,
+        titleBottom: title!.offsetTop + title!.offsetHeight,
+        compact: width <= 640,
+      });
+      update();
     }
 
     const sizeObserver = new ResizeObserver(resize);
@@ -194,45 +222,36 @@
 
     const viewObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (visible) resume();
-      else stop();
+      update();
     });
     viewObserver.observe(layer);
 
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (!motion.matches) resume();
-      },
-      { passive: true, signal: abort.signal },
-    );
+    window.addEventListener("scroll", update, {
+      passive: true,
+      signal: abort.signal,
+    });
     window.addEventListener("resize", resize, { signal: abort.signal });
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.hidden) stop();
-        else resume();
-      },
-      { signal: abort.signal },
-    );
+    document.addEventListener("visibilitychange", update, {
+      signal: abort.signal,
+    });
     motion.addEventListener(
       "change",
       () => {
-        stop();
-        entrance = 1;
-        setOpacity();
-        resume();
+        stillDrawn = false;
+        if (motion.matches) start();
+        update();
       },
       { signal: abort.signal },
     );
 
     resize();
+    startWithTitle();
     cleanup = () => {
       disposed = true;
-      stop();
       abort.abort();
       sizeObserver.disconnect();
       viewObserver.disconnect();
+      wave.dispose();
     };
   }
 
