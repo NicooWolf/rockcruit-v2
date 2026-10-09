@@ -814,6 +814,60 @@ import HireForm from "../components/HireForm.astro";
     line-height: 1.65;
   }
 
+  /* CORNER GLOWS
+     One soft glow in a corner of five sections. The corners and the colors
+     change from one section to the next, so the glows stay a detail. A glow
+     sits at z-index -1 inside an isolated section: above the section
+     background, below the content. */
+  .decision,
+  .cont,
+  #raas,
+  .pillars-section,
+  .final-cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .decision::after,
+  .cont::after,
+  #raas::after,
+  .pillars-section::after,
+  .final-cta::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .decision::after {
+    bottom: -120px;
+    right: -100px;
+    background: rgba(var(--violet-rgb), 0.1);
+  }
+  .cont::after {
+    top: -100px;
+    right: -120px;
+    background: rgba(var(--violet-rgb), 0.12);
+  }
+  #raas::after {
+    bottom: -140px;
+    left: -120px;
+    background: rgba(var(--green-rgb), 0.1);
+  }
+  .pillars-section::after {
+    top: -120px;
+    left: -100px;
+    background: rgba(var(--violet-rgb), 0.09);
+  }
+  .final-cta::after {
+    bottom: -140px;
+    right: -120px;
+    background: rgba(var(--green-rgb), 0.09);
+  }
+
   /* FINAL CTA (layout only — form styles in HireForm.astro) */
   .final-cta {
     background: #0b0b0b;
