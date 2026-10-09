@@ -1,4 +1,30 @@
-<div class="hero-wave" data-hero-wave aria-hidden="true">
+---
+// Each page picks two colors of the site palette. The names are the CSS
+// variables of global.css. The split sets the share of each color. See
+// WaveColors in src/lib/heroWave.ts. The defaults give the Home wave.
+type WaveTone =
+  | "green"
+  | "green-light"
+  | "violet"
+  | "violet-light"
+  | "violet-dark";
+
+interface Props {
+  first?: WaveTone;
+  second?: WaveTone;
+  split?: number;
+}
+
+const { first = "green", second = "violet", split = 0 } = Astro.props;
+---
+
+<div
+  class="hero-wave"
+  data-hero-wave
+  data-split={split}
+  style={`--wave-first: var(--${first}); --wave-second: var(--${second});`}
+  aria-hidden="true"
+>
   <canvas></canvas>
 </div>
 
@@ -86,30 +112,27 @@
     cleanup = undefined;
 
     const layer = document.querySelector<HTMLElement>("[data-hero-wave]");
-    const hero = layer?.closest<HTMLElement>(".hero");
-    const support = hero?.querySelector<HTMLElement>(".subhero-grid");
+    // The Home hero has a support grid and a stats row. A page hero has only
+    // a title and an intro line.
+    const hero = layer?.closest<HTMLElement>(".hero, .page-hero");
+    const support = hero?.querySelector<HTMLElement>(
+      ".subhero-grid, .page-hero-sub",
+    );
     const supportLeft = support?.querySelector<HTMLElement>(".subhero-left");
     const supportRight = support?.querySelector<HTMLElement>(".subhero-right");
     const stats = hero?.querySelector<HTMLElement>(".hero-stats");
-    const title = hero?.querySelector<HTMLElement>(".hero-h1-wrap");
+    const title = hero?.querySelector<HTMLElement>(
+      ".hero-h1-wrap, .page-hero-h",
+    );
     const canvas = layer?.querySelector("canvas");
-    if (
-      !layer ||
-      !hero ||
-      !support ||
-      !supportLeft ||
-      !supportRight ||
-      !stats ||
-      !title ||
-      !canvas
-    )
-      return;
+    if (!layer || !hero || !support || !title || !canvas) return;
 
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const palette = getComputedStyle(layer);
     const wave = connect(canvas, {
-      green: palette.getPropertyValue("--green").trim(),
-      violet: palette.getPropertyValue("--violet").trim(),
+      first: palette.getPropertyValue("--wave-first").trim(),
+      second: palette.getPropertyValue("--wave-second").trim(),
+      split: Number(layer.dataset.split) || 0,
     });
     if (!wave) return;
 
@@ -194,11 +217,11 @@
     // stats far down, and the wave moves too low. End the wave at the bottom
     // of the subhero text there.
     function waveHeight() {
-      const stacked = supportRight!.offsetTop > supportLeft!.offsetTop;
-      if (!stacked) return stats!.offsetTop;
-      return (
-        support!.offsetTop + supportLeft!.offsetTop + supportLeft!.offsetHeight
-      );
+      // A page hero has no stats row. The wave covers the whole hero.
+      if (!stats || !supportLeft || !supportRight) return hero!.offsetHeight;
+      const stacked = supportRight.offsetTop > supportLeft.offsetTop;
+      if (!stacked) return stats.offsetTop;
+      return support!.offsetTop + supportLeft.offsetTop + supportLeft.offsetHeight;
     }
 
     function resize() {

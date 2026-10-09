@@ -4,6 +4,11 @@
 const ENDPOINT =
   import.meta.env.WP_GRAPHQL_ENDPOINT ?? "https://rblog.rockcruit.com/graphql";
 
+// Build-time kill switch. Set BLOG_ENABLED=false to build without WordPress:
+// blog list renders its empty state, zero post pages generate, RSS is empty.
+// Any other value (or unset) = WP required, and failures still kill the build loudly.
+export const BLOG_ENABLED = import.meta.env.BLOG_ENABLED !== "false";
+
 // ── Types ────────────────────────────────────────────────────────────────
 // The owner confirmed these ACF groups on rblog.rockcruit.com:
 //   Post group  = postFields   (postImage, subtitle, description,
@@ -110,6 +115,7 @@ const POST_FIELDS_SELECTION = `
 
 // ── Public API ───────────────────────────────────────────────────────────
 export async function getAllPosts(): Promise<Post[]> {
+  if (!BLOG_ENABLED) return [];
   const data = await gql<{ posts: { nodes: Post[] } }>(`
     query AllPosts {
       posts(where: { status: PUBLISH }, first: 100) {
@@ -129,6 +135,7 @@ export async function getAllPosts(): Promise<Post[]> {
 // when the post count approaches it. Not before (speculative abstraction).
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
+  if (!BLOG_ENABLED) return null;
   const data = await gql<{ post: Post | null }>(
     `
     query PostBySlug($slug: ID!) {

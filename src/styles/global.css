@@ -8,7 +8,11 @@
   font-family: "Bebas Neue";
   font-style: normal;
   font-weight: 400;
-  font-display: optional; /* Prevents font metric layout shift during page swaps */
+  /* block, not optional: with optional, a face that is not ready within 100ms
+     stays on the fallback font until a reload. A page swap can re-insert this
+     rule, so the face is not ready in time. The font is preloaded in
+     Layout.astro, so the block period is short. */
+  font-display: block;
   src: url("../assets/fonts/bebas-neue-400.woff2") format("woff2");
 }
 @font-face {
@@ -425,4 +429,12 @@ nav[transition\:persist] {
   isolation: isolate;
   z-index: 9999;
   transform: translateZ(0);
+}
+
+/* ── Page hero wave ──
+   The wave layer sits at the top of the hero. The label, the title and the
+   intro line sit above it. The glow keeps its own absolute position. */
+.page-hero > :is(.page-hero-label, .page-hero-h, .page-hero-sub) {
+  position: relative;
+  z-index: 1;
 }

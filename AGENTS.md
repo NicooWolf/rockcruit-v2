@@ -76,8 +76,12 @@ Do these steps in this order for every task:
 1. Read the files that relate to the task.
 2. Make the change.
 3. Run `npx astro check`.
-4. Run `npm run build`
-5. Report the result. Give the command output if an error occurs.
+4. Run `npm run build` with `BLOG_ENABLED=false`.
+5. Run `npm run build` with `BLOG_ENABLED=true` if you changed `src/lib/wp.ts`.
+6. Report the result. Give the command output if an error occurs.
+
+The build must pass with `BLOG_ENABLED=false` and no network access.
+This rule has no exception.
 
 ---
 
@@ -102,6 +106,7 @@ A hard-coded path breaks the navigation on GitHub Pages.
 
 `src/lib/wp.ts` is the only file that queries WordPress.
 Do not call WPGraphQL from a page, a component, or a layout.
+Do not remove the `BLOG_ENABLED` kill switch.
 Do not delete a `TODO(ACF)` marker. The ACF field list is not final.
 Do not invent an ACF field name. See section 9.
 
@@ -162,6 +167,8 @@ Do not write new marketing copy. Ask the owner for the text.
 ## 6. CI/CD RULES
 
 The workflow files are in `.github/workflows/`.
+Put `BLOG_ENABLED` under `env:`. Do not put it directly on the step.
+A wrong position causes an invalid YAML file.
 
 ---
 
@@ -180,7 +187,7 @@ Ask the owner before you change one of these items:
 
 - Services dropdown order: 01 RaaS, then 02 Contingency.
 - `--bdark` opacity: `.06`.
-- The Blog link is in `Nav` and in `Footer`.
+- The Blog link is in `Nav` and in `Footer`. The `showBlog` flag hides it when `BLOG_ENABLED=false`.
 - `HireForm` is shared between the Home page and the Services page.
 - The Process page uses the `recruitingProcessCards` copy from v1.
 - The FAQ answers use only facts from the prototypes.
@@ -223,9 +230,9 @@ Use Conventional Commits.
 
 ```
 feat(nav): add base-aware href helper to the dropdown
-fix(wp): keep the build green
+fix(wp): keep the build green when BLOG_ENABLED is false
 docs(readme): add the architecture diagram
-chore(ci): move xxxx under env
+chore(ci): move BLOG_ENABLED under env
 ```
 
 Rules:

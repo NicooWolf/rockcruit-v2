@@ -34,15 +34,15 @@ This repository contains the public website of the company.
 
 ## 3. KEY FILES
 
-| File                      | Purpose                                                                |
-| ------------------------- | ---------------------------------------------------------------------- |
-| `AGENTS.md`               | AI-Agents context & architecture rules. Read this file first.          |
-| `CLAUDE.md`               | Claude-scoped architecture rules.                                      |
-| `astro.config.mjs`        | Astro configuration. Contains `site` and `base`. Do not remove `site`. |
-| `src/lib/wp.ts`           | WordPress data layer. Contains `TODO(ACF)` markers.                    |
-| `src/lib/url.ts`          | Base-aware `href()` helper. Use it for all internal links.             |
-| `.env`                    | Secret keys (EmailJS). Never commit this file.                         |
-| `.github/workflows/*.yml` | CI pipeline.                                                           |
+| File                      | Purpose                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| `AGENTS.md`               | AI-Agents context & architecture rules. Read this file first.                              |
+| `CLAUDE.md`               | Claude-scoped architecture rules.                                                          |
+| `astro.config.mjs`        | Astro configuration. Contains `site` and `base`. Do not remove `site`.                     |
+| `src/lib/wp.ts`           | WordPress data layer. Contains the `BLOG_ENABLED` kill switch. Contains `TODO(ACF)` markers. |
+| `src/lib/url.ts`          | Base-aware `href()` helper. Use it for all internal links.                                 |
+| `.env`                    | Secret keys (EmailJS). Never commit this file.                                             |
+| `.github/workflows/*.yml` | CI pipeline. `BLOG_ENABLED` must be under `env:`.                                            |
 
 ---
 
@@ -65,7 +65,7 @@ This repository contains the public website of the company.
 | Technology             | Role                     | Notes                                                |
 | ---------------------- | ------------------------ | ---------------------------------------------------- |
 | Astro v2               | Static site generator    | All pages build to static HTML.                      |
-| WPGraphQL              | Blog content API         |                                                      |
+| WPGraphQL              | Blog content API         | Only active when `BLOG_ENABLED=true`.                  |
 | WPGraphQL-for-ACF      | Custom fields API        | Field list is not final. See `TODO(ACF)` in `wp.ts`. |
 | EmailJS                | Contact and hire forms   | Keys live in `.env`. A domain allowlist is active.   |
 | IntersectionObserver   | Scroll reveal animations | Lightweight. No animation library is required.       |
@@ -82,7 +82,7 @@ This repository contains the public website of the company.
 | `src/pages/index.astro`    | Home page. Main entry for users. Contains the shared `HireForm`.              |
 | `src/pages/services.astro` | Services page. Anchors: `#contingency`, `#raas`, `#contact`.                  |
 | `astro.config.mjs`         | Main entry for the build. Sets `site` and `base`.                             |
-| `.github/workflows/*.yml`  | Main entry for CI.                                                            |
+| `.github/workflows/*.yml`  | Main entry for CI. Sets `BLOG_ENABLED` under `env:`.                            |
 | `src/lib/wp.ts`            | Single entry for all WordPress data. Do not query WordPress from other files. |
 
 ---
@@ -95,7 +95,7 @@ This repository contains the public website of the company.
 WordPress (Hostinger)
    │  WPGraphQL + ACF, build time only
    ▼
-src/lib/wp.ts
+src/lib/wp.ts  ── BLOG_ENABLED=false → static fallback, no network
    │
    ▼
 Astro build (GitHub Actions)
@@ -108,9 +108,11 @@ Static HTML/CSS/JS → GitHub Pages (now) / Hostinger (production)
 
 1. The site is fully static. The browser never calls WordPress.
 2. `wp.ts` is the only WordPress access point.
-3. Use the `href()` helper from `src/lib/url.ts` for all internal links. GitHub Pages uses `BASE_URL=/rockcruit-v2/`.
-4. The HTML prototypes (`index.html`, `services.html`) are the source of truth for design and copy. The v1 React code is not.
-5. EmailJS sends the forms from the client. Keep the keys in `.env`.
+3. `BLOG_ENABLED=false` must give a successful build with no network access.
+4. When `BLOG_ENABLED=false`, the `showBlog` flag hides the Blog link in `Nav` and `Footer`.
+5. Use the `href()` helper from `src/lib/url.ts` for all internal links. GitHub Pages uses `BASE_URL=/rockcruit-v2/`.
+6. The HTML prototypes (`index.html`, `services.html`) are the source of truth for design and copy. The v1 React code is not.
+7. EmailJS sends the forms from the client. Keep the keys in `.env`.
 
 ### 7.3 Locked design decisions
 

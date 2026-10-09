@@ -3,6 +3,7 @@
 // Reuses the home page's accordion pattern with faq-* classes. Every answer is
 // grounded in facts already published on the prototypes — nothing invented.
 import Layout from "../layouts/Layout.astro";
+import HeroWave from "../components/HeroWave.astro";
 import { href } from "../lib/url";
 
 const faqs = [
@@ -46,6 +47,7 @@ const faqs = [
   description="Common questions about working with Rockcruit: speed to first candidate, Contingency vs RaaS, pricing model, roles covered, and how to start."
 >
   <div class="page-hero">
+  <HeroWave first="violet-dark" second="violet" />
     <div class="page-hero-glow"></div>
     <div class="page-hero-label reveal">Questions, answered straight</div>
     <h1 class="page-hero-h reveal">
@@ -126,7 +128,7 @@ const faqs = [
     display: block;
   }
   .page-hero-h .dim {
-    color: rgba(240, 237, 227, 0.2);
+    color: color-mix(in srgb, var(--paper) 20%, var(--ink));
   }
   .page-hero-sub {
     font-size: 0.95rem;

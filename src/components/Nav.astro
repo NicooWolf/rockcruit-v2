@@ -3,10 +3,12 @@
 // Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
 // "Open Positions" → /#contact until its real destination is decided (open ledger).
 import { href } from "../lib/url";
+import { BLOG_ENABLED } from "../lib/wp";
 import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
 
 const path = Astro.url.pathname;
 const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
+const showBlog = BLOG_ENABLED;
 ---
 
 <nav>
@@ -49,12 +51,15 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
     <li>
       <a href={href("/faq")} class={isActive("/faq") ? "active" : ""}>FAQ</a>
     </li>
-
-    <li>
-      <a href={href("/blog")} class={isActive("/blog") ? "active" : ""}>
-        Blog
-      </a>
-    </li>
+    {
+      showBlog && (
+        <li>
+          <a href={href("/blog")} class={isActive("/blog") ? "active" : ""}>
+            Blog
+          </a>
+        </li>
+      )
+    }
   </ul>
   <div class="nav-actions">
     <a href={href("/#contact")} class="nav-open">Open Positions</a>
@@ -109,13 +114,19 @@ const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
               <span class="nav-mobile-label">FAQ</span>
             </a>
           </li>
-
-          <li>
-            <a href={href("/blog")} class={isActive("/blog") ? "active" : ""}>
-              <span class="nav-mobile-idx">06</span>
-              <span class="nav-mobile-label">Blog</span>
-            </a>
-          </li>
+          {
+            showBlog && (
+              <li>
+                <a
+                  href={href("/blog")}
+                  class={isActive("/blog") ? "active" : ""}
+                >
+                  <span class="nav-mobile-idx">06</span>
+                  <span class="nav-mobile-label">Blog</span>
+                </a>
+              </li>
+            )
+          }
         </ul>
         <div class="nav-mobile-cta">
           <a href={href("/#contact")} class="nav-mobile-open">
