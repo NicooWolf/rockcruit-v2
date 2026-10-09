@@ -1,0 +1,244 @@
+<div class="hero-wave" data-hero-wave aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .hero-wave {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  let cleanup: (() => void) | undefined;
+
+  function initWave() {
+    cleanup?.();
+    cleanup = undefined;
+
+    const layer = document.querySelector<HTMLElement>("[data-hero-wave]");
+    const hero = layer?.closest<HTMLElement>(".hero");
+    const support = hero?.querySelector<HTMLElement>(".subhero-grid");
+    const stats = hero?.querySelector<HTMLElement>(".hero-stats");
+    const title = hero?.querySelector<HTMLElement>(".hero-h1-wrap");
+    const canvas = layer?.querySelector("canvas");
+    if (!layer || !hero || !support || !stats || !title || !canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const palette = getComputedStyle(layer);
+    const green = palette.getPropertyValue("--green").trim();
+    const violet = palette.getPropertyValue("--violet").trim();
+    const abort = new AbortController();
+    let width = 0;
+    let height = 0;
+    let titleBottom = 0;
+    let visible = false;
+    let frame = 0;
+    let previousTime = 0;
+    let elapsed = 0;
+    let entrance = 0;
+    let disposed = false;
+    let particles: {
+      x: number;
+      row: number;
+      jitter: number;
+      radius: number;
+    }[] = [];
+
+    const clamp = (value: number) => Math.max(0, Math.min(1, value));
+    const smooth = (value: number) => {
+      const t = clamp(value);
+      return t * t * (3 - 2 * t);
+    };
+
+    function scrollOpacity() {
+      return 1 - smooth(window.scrollY / Math.max(1, height * 0.75));
+    }
+
+    function setOpacity() {
+      layer!.style.opacity = String(
+        motion.matches ? 1 : smooth(entrance) * scrollOpacity(),
+      );
+    }
+
+    function draw() {
+      if (!width || !height) return;
+      context!.clearRect(0, 0, width, height);
+      const phase = elapsed * 0.00016;
+      const levels = 24;
+      const paths = Array.from({ length: levels * 2 }, () => new Path2D());
+
+      for (const particle of particles) {
+        const u = particle.x;
+        const depth = particle.row;
+        const x = u * width;
+        const center =
+          0.49 +
+          Math.sin(u * Math.PI * 2 - 0.9 + phase) * 0.19 +
+          Math.sin(u * Math.PI * 3.4 + phase * 0.6) * 0.045;
+        const spread = 0.2 + Math.sin(u * Math.PI + phase * 0.4) * 0.06;
+        const y =
+          (center +
+            depth * spread +
+            Math.sin(u * 13 + depth * 3 + phase) * 0.022 +
+            particle.jitter * 0.004) *
+          height;
+        const v = y / height;
+        const edge =
+          smooth(u / 0.13) *
+          smooth((1 - u) / 0.13) *
+          smooth(v / 0.22) *
+          smooth((1 - v) / 0.25);
+        const ribbon = 1 - smooth(Math.abs(depth));
+        // Keep the brightest particles to the right of the title.
+        const textDimming =
+          y < titleBottom ? 0.55 + smooth((u - 0.65) / 0.3) * 0.45 : 0.8;
+        const opacity = edge * (0.18 + ribbon * 0.62) * textDimming;
+        const level = Math.round((opacity / 0.8) * (levels - 1));
+        if (!level) continue;
+        const color = depth + Math.sin(u * 5 + phase * 0.3) * 0.35 > 0 ? 1 : 0;
+        const path = paths[color * levels + level];
+        path.moveTo(x + particle.radius, y);
+        path.arc(x, y, particle.radius, 0, Math.PI * 2);
+      }
+      // Draw particles with shared colors and opacity in one operation.
+      for (let color = 0; color < 2; color++) {
+        context!.fillStyle = color ? violet : green;
+        for (let level = 1; level < levels; level++) {
+          context!.globalAlpha = (level / (levels - 1)) * 0.8;
+          context!.fill(paths[color * levels + level]);
+        }
+      }
+      context!.globalAlpha = 1;
+    }
+
+    function stop() {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      previousTime = 0;
+    }
+
+    function tick(time: number) {
+      frame = 0;
+      if (disposed || !visible || document.hidden || motion.matches) return;
+      const delta = previousTime ? Math.min(time - previousTime, 50) : 0;
+      previousTime = time;
+      elapsed += delta;
+      entrance = Math.min(1, entrance + delta / 1000);
+      setOpacity();
+      if (scrollOpacity() === 0) {
+        previousTime = 0;
+        return;
+      }
+      draw();
+      frame = requestAnimationFrame(tick);
+    }
+
+    function resume() {
+      if (disposed || !visible || document.hidden) return;
+      setOpacity();
+      if (motion.matches) {
+        draw();
+      } else if (!frame && scrollOpacity() > 0) {
+        frame = requestAnimationFrame(tick);
+      }
+    }
+
+    function resize() {
+      if (disposed) return;
+      width = hero!.clientWidth;
+      height = stats!.offsetTop;
+      titleBottom = title!.offsetTop + title!.offsetHeight;
+      hero!.style.setProperty("--hero-support-top", `${support!.offsetTop}px`);
+      layer!.style.height = `${height}px`;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas!.width = Math.round(width * ratio);
+      canvas!.height = Math.round(height * ratio);
+      context!.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+      const rows = width <= 640 ? 38 : 64;
+      const columns = Math.min(240, Math.ceil(width / (width <= 640 ? 5 : 7)));
+      particles = [];
+      for (let row = 0; row < rows; row++) {
+        for (let column = 0; column < columns; column++) {
+          const seed = Math.sin(row * 127.1 + column * 311.7) * 43758.5453;
+          const jitter = seed - Math.floor(seed);
+          particles.push({
+            x: (column + jitter * 0.65) / columns,
+            row: (row / (rows - 1)) * 2 - 1,
+            jitter: jitter - 0.5,
+            radius: 0.65 + jitter * 0.85,
+          });
+        }
+      }
+      draw();
+      resume();
+    }
+
+    const sizeObserver = new ResizeObserver(resize);
+    sizeObserver.observe(hero);
+    sizeObserver.observe(support);
+
+    const viewObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) resume();
+      else stop();
+    });
+    viewObserver.observe(layer);
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!motion.matches) resume();
+      },
+      { passive: true, signal: abort.signal },
+    );
+    window.addEventListener("resize", resize, { signal: abort.signal });
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.hidden) stop();
+        else resume();
+      },
+      { signal: abort.signal },
+    );
+    motion.addEventListener(
+      "change",
+      () => {
+        stop();
+        entrance = 1;
+        setOpacity();
+        resume();
+      },
+      { signal: abort.signal },
+    );
+
+    resize();
+    cleanup = () => {
+      disposed = true;
+      stop();
+      abort.abort();
+      sizeObserver.disconnect();
+      viewObserver.disconnect();
+    };
+  }
+
+  document.addEventListener("astro:page-load", initWave);
+  document.addEventListener("astro:before-swap", () => {
+    cleanup?.();
+    cleanup = undefined;
+  });
+</script>
