@@ -1,20 +1,27 @@
 ---
 // src/pages/blog/[slug].astro — one static HTML file per published post.
 import Layout from "../../layouts/Layout.astro";
-import { getAllPosts, getPostBySlug } from "../../lib/wp";
+import { getAllPosts, getPostBySlug, type Post } from "../../lib/wp";
 import { href } from "../../lib/url";
+import { decodeEntities } from "../../lib/text";
 
+// Each page gets one other post for the "Read next" card: the next older
+// post, or the newest post when this post is the oldest.
 export async function getStaticPaths() {
   const posts = await getAllPosts();
-  return posts.map((p) => ({ params: { slug: p.slug } }));
+  return posts.map((p, i) => {
+    const next = posts[i + 1] ?? (i > 0 ? posts[0] : undefined);
+    return { params: { slug: p.slug }, props: { next } };
+  });
 }
 
+const { next } = Astro.props as { next?: Post };
 const { slug } = Astro.params;
 const post = await getPostBySlug(slug!);
 if (!post) throw new Error(`Post not found at build time: ${slug}`);
 
-const metaDescription = post.excerpt
-  .replace(/<[^>]+>/g, "")
+const title = decodeEntities(post.title);
+const metaDescription = decodeEntities(post.excerpt.replace(/<[^>]+>/g, ""))
   .trim()
   .slice(0, 160);
 const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
@@ -24,34 +31,99 @@ const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
 // The author relation returns a list. Take the first author.
 const author = post.postFields?.author?.nodes?.[0]?.authorFields;
 const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
+
+const readingTime = post.postFields?.readingTime;
+const category = post.categories?.nodes?.[0];
+
+// The post page shows no image. Remove the image blocks from the WordPress
+// HTML at build time, so the browser does not download them.
+const body = (post.content ?? "")
+  .replace(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi, (block) =>
+    /<img\b/i.test(block) ? "" : block,
+  )
+  .replace(/<picture\b[^>]*>[\s\S]*?<\/picture>/gi, "")
+  .replace(/<img\b[^>]*>/gi, "");
+
+const nextTitle = next ? decodeEntities(next.title) : "";
+const nextCategory = next?.categories?.nodes?.[0];
+const fmt = (d: string) =>
+  new Date(d).toLocaleDateString("en-US", { dateStyle: "medium" });
 ---
 
-<Layout title={`${post.title} — Rockcruit`} description={metaDescription}>
+<Layout title={`${title} — Rockcruit`} description={metaDescription}>
   <article class="post">
-    <header class="post-header reveal">
-      <a class="post-back" href={href("/blog")}>← All posts</a>
-      <h1 class="post-h1">{post.title}</h1>
-      <time class="post-meta" datetime={post.date}>{dateLabel}</time>
-    </header>
-
-    <div class="post-content reveal">
-      <div class="post-content-header">
-        <h2>{post.postFields?.subtitle}</h2>
-        <p>{post.postFields?.description}</p>
+    <header class="post-header">
+      <div class="reveal">
+        <a class="post-back" href={href("/blog/")}>← All posts</a>
+      </div>
+      <h1 class="post-h1 reveal">
+        <span class="mask-line"><span class="mask-inner">{title}</span></span>
+      </h1>
+      <!-- The date on the left, the author on the right, on one line. -->
+      <div class="post-meta-row reveal">
+        <p class="post-meta">
+          <time datetime={post.date}>{dateLabel}</time>
+          {readingTime && <span> · {readingTime} min read</span>}
+          {category && (
+            <>
+              {" · "}
+              <span class="post-cat">{category.name}</span>
+            </>
+          )}
+        </p>
         {
           authorName && (
-            <span class="post-content-author">
-              <span class="post-content-author-label">Written by</span>
-              <span class="post-content-author-name">{authorName}</span>
+            <span class="post-author">
+              <span class="post-author-label">Written by</span>
+              <span class="post-author-name">{authorName}</span>
             </span>
           )
         }
       </div>
+    </header>
+
+    <div class="post-content reveal soft">
+      <div class="post-content-header">
+        {post.postFields?.subtitle && <h2>{post.postFields.subtitle}</h2>}
+        {post.postFields?.description && <p>{post.postFields.description}</p>}
+      </div>
+      {/* The owner writes this HTML in the WordPress CMS. */}
+      {body && <div class="post-body" set:html={body} />}
     </div>
 
-    <footer class="post-footer reveal">
-      <p class="post-cta-line">Hiring for a role like this?</p>
-      <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+    {
+      next && (
+        <aside class="post-next reveal soft" aria-labelledby="post-next-label">
+          <div class="post-next-label" id="post-next-label">
+            Read next
+          </div>
+          <a class="next-card" href={href(`/blog/${next.slug}/`)}>
+            <span class="next-meta">
+              <time datetime={next.date}>{fmt(next.date)}</time>
+              {next.postFields?.readingTime && (
+                <span>{next.postFields.readingTime} min read</span>
+              )}
+              {nextCategory && (
+                <span class="next-cat">{nextCategory.name}</span>
+              )}
+              <span class="next-arrow" aria-hidden="true">
+                →
+              </span>
+            </span>
+            <span class="next-title">{nextTitle}</span>
+            {next.postFields?.subtitle && (
+              <span class="next-sub">{next.postFields.subtitle}</span>
+            )}
+          </a>
+        </aside>
+      )
+    }
+
+    <footer class="post-footer">
+      <p class="post-cta-line reveal">Hiring for a role like this?</p>
+      <div class="reveal">
+        <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+      </div>
     </footer>
   </article>
 </Layout>
@@ -66,15 +138,19 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
   .post-header {
     border-bottom: 1px solid var(--bdark);
     padding-bottom: 2rem;
-    margin-bottom: 2rem;
   }
 
+  /* min-height gives a 44px tap target on a phone. */
   .post-back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.65rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.35);
+    color: color-mix(in srgb, var(--paper) 35%, transparent);
     text-decoration: none;
     transition: color 0.2s;
   }
@@ -89,45 +165,80 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
     line-height: 1.05;
     letter-spacing: -0.02em;
     color: var(--paper);
-    margin: 1.5rem 0 1rem;
+    margin: 0.6rem 0 1rem;
+    overflow-wrap: anywhere;
+  }
+  /* The mask clips the line box. This padding keeps the italic descenders. */
+  .post-h1 .mask-inner {
+    padding-bottom: 0.1em;
   }
   .post-meta {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.68rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
+  /* One 2.5rem gap between the header line and the first text. */
   .post-content {
-    margin-top: 2rem;
-    margin-bottom: 6rem;
+    margin-top: 2.5rem;
+    overflow-wrap: anywhere;
     font-size: 0.98rem;
     line-height: 1.9;
-    color: rgba(240, 237, 227, 0.7);
+    color: color-mix(in srgb, var(--paper) 70%, transparent);
   }
-  /* Author byline. It sits after the content, aligned to the bottom right. */
-  .post-content-author {
+  /* Date and author share one line. The author sits on the right. On a
+     narrow screen the author wraps below the date. */
+  .post-meta-row {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.2rem;
-    margin-top: 2.5rem;
-    padding-top: 1.4rem;
-    border-top: 1px solid var(--bdark);
-    text-align: right;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.6rem 1.5rem;
   }
-  .post-content-author-label {
+  .post-cat {
+    color: var(--green);
+  }
+  .post-content-header > h2:first-child {
+    margin-top: 0;
+  }
+  .post-author {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .post-author-label {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.62rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
-  .post-content-author-name {
+  .post-author-name {
     font-family: var(--serif);
     font-style: italic;
+    font-weight: 400;
     font-size: 1.15rem;
     color: var(--paper);
+  }
+  /* WordPress HTML can carry inline colors and fonts. These rules replace
+     them with the brand fonts and colors. */
+  .post-body :global([style]),
+  .post-body :global(font) {
+    color: inherit !important;
+    background-color: transparent !important;
+    font-family: inherit !important;
+  }
+  .post-body :global(h2[style]) {
+    font-family: var(--serif) !important;
+  }
+  .post-body :global(h3[style]) {
+    font-family: var(--bebas) !important;
+  }
+  .post-body :global(a[style]) {
+    color: var(--green) !important;
   }
   /* WP content arrives unscoped-able — :global() lets scoped CSS style it */
   .post-content :global(h2) {
@@ -161,30 +272,114 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
   .post-content :global(li) {
     margin-bottom: 0.4rem;
   }
-  .post-content :global(img) {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 1.5rem 0;
-  }
   .post-content :global(blockquote) {
     border-left: 2px solid var(--green);
     padding-left: 1.2rem;
     font-family: var(--serif);
     font-style: italic;
-    color: rgba(240, 237, 227, 0.55);
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
     margin: 1.8rem 0;
   }
   .post-content :global(pre) {
-    background: #0b0b0b;
+    background: var(--bg-base);
     border: 1px solid var(--bdark);
     border-radius: 8px;
     padding: 1.2rem;
     overflow-x: auto;
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.82rem;
     margin: 1.5rem 0;
   }
+  /* ── Read next ── A text card: the post page shows no image. */
+  .post-next {
+    margin-top: 4rem;
+  }
+  .post-next-label {
+    margin-bottom: 1rem;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .next-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.5rem;
+    border: 1px solid var(--bdark);
+    border-radius: 10px;
+    background: var(--bg-card);
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      transform 0.2s;
+  }
+  .next-meta {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
+  }
+  .next-cat {
+    color: var(--green);
+  }
+  .next-arrow {
+    margin-left: auto;
+    color: var(--green);
+    opacity: 0;
+    translate: -6px 0;
+    transition:
+      opacity 0.25s,
+      translate 0.25s;
+  }
+  .next-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    color: var(--paper);
+    transition: color 0.2s;
+  }
+  .next-sub {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+  @media (hover: hover) {
+    .next-card:hover {
+      border-color: rgba(var(--green-rgb), 0.4);
+      transform: translateY(-4px);
+    }
+    .next-card:hover .next-title {
+      color: var(--green);
+    }
+    .next-card:hover .next-arrow {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  .next-card:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .next-card,
+    .next-arrow {
+      transition: none;
+    }
+    .next-card:hover {
+      transform: none;
+    }
+  }
+
   .post-footer {
     margin-top: 4rem;
     padding-top: 2.5rem;
@@ -198,15 +393,23 @@ const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
   .post-cta-line {
     font-family: var(--serif);
     font-style: italic;
+    font-weight: 400;
     font-size: 1.2rem;
-    color: rgba(240, 237, 227, 0.5);
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
   }
+  /* inline-flex gives the link a real box. A plain inline link puts its
+     padding outside the line box, and the .reveal wrapper (contain: paint)
+     then clips the top and the bottom of the button. */
   .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    padding: 0 1.2rem;
     background: var(--green);
     color: var(--ink);
     font-size: 0.88rem;
     font-weight: 500;
-    padding: 0.85rem 2rem;
     border-radius: 4px;
     text-decoration: none;
     transition:

@@ -16,8 +16,16 @@ export const WP_ENABLED = import.meta.env.WP_ENABLED !== "false";
 //   Author group = authorFields (firstName, lastName, profilePhoto,
 //                               role, linkedin, email)
 // WPGraphQL-for-ACF exposes each snake_case field as camelCase.
-// TODO(ACF): the field list is still not final. Confirm categories, tags,
-// and media subfields (altText) before you rely on them.
+// Categories are the core WordPress taxonomy, not an ACF field. The owner
+// approved them for the blog filters on 2026-10-08.
+// TODO(ACF): the field list is still not final. Confirm tags and media
+// subfields (altText) before you rely on them.
+
+// One core WordPress category.
+export interface Category {
+  name: string;
+  slug: string;
+}
 
 // A WPGraphQL media field returns one connected node.
 export interface MediaField {
@@ -53,6 +61,7 @@ export interface Post {
   date: string; // ISO string from WP
   excerpt: string; // HTML
   content?: string; // HTML — fetched only for single posts
+  categories?: { nodes: Category[] } | null;
   postFields?: PostFields;
 }
 
@@ -81,6 +90,7 @@ async function gql<T>(
 // One place holds the ACF selection. Both queries reuse it. A field change
 // happens here one time. (See the old Apollo GET_ALL_POSTS query for the shape.)
 const POST_FIELDS_SELECTION = `
+  categories { nodes { name slug } }
   postFields {
     subtitle
     description
