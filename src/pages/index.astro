@@ -2,6 +2,7 @@
 // src/pages/index.astro — Home. Port of prototype index.html (structural refactor, not redesign).
 import Layout from "../layouts/Layout.astro";
 import HireForm from "../components/HireForm.astro";
+import HeroWave from "../components/HeroWave.astro";
 import Bolt from "../assets/icons/bolt.svg";
 import Link from "../assets/icons/link.svg";
 import Signal from "../assets/icons/signal.svg";
@@ -16,7 +17,19 @@ import { brands } from "../lib/brands";
 >
   <!-- ═══════ HERO ═══════ -->
   <section class="hero" id="top">
-    <div class="hero-glow"></div>
+    <HeroWave />
+    <noscript>
+      <style is:inline>
+        .hero .hero-h1-wrap,
+        .hero .hero-eyebrow-row {
+          opacity: 1;
+          transform: none;
+        }
+        .hero .mask-inner {
+          transform: none;
+        }
+      </style>
+    </noscript>
 
     <div class="hero-eyebrow-row reveal">
       <span class="hero-eyebrow">Tech headhunters · LATAM</span>
@@ -474,6 +487,11 @@ import { brands } from "../lib/brands";
   /* HERO */
   .hero {
     min-height: 100vh;
+    background: linear-gradient(
+      to bottom,
+      var(--ink) var(--hero-support-top, 60%),
+      var(--bg-base)
+    );
     /* The bar grows by the top inset of the phone, so the first line of the
        page must move down by the same amount. */
     padding-top: calc(54px + env(safe-area-inset-top, 0px));
@@ -483,16 +501,12 @@ import { brands } from "../lib/brands";
     position: relative;
     overflow: hidden;
   }
-  .hero-glow {
-    position: absolute;
-    bottom: -80px;
-    right: -80px;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: rgba(var(--green-rgb), 0.06);
-    filter: blur(100px);
-    pointer-events: none;
+  .hero-eyebrow-row,
+  .hero-h1-wrap,
+  .subhero-grid,
+  .hero-stats {
+    position: relative;
+    z-index: 1;
   }
   .hero-h1-wrap {
     flex: 1;
@@ -526,7 +540,7 @@ import { brands } from "../lib/brands";
   }
   .hl-muted {
     display: block;
-    color: rgba(240, 237, 227, 0.18);
+    color: var(--paper);
   }
   .hero-eyebrow-row {
     padding: 2.5rem 5% 0;
@@ -547,8 +561,6 @@ import { brands } from "../lib/brands";
     gap: 4rem;
     align-items: start;
     padding: 4.5rem 5% 3.5rem;
-    border-top: 1px solid var(--bdark);
-    background: var(--bg-base);
   }
   .subhero-left {
     display: flex;

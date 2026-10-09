@@ -1,0 +1,263 @@
+<div class="hero-wave" data-hero-wave aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .hero-wave {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+
+  canvas.is-on {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    canvas {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { createWave, type WaveColors, type WaveSize } from "../lib/heroWave";
+
+  interface WaveControl {
+    resize: (size: WaveSize) => void;
+    run: (running: boolean) => void;
+    still: () => void;
+    dispose: () => void;
+  }
+
+  // Draw in a worker when the browser can move the canvas there. A slow frame
+  // in the worker cannot delay the Lenis scroll or the title reveal.
+  function connect(
+    canvas: HTMLCanvasElement,
+    colors: WaveColors,
+  ): WaveControl | undefined {
+    if ("transferControlToOffscreen" in canvas) {
+      let worker: Worker | undefined;
+      try {
+        worker = new Worker(
+          new URL("../lib/heroWave.worker.ts", import.meta.url),
+          { type: "module" },
+        );
+        const offscreen = canvas.transferControlToOffscreen();
+        worker.postMessage({ type: "init", canvas: offscreen, colors }, [
+          offscreen,
+        ]);
+        const target = worker;
+        return {
+          resize: (size) => target.postMessage({ type: "resize", size }),
+          run: (running) => target.postMessage({ type: "run", running }),
+          still: () => target.postMessage({ type: "still" }),
+          dispose: () => target.terminate(),
+        };
+      } catch {
+        // The canvas stays on the main thread. Use the fallback below.
+        worker?.terminate();
+      }
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const wave = createWave(context, colors, {
+      request: (callback) => requestAnimationFrame(callback),
+      cancel: (handle) => cancelAnimationFrame(handle),
+    });
+    return { ...wave, dispose: () => wave.run(false) };
+  }
+
+  let cleanup: (() => void) | undefined;
+
+  function initWave() {
+    cleanup?.();
+    cleanup = undefined;
+
+    const layer = document.querySelector<HTMLElement>("[data-hero-wave]");
+    const hero = layer?.closest<HTMLElement>(".hero");
+    const support = hero?.querySelector<HTMLElement>(".subhero-grid");
+    const supportLeft = support?.querySelector<HTMLElement>(".subhero-left");
+    const supportRight = support?.querySelector<HTMLElement>(".subhero-right");
+    const stats = hero?.querySelector<HTMLElement>(".hero-stats");
+    const title = hero?.querySelector<HTMLElement>(".hero-h1-wrap");
+    const canvas = layer?.querySelector("canvas");
+    if (
+      !layer ||
+      !hero ||
+      !support ||
+      !supportLeft ||
+      !supportRight ||
+      !stats ||
+      !title ||
+      !canvas
+    )
+      return;
+
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const palette = getComputedStyle(layer);
+    const wave = connect(canvas, {
+      green: palette.getPropertyValue("--green").trim(),
+      violet: palette.getPropertyValue("--violet").trim(),
+    });
+    if (!wave) return;
+
+    const abort = new AbortController();
+    let height = 0;
+    let visible = false;
+    let started = false;
+    let running = false;
+    let stillDrawn = false;
+    let opacity = "";
+    let disposed = false;
+
+    const smooth = (value: number) => {
+      const t = Math.max(0, Math.min(1, value));
+      return t * t * (3 - 2 * t);
+    };
+
+    function scrollOpacity() {
+      return 1 - smooth(window.scrollY / Math.max(1, height * 0.75));
+    }
+
+    function update() {
+      if (disposed) return;
+      const fade = scrollOpacity();
+      const nextOpacity = String(motion.matches ? 1 : fade);
+      if (nextOpacity !== opacity) {
+        opacity = nextOpacity;
+        layer!.style.opacity = opacity;
+      }
+
+      const active = started && visible && !document.hidden;
+      const nextRunning = active && !motion.matches && fade > 0;
+      if (nextRunning !== running) {
+        running = nextRunning;
+        wave!.run(running);
+      }
+      if (active && motion.matches && !stillDrawn) {
+        stillDrawn = true;
+        wave!.still();
+      }
+    }
+
+    function start() {
+      if (disposed || started) return;
+      started = true;
+      canvas!.classList.add("is-on");
+      update();
+    }
+
+    // The reveal engine adds .on to the title. The fade then starts after the
+    // --reveal-index delay. Give true when a title transition is past its
+    // delay, or when the reveal is already complete.
+    function titleRevealStarted() {
+      if (!title!.classList.contains("on")) return false;
+      const animations = title!.getAnimations({ subtree: true });
+      if (!animations.length) return true;
+      return animations.some((animation) => {
+        const delay = Number(animation.effect?.getTiming().delay ?? 0);
+        return Number(animation.currentTime ?? 0) >= delay;
+      });
+    }
+
+    // Start the wave when the title starts to fade in. The worker draws the
+    // wave, so the wave and the title do not compete for the main thread.
+    function startWithTitle() {
+      if (motion.matches || titleRevealStarted()) {
+        start();
+        return;
+      }
+      // The event bubbles from the title lines. It also comes when the reveal
+      // waits for a page transition.
+      title!.addEventListener("transitionstart", start, {
+        once: true,
+        signal: abort.signal,
+      });
+      // A safety limit, if the reveal never comes.
+      const timer = window.setTimeout(start, 4000);
+      abort.signal.addEventListener("abort", () => clearTimeout(timer));
+    }
+
+    // The subhero columns stack on a narrow screen. The cards then push the
+    // stats far down, and the wave moves too low. End the wave at the bottom
+    // of the subhero text there.
+    function waveHeight() {
+      const stacked = supportRight!.offsetTop > supportLeft!.offsetTop;
+      if (!stacked) return stats!.offsetTop;
+      return (
+        support!.offsetTop + supportLeft!.offsetTop + supportLeft!.offsetHeight
+      );
+    }
+
+    function resize() {
+      if (disposed) return;
+      const width = hero!.clientWidth;
+      height = waveHeight();
+      hero!.style.setProperty("--hero-support-top", `${support!.offsetTop}px`);
+      layer!.style.height = `${height}px`;
+      wave!.resize({
+        width,
+        height,
+        titleBottom: title!.offsetTop + title!.offsetHeight,
+        compact: width <= 640,
+      });
+      update();
+    }
+
+    const sizeObserver = new ResizeObserver(resize);
+    sizeObserver.observe(hero);
+    sizeObserver.observe(support);
+
+    const viewObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      update();
+    });
+    viewObserver.observe(layer);
+
+    window.addEventListener("scroll", update, {
+      passive: true,
+      signal: abort.signal,
+    });
+    window.addEventListener("resize", resize, { signal: abort.signal });
+    document.addEventListener("visibilitychange", update, {
+      signal: abort.signal,
+    });
+    motion.addEventListener(
+      "change",
+      () => {
+        stillDrawn = false;
+        if (motion.matches) start();
+        update();
+      },
+      { signal: abort.signal },
+    );
+
+    resize();
+    startWithTitle();
+    cleanup = () => {
+      disposed = true;
+      abort.abort();
+      sizeObserver.disconnect();
+      viewObserver.disconnect();
+      wave.dispose();
+    };
+  }
+
+  document.addEventListener("astro:page-load", initWave);
+  document.addEventListener("astro:before-swap", () => {
+    cleanup?.();
+    cleanup = undefined;
+  });
+</script>
