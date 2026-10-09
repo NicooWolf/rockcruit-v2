@@ -827,7 +827,7 @@ import HireForm from "../components/HireForm.astro";
   .decision,
   .cont,
   #raas,
-  .pillars-section .raas-when,
+  .pillars-section,
   .final-cta {
     position: relative;
     overflow: hidden;
@@ -836,6 +836,7 @@ import HireForm from "../components/HireForm.astro";
   .decision::after,
   .cont::after,
   #raas::after,
+  .pillars-section::before,
   .pillars-section::after,
   .final-cta::after {
     content: "";
@@ -861,6 +862,12 @@ import HireForm from "../components/HireForm.astro";
   #raas::after {
     top: -60px;
     left: -60px;
+    background: rgba(var(--green-rgb), 0.09);
+  }
+  .pillars-section::before {
+    bottom: -60px;
+    left: -60px;
+    z-index: 1;
     background: rgba(var(--green-rgb), 0.09);
   }
   .pillars-section::after {
