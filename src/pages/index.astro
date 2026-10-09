@@ -2,6 +2,9 @@
 // src/pages/index.astro — Home. Port of prototype index.html (structural refactor, not redesign).
 import Layout from "../layouts/Layout.astro";
 import HireForm from "../components/HireForm.astro";
+import Bolt from "../assets/icons/bolt.svg";
+import Link from "../assets/icons/link.svg";
+import Signal from "../assets/icons/signal.svg";
 
 import { href } from "../lib/url";
 import { brands } from "../lib/brands";
@@ -36,8 +39,8 @@ import { brands } from "../lib/brands";
       </h1>
     </div>
 
-    <div class="subhero-grid reveal">
-      <div class="subhero-left">
+    <div class="subhero-grid">
+      <div class="subhero-left reveal">
         <h2 class="subhero-title">
           When growth accelerates, most talent teams become <strong
             >overloaded fast.</strong
@@ -55,76 +58,73 @@ import { brands } from "../lib/brands";
         </div>
       </div>
       <div class="subhero-right">
-        <div class="subhero-prop">
-          <div class="subhero-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              ><circle cx="12" cy="12" r="10"></circle><polyline
-                points="12 6 12 12 16 14"></polyline></svg
-            >
-          </div>
-          <div>
-            <div class="subhero-prop-title">First candidate in 5 days</div>
-            <div class="subhero-prop-sub">
-              In 85% of our searches — no waiting for inbound applicants.
-            </div>
-          </div>
+        <div class="subhero-cards">
+          {
+            [
+              {
+                Icon: Bolt,
+                title: "First candidate\nin 5 days",
+                body: "In 85% of our searches — no waiting for inbound applicants.",
+              },
+              {
+                Icon: Link,
+                title: "Embedded in your workflow",
+                body: "We operate inside Slack, Teams, and your hiring process — not outside of it.",
+              },
+              {
+                Icon: Signal,
+                title: "No cold starts between searches",
+                body: "Context from every previous search makes the next one faster and sharper.",
+              },
+            ].map(({ Icon, title, body }) => (
+              <div class="subhero-prop reveal">
+                <div class="subhero-card">
+                  <div class="subhero-icon">
+                    <Icon
+                      width="28"
+                      height="28"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h3 class="subhero-prop-title">{title}</h3>
+                  <p class="subhero-prop-sub">{body}</p>
+                </div>
+              </div>
+            ))
+          }
         </div>
-        <div class="subhero-prop">
-          <div class="subhero-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              ><rect x="2" y="3" width="20" height="14" rx="2"></rect><path
-                d="M8 21h8M12 17v4"></path></svg
-            >
-          </div>
-          <div>
-            <div class="subhero-prop-title">Embedded in your workflow</div>
-            <div class="subhero-prop-sub">
-              We operate inside Slack, Teams, and your hiring process — not
-              outside of it.
-            </div>
-          </div>
-        </div>
-        <div class="subhero-prop">
-          <div class="subhero-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              ><path
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              ></path></svg
-            >
-          </div>
-          <div>
-            <div class="subhero-prop-title">
-              No cold starts between searches
-            </div>
-            <div class="subhero-prop-sub">
-              Context from every previous search makes the next one faster and
-              sharper.
-            </div>
-          </div>
+        <div class="subhero-outcomes reveal">
+          <div class="subhero-divider">Built for what’s next</div>
+          <ul class="subhero-benefits">
+            {
+              [
+                "Less time to hire",
+                "More qualified talent",
+                "A leaner, more efficient team",
+              ].map((benefit) => (
+                <li>
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <circle cx="16" cy="16" r="15" stroke="currentColor" />
+                    <path
+                      d="m9 16 5 5 9-10"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span>{benefit}</span>
+                </li>
+              ))
+            }
+          </ul>
         </div>
       </div>
     </div>
@@ -543,91 +543,203 @@ import { brands } from "../lib/brands";
   }
   .subhero-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5rem;
-    align-items: center;
-    padding: 4rem 5%;
+    grid-template-columns: 0.94fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    padding: 4.5rem 5% 3.5rem;
     border-top: 1px solid var(--bdark);
-    background: #0b0b0b;
+    background: var(--bg-base);
   }
   .subhero-left {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
+    gap: 2rem;
   }
   .subhero-title {
-    font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+    font-size: clamp(1.8rem, 2.7vw, 2.55rem);
     font-weight: 400;
     line-height: 1.2;
     letter-spacing: -0.02em;
-    color: #e4e4e7;
+    color: var(--paper);
   }
   .subhero-title strong {
     font-weight: 700;
-    color: #fff;
   }
   .subhero-body {
-    font-size: 0.95rem;
+    font-size: 1rem;
     line-height: 1.8;
-    color: #a1a1aa;
-    max-width: 440px;
+    color: color-mix(in srgb, var(--paper) 58%, transparent);
+    max-width: 490px;
   }
   .subhero-ctas {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 1rem;
     flex-wrap: wrap;
-    padding-top: 0.4rem;
+    padding-top: 0.3rem;
+  }
+  .subhero-ctas a {
+    padding: 1rem 2rem;
+    cursor: pointer;
   }
   .btn-ghost-sub {
     font-size: 0.88rem;
-    color: #e4e4e7;
+    color: var(--paper);
     text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
     border-radius: 4px;
-    padding: 0.85rem 2rem;
     transition:
       border-color 0.2s,
-      color 0.2s,
       background 0.2s;
   }
-  .btn-ghost-sub:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+  .btn-ghost-sub:hover,
+  .btn-ghost-sub:focus-visible {
+    border-color: var(--green);
+    background: rgba(var(--green-rgb), 0.05);
   }
   .subhero-right {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    min-width: 0;
+  }
+  .subhero-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
   }
   .subhero-prop {
     display: flex;
-    align-items: flex-start;
-    gap: 1.2rem;
+    padding-block: 8px;
+  }
+  .subhero-card {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    min-height: 230px;
+    padding: 1.1rem;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--paper) 7%, var(--bg-base));
+    transition:
+      transform 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .subhero-prop:first-child .subhero-card::before,
+  .subhero-prop:last-child .subhero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at top right,
+      rgba(var(--green-rgb), 0.14),
+      transparent 65%
+    );
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+  .subhero-prop:last-child .subhero-card::before {
+    background: radial-gradient(
+      ellipse at bottom left,
+      rgba(var(--violet-rgb), 0.14),
+      transparent 65%
+    );
+  }
+  .subhero-prop .subhero-card:hover::before {
+    opacity: 1;
+  }
+  .subhero-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(var(--green-rgb), 0.3);
   }
   .subhero-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: rgba(var(--green-rgb), 0.1);
-    border: 1px solid rgba(var(--green-rgb), 0.2);
+    width: 44px;
+    height: 44px;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: rgba(var(--green-rgb), 0.04);
+    border: 1px solid rgba(var(--green-rgb), 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--green);
-    flex-shrink: 0;
   }
   .subhero-prop-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #e4e4e7;
-    margin-bottom: 0.25rem;
+    white-space: pre-line;
+    font-family: var(--sans);
+    font-size: 1.18rem;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--paper);
+    margin-bottom: 0.6rem;
   }
   .subhero-prop-sub {
+    font-size: 0.84rem;
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+    line-height: 1.2;
+  }
+  .subhero-outcomes {
+    margin-top: 2.8rem;
+  }
+  .subhero-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+  }
+  .subhero-divider::before,
+  .subhero-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: color-mix(in srgb, var(--paper) 28%, transparent);
+  }
+  .subhero-benefits {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    list-style: none;
+    margin-top: 1.6rem;
+  }
+  .subhero-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
     font-size: 0.82rem;
-    color: #71717a;
-    line-height: 1.6;
+    line-height: 1.35;
+    color: var(--paper);
+  }
+  .subhero-benefits svg {
+    flex-shrink: 0;
+    color: var(--green);
+  }
+  @media (max-width: 640px) {
+    .subhero-cards {
+      grid-template-columns: 1fr;
+    }
+    .subhero-card {
+      min-height: auto;
+      padding: 1.4rem;
+    }
+    .subhero-benefits {
+      flex-direction: column;
+    }
+    .subhero-grid {
+      padding-block: 3rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .subhero-prop .subhero-card::before {
+      transition: none;
+    }
+    .subhero-card {
+      transition: none;
+    }
+    .subhero-card:hover {
+      transform: none;
+    }
   }
   .btn-primary {
     background: var(--green);
@@ -1407,7 +1519,7 @@ import { brands } from "../lib/brands";
       font-size: clamp(5.1765rem, 13vw, 15.0588rem);
     }
     .subhero-title {
-      font-size: clamp(1.4118rem, 2.8vw, 2.2588rem);
+      font-size: clamp(1.8rem, 2.7vw, 2.55rem);
     }
     .stat-num {
       font-size: clamp(2.2588rem, 4vw, 3.2rem);
