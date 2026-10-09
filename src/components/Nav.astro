@@ -3,12 +3,12 @@
 // Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
 // "Open Positions" → /#contact until its real destination is decided (open ledger).
 import { href } from "../lib/url";
-import { WP_ENABLED } from "../lib/wp";
+import { BLOG_ENABLED } from "../lib/wp";
 import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
 
 const path = Astro.url.pathname;
 const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
-const showBlog = WP_ENABLED;
+const showBlog = BLOG_ENABLED;
 ---
 
 <nav>

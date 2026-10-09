@@ -75,7 +75,7 @@ jobs:
             --base "${{ steps.config.outputs.base_path }}" \
             --outDir "${{ steps.config.outputs.out_dir }}"
         env:
-          WP_ENABLED: "true"
+          BLOG_ENABLED: "true"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Restructure artifact for dev branch
         if: github.ref_name == 'dev'
