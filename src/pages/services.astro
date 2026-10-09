@@ -821,7 +821,9 @@ import HireForm from "../components/HireForm.astro";
      stay a detail. Each glow sits in a corner that has no solid box on top of
      it: the first screen of the section, or the header of the Standard of
      service block. A glow sits at z-index -1 inside an isolated box: above the
-     background of that box, below the content. */
+     background of that box, below the content. The Decision glow and the
+     Standard of service glow use z-index 1 instead. They go over the boxes
+     below the header (the two columns, the list of rows). */
   .decision,
   .cont,
   #raas,
@@ -834,7 +836,7 @@ import HireForm from "../components/HireForm.astro";
   .decision::after,
   .cont::after,
   #raas::after,
-  .pillars-section .raas-when::after,
+  .pillars-section::after,
   .final-cta::after {
     content: "";
     position: absolute;
@@ -846,8 +848,9 @@ import HireForm from "../components/HireForm.astro";
     pointer-events: none;
   }
   .decision::after {
-    top: -60px;
+    top: 45px;
     left: -60px;
+    z-index: 1;
     background: rgba(var(--violet-rgb), 0.09);
   }
   .cont::after {
@@ -860,9 +863,10 @@ import HireForm from "../components/HireForm.astro";
     left: -60px;
     background: rgba(var(--green-rgb), 0.09);
   }
-  .pillars-section .raas-when::after {
-    top: -60px;
-    right: -60px;
+  .pillars-section::after {
+    top: 10px;
+    right: -190px;
+    z-index: 1;
     background: rgba(var(--violet-rgb), 0.09);
   }
   .final-cta::after {
