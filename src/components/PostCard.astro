@@ -1,15 +1,28 @@
 ---
 // src/components/PostCard.astro — one post as a card.
-// MVP goal: show the ACF data pull works. Keep the markup small.
+// `featured` gives the large card at the top of the blog page. On a wide
+// screen it puts the image and the text side by side.
+import PostPlaceholder from "./PostPlaceholder.astro";
 import { href } from "../lib/url";
+import { decodeEntities } from "../lib/text";
 import type { Post } from "../lib/wp";
 
 interface Props {
   post: Post;
+  featured?: boolean;
+  // The grid alternates green and violet. The blog filter script updates
+  // this value on the visible cards.
+  accent?: "green" | "violet";
 }
 
-const { post } = Astro.props;
+const { post, featured = false, accent = "green" } = Astro.props;
 const f = post.postFields;
+const title = decodeEntities(post.title);
+
+// The blog filters match on these slugs. A post can have more than one
+// category. The card label shows the first one.
+const categories = post.categories?.nodes ?? [];
+const category = categories[0];
 
 // The author relation returns a list. Take the first author.
 const author = f?.author?.nodes?.[0]?.authorFields;
@@ -24,22 +37,39 @@ const fmt = (d: string) =>
   new Date(d).toLocaleDateString("en-US", { dateStyle: "medium" });
 ---
 
-<a class="card reveal soft" href={href(`/blog/${post.slug}/`)}>
-  {
-    image?.sourceUrl && (
-      <div class="card-media">
-        <img src={image.sourceUrl} alt={image.altText ?? post.title} loading="lazy" />
-      </div>
-    )
-  }
+<!-- The featured card slides in like the large Team cards. A grid card
+     rises with the soft reveal. The .soft motion uses `translate`, so the
+     hover `transform` stays free. -->
+<a
+  class:list={[
+    "card",
+    "soft",
+    featured ? "slide-left card--featured" : "reveal",
+  ]}
+  href={href(`/blog/${post.slug}/`)}
+  data-categories={categories.map((c) => c.slug).join(" ")}
+  data-accent={accent}
+>
+  {featured && <span class="card-ghost" aria-hidden="true">01</span>}
+  <div class="card-media">
+    {
+      image?.sourceUrl ? (
+        <img src={image.sourceUrl} alt={image.altText ?? title} loading="lazy" />
+      ) : (
+        <PostPlaceholder seed={post.slug} />
+      )
+    }
+  </div>
 
   <div class="card-body">
     <div class="card-meta">
       <time datetime={post.date}>{fmt(post.date)}</time>
       {f?.readingTime && <span>{f.readingTime} min read</span>}
+      {category && <span class="card-cat">{category.name}</span>}
+      <span class="card-arrow" aria-hidden="true">→</span>
     </div>
 
-    <h2 class="card-title">{post.title}</h2>
+    <h2 class="card-title">{title}</h2>
     {f?.subtitle && <p class="card-subtitle">{f.subtitle}</p>}
     {f?.description && <p class="card-desc">{f.description}</p>}
 
@@ -61,6 +91,7 @@ const fmt = (d: string) =>
         </div>
       )
     }
+    {featured && <span class="card-more">Read the post →</span>}
   </div>
 </a>
 
@@ -94,13 +125,15 @@ const fmt = (d: string) =>
     overflow: hidden;
     background: rgba(var(--green-rgb), 0.05);
   }
-  .card-media img {
+  .card-media img,
+  .card-media :global(svg) {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s;
   }
-  .card:hover .card-media img {
+  .card:hover .card-media img,
+  .card:hover .card-media :global(svg) {
     transform: scale(1.03);
   }
 
@@ -114,10 +147,11 @@ const fmt = (d: string) =>
     display: flex;
     gap: 1rem;
     font-family: var(--mono);
+    font-weight: 400; /* DM Mono loads 400 and 500 only */
     font-size: 0.64rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
   }
 
   .card-title {
@@ -135,12 +169,12 @@ const fmt = (d: string) =>
   }
   .card-subtitle {
     font-size: 0.9rem;
-    color: rgba(240, 237, 227, 0.55);
+    color: color-mix(in srgb, var(--paper) 55%, transparent);
     line-height: 1.5;
   }
   .card-desc {
     font-size: 0.84rem;
-    color: rgba(240, 237, 227, 0.4);
+    color: color-mix(in srgb, var(--paper) 40%, transparent);
     line-height: 1.7;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -173,9 +207,143 @@ const fmt = (d: string) =>
   }
   .card-author-role {
     font-family: var(--mono);
+    font-weight: 400;
     font-size: 0.62rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(240, 237, 227, 0.3);
+    color: color-mix(in srgb, var(--paper) 30%, transparent);
+  }
+
+  /* ── Category and hover arrow ── */
+  .card {
+    position: relative;
+  }
+  .card-cat {
+    color: var(--green);
+  }
+  .card-arrow {
+    margin-left: auto;
+    color: var(--green);
+    opacity: 0;
+    translate: -6px 0;
+    transition:
+      opacity 0.25s,
+      translate 0.25s;
+  }
+  .card:hover .card-arrow {
+    opacity: 1;
+    translate: 0 0;
+  }
+  /* Every second card in the grid uses the violet accent. */
+  .card[data-accent="violet"]:hover {
+    border-color: rgba(var(--violet-light-rgb), 0.4);
+  }
+  .card[data-accent="violet"]:hover .card-title,
+  .card[data-accent="violet"] .card-arrow,
+  .card[data-accent="violet"] .card-cat {
+    color: var(--violet-light);
+  }
+
+  /* ── Featured card ── */
+  .card--featured::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--green),
+      rgba(var(--green-rgb), 0) 60%
+    );
+  }
+  .card--featured .card-media {
+    position: relative;
+  }
+  /* A green tint on the image. It goes away on hover. */
+  .card--featured .card-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--green-rgb), 0.16);
+    mix-blend-mode: color;
+    transition: opacity 0.4s;
+  }
+  .card--featured:hover .card-media::after {
+    opacity: 0;
+  }
+  .card-ghost {
+    display: none;
+  }
+  .card--featured .card-body {
+    position: relative;
+    z-index: 1;
+  }
+  .card--featured .card-title {
+    font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+    line-height: 1.05;
+  }
+  .card--featured .card-subtitle {
+    font-size: 1rem;
+  }
+  .card--featured .card-desc {
+    -webkit-line-clamp: 4;
+    font-size: 0.92rem;
+  }
+  .card--featured .card-author-photo {
+    width: 42px;
+    height: 42px;
+  }
+  .card--featured .card-author-name {
+    font-size: 0.88rem;
+  }
+  .card-more {
+    margin-top: 0.4rem;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+
+  @media (width >= 64em) {
+    .card--featured {
+      flex-direction: row;
+    }
+    .card--featured .card-media {
+      flex: 0 0 55%;
+      aspect-ratio: auto;
+      min-height: 360px;
+    }
+    .card--featured .card-body {
+      flex: 1;
+      justify-content: center;
+      gap: 0.9rem;
+      padding: 2.5rem;
+    }
+    /* The large number behind the text. */
+    .card-ghost {
+      position: absolute;
+      right: 1.5rem;
+      bottom: -0.15em;
+      z-index: 0;
+      display: block;
+      font-family: var(--bebas);
+      font-weight: 400;
+      font-size: 11rem;
+      line-height: 1;
+      color: color-mix(in srgb, var(--paper) 5%, transparent);
+      pointer-events: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-arrow,
+    .card--featured .card-media::after {
+      transition: none;
+    }
   }
 </style>
