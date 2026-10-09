@@ -83,38 +83,52 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     </div>
     <div class="members-grid">
       <div class="member-card slide-left soft">
-        <div class="member-av">
-          <img src={profileJulieta.src} alt="Julieta Wolf" />
+        <div class="member-photo">
+          <img
+            src={profileJulieta.src}
+            alt="Julieta Wolf"
+            loading="lazy"
+            style="object-position: 62% 20%"
+          />
         </div>
-        <div class="member-name">Julieta Wolf</div>
-        <div class="member-role">Co-Founder</div>
-        <p class="member-bio">
-          Julieta is an expert in client partnership, search strategy, and
-          talent positioning. She leads commercial strategy, discovery, role
-          definition, and sourcing direction.
-        </p>
-        <p class="member-bio">
-          She works closely with clients to understand what they truly need,
-          what will work, and how to design a search process that attracts the
-          right talent.
-        </p>
+        <div class="member-info">
+          <div class="member-name">Julieta Wolf</div>
+          <div class="member-role">Co-Founder</div>
+          <p class="member-bio">
+            Julieta is an expert in client partnership, search strategy, and
+            talent positioning. She leads commercial strategy, discovery, role
+            definition, and sourcing direction.
+          </p>
+          <p class="member-bio">
+            She works closely with clients to understand what they truly need,
+            what will work, and how to design a search process that attracts the
+            right talent.
+          </p>
+        </div>
       </div>
       <div class="member-card slide-right soft">
-        <div class="member-av">
-          <img src={profileAgustina.src} alt="Agustina Valverde" />
+        <div class="member-photo">
+          <img
+            src={profileAgustina.src}
+            alt="Agustina Valverde"
+            loading="lazy"
+            style="object-position: 50% 15%"
+          />
         </div>
-        <div class="member-name">Agustina Valverde</div>
-        <div class="member-role">Co-Founder</div>
-        <p class="member-bio">
-          Agustina specializes in strategic recruiting for commercial,
-          technical, and leadership roles. She has experience building teams for
-          startups and tech companies across multiple markets.
-        </p>
-        <p class="member-bio">
-          Within Rockcruit, she leads operations, process design, quality, and
-          candidate experience, ensuring every search runs with structure,
-          clarity, and consistency.
-        </p>
+        <div class="member-info">
+          <div class="member-name">Agustina Valverde</div>
+          <div class="member-role">Co-Founder</div>
+          <p class="member-bio">
+            Agustina specializes in strategic recruiting for commercial,
+            technical, and leadership roles. She has experience building teams for
+            startups and tech companies across multiple markets.
+          </p>
+          <p class="member-bio">
+            Within Rockcruit, she leads operations, process design, quality, and
+            candidate experience, ensuring every search runs with structure,
+            clarity, and consistency.
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -528,18 +542,19 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   }
   .members-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  @media (max-width: 768px) {
-    .members-grid {
-      grid-template-columns: 1fr;
-    }
-  }
   .member-card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1.5rem;
+    /* stretch: the photo takes the height of the text block, so its top edge
+       lines up with the name and its bottom edge with the last bio line. */
+    align-items: stretch;
     border: 1px solid var(--bdark);
     border-radius: 12px;
-    padding: 1.5rem 1.8rem;
+    padding: 1.25rem;
     /* This scoped rule beats the global .slide-left.soft rule, so the reveal
        transition (opacity, translate) must live here too. */
     transition:
@@ -555,26 +570,30 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     border-color: rgba(var(--violet-light-rgb), 0.3);
     transform: translateY(-4px);
   }
-  .member-av {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: 1px solid rgba(var(--violet-light-rgb), 0.25);
-    margin-bottom: 1rem;
+  .member-photo {
+    height: 100%;
+    min-height: 150px;
+    border-radius: 8px;
     overflow: hidden;
+    border: 1px solid rgba(var(--violet-light-rgb), 0.2);
+    background: var(--bg-card);
   }
-  .member-av img {
+  .member-photo img {
     width: 100%;
     height: 100%;
     display: block;
     object-fit: cover;
-    object-position: center;
-    filter: brightness(0.65);
+    filter: brightness(0.85);
     transition: filter 0.4s ease;
   }
-
-  .member-card:hover .member-av img {
+  .member-card:hover .member-photo img {
     filter: brightness(1);
+  }
+  .member-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .member-name {
@@ -582,6 +601,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     font-weight: 400;
     font-size: 1.5rem;
     letter-spacing: 0.03em;
+    line-height: 1;
     color: var(--paper);
   }
   .member-role {
@@ -590,7 +610,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--violet-light);
-    margin: 0.3rem 0 1rem;
+    margin: 0.4rem 0 0.9rem;
   }
   .member-bio {
     font-size: 0.84rem;
@@ -598,7 +618,24 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     line-height: 1.75;
   }
   .member-bio + .member-bio {
-    margin-top: 0.9rem;
+    margin-top: 0.7rem;
+  }
+  /* Trims the half-leading under the last line so the text ends on the
+     photo's bottom edge. */
+  .member-bio:last-child {
+    margin-bottom: -0.3em;
+  }
+
+  @media (min-width: 48em) {
+    .member-card {
+      grid-template-columns: 150px 1fr;
+      padding: 1.5rem;
+    }
+  }
+  @media (min-width: 64em) {
+    .members-grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .team-cta {
