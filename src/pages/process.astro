@@ -32,7 +32,7 @@ const steps = [
   description="From job description to signed offer: how a Rockcruit search runs. First candidate in 3–5 days, average fill in 3–4 weeks."
 >
   <div class="page-hero">
-  <HeroWave first="green" second="green-light" />
+    <HeroWave first="green" second="green-light" />
     <div class="page-hero-glow"></div>
     <div class="page-hero-label reveal">How a search runs</div>
     <h1 class="page-hero-h reveal">
@@ -40,7 +40,7 @@ const steps = [
       <span class="mask-line"
         ><span class="mask-inner">SIGNED OFFER,</span></span
       >
-      <span class="dim mask-line"
+      <span class="g mask-line"
         ><span class="mask-inner">NO BLACK BOXES.</span></span
       >
     </h1>
@@ -108,7 +108,7 @@ const steps = [
   .page-hero-h {
     font-family: var(--bebas);
     font-weight: 400;
-    font-size: clamp(3.5rem, 9vw, 10rem);
+    font-size: clamp(2.5rem, 10vw, 11rem);
     line-height: 0.86;
     letter-spacing: 0.02em;
     color: var(--paper);
@@ -117,9 +117,11 @@ const steps = [
   .page-hero-h span {
     display: block;
   }
-  .page-hero-h .dim {
-    color: color-mix(in srgb, var(--paper) 20%, var(--ink));
+
+  .page-hero-h .g {
+    color: var(--green);
   }
+
   .page-hero-sub {
     font-size: 0.95rem;
     color: #a1a1aa;

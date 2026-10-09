@@ -177,6 +177,20 @@ for (const post of latest) {
     filter: blur(80px);
     pointer-events: none;
   }
+  /* The violet glow sits at the bottom left, next to the intro line. It comes
+     first in the tree, so the text stays above it. */
+  .page-hero::before {
+    content: "";
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 440px;
+    height: 440px;
+    border-radius: 50%;
+    background: rgba(var(--violet-rgb), 0.14);
+    filter: blur(80px);
+    pointer-events: none;
+  }
   .page-hero-label {
     font-family: var(--mono);
     font-weight: 400;
@@ -202,7 +216,7 @@ for (const post of latest) {
     display: block;
   }
   .page-hero-h .dim {
-    color: color-mix(in srgb, var(--paper) 20%, transparent);
+    color: var(--violet-light);
   }
   .page-hero-sub {
     font-size: 0.95rem;
