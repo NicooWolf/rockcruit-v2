@@ -4,6 +4,7 @@
 // rendered in the prototypes' pillars-row pattern. Numbered markers are appropriate
 // here: this content IS a sequence.
 import Layout from "../layouts/Layout.astro";
+import HeroWave from "../components/HeroWave.astro";
 import { href } from "../lib/url";
 
 const steps = [
@@ -31,6 +32,7 @@ const steps = [
   description="From job description to signed offer: how a Rockcruit search runs. First candidate in 3–5 days, average fill in 3–4 weeks."
 >
   <div class="page-hero">
+  <HeroWave first="green" second="green-light" />
     <div class="page-hero-glow"></div>
     <div class="page-hero-label reveal">How a search runs</div>
     <h1 class="page-hero-h reveal">

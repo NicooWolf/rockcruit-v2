@@ -426,3 +426,11 @@ nav[transition\:persist] {
   z-index: 9999;
   transform: translateZ(0);
 }
+
+/* ── Page hero wave ──
+   The wave layer sits at the top of the hero. The label, the title and the
+   intro line sit above it. The glow keeps its own absolute position. */
+.page-hero > :is(.page-hero-label, .page-hero-h, .page-hero-sub) {
+  position: relative;
+  z-index: 1;
+}

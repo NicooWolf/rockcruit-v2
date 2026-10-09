@@ -4,6 +4,7 @@
 // ("Specialized Knowledge" + domain list). The typewriter effect is dropped per
 // CLAUDE.md animation non-goals — domains render as a static mono list.
 import Layout from "../layouts/Layout.astro";
+import HeroWave from "../components/HeroWave.astro";
 import { href } from "../lib/url";
 import profileJulieta from "../assets/images/profile_julieta.jpeg";
 import profileAgustina from "../assets/images/profile_agustina.png";
@@ -14,6 +15,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   description="The people behind Rockcruit — tech headhunters with years of experience identifying and attracting top technical talent across LATAM."
 >
   <div class="page-hero">
+  <HeroWave first="green-light" second="violet-light" />
     <div class="page-hero-glow"></div>
     <div class="page-hero-label reveal">Who you'll work with</div>
     <h1 class="page-hero-h reveal">

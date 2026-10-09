@@ -3,6 +3,7 @@
 // Finalized decisions: shared <HireForm/> (boxed style) replaces the prototype's
 // underline-style form — one form implementation site-wide; select options stay shared.
 import Layout from "../layouts/Layout.astro";
+import HeroWave from "../components/HeroWave.astro";
 import HireForm from "../components/HireForm.astro";
 ---
 
@@ -13,6 +14,7 @@ import HireForm from "../components/HireForm.astro";
   <div class="services-page">
     <!-- ═══════ PAGE HERO ═══════ -->
     <div class="page-hero">
+      <HeroWave first="green" second="violet" split={-0.5} />
       <div class="page-hero-glow"></div>
       <div class="page-hero-label reveal">Our delivery models</div>
       <h1 class="page-hero-h reveal">

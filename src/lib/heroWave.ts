@@ -1,4 +1,4 @@
-// src/lib/heroWave.ts — The particle wave behind the Home hero.
+// src/lib/heroWave.ts — The particle wave behind a page hero.
 // The worker in heroWave.worker.ts runs this renderer. The main thread runs it
 // only when the browser cannot move a canvas to a worker.
 
@@ -6,9 +6,13 @@ export type WaveContext =
   | CanvasRenderingContext2D
   | OffscreenCanvasRenderingContext2D;
 
+// The wave draws with two colors. The split sets the share of each color.
+// Zero gives about half of the particles to each color. A negative value
+// gives more particles to the second color. A positive value gives fewer.
 export interface WaveColors {
-  green: string;
-  violet: string;
+  first: string;
+  second: string;
+  split: number;
 }
 
 export interface WaveSize {
@@ -96,14 +100,15 @@ export function createWave(
       const opacity = edge * (0.18 + ribbon * 0.62) * textDimming;
       const level = Math.round((opacity / 0.8) * (LEVELS - 1));
       if (!level) continue;
-      const color = depth + Math.sin(u * 5 + phase * 0.3) * 0.35 > 0 ? 1 : 0;
+      const color =
+        depth + Math.sin(u * 5 + phase * 0.3) * 0.35 > colors.split ? 1 : 0;
       const half = particle.side / 2;
       buckets[color * LEVELS + level].push(x - half, y - half, particle.side);
     }
     // Draw particles with shared colors and opacity in one operation.
     // A square of 1 to 3px looks the same as a circle and draws faster.
     for (let color = 0; color < 2; color++) {
-      context.fillStyle = color ? colors.violet : colors.green;
+      context.fillStyle = color ? colors.second : colors.first;
       for (let level = 1; level < LEVELS; level++) {
         const bucket = buckets[color * LEVELS + level];
         if (!bucket.length) continue;
