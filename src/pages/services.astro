@@ -815,15 +815,17 @@ import HireForm from "../components/HireForm.astro";
   }
 
   /* CORNER GLOWS
-     One soft glow in a corner of five sections. The size, the blur, the offset
-     and the opacity match the glows of the other pages. The corners and the colors
-     change from one section to the next, so the glows stay a detail. A glow
-     sits at z-index -1 inside an isolated section: above the section
-     background, below the content. */
+     One soft glow in a corner of five sections. The size, the blur and the
+     offset match the glows of the other pages. The corners alternate left and
+     right, and the colors change from one section to the next, so the glows
+     stay a detail. Each glow sits in a corner that has no solid box on top of
+     it: the first screen of the section, or the header of the Standard of
+     service block. A glow sits at z-index -1 inside an isolated box: above the
+     background of that box, below the content. */
   .decision,
   .cont,
   #raas,
-  .pillars-section,
+  .pillars-section .raas-when,
   .final-cta {
     position: relative;
     overflow: hidden;
@@ -832,7 +834,7 @@ import HireForm from "../components/HireForm.astro";
   .decision::after,
   .cont::after,
   #raas::after,
-  .pillars-section::after,
+  .pillars-section .raas-when::after,
   .final-cta::after {
     content: "";
     position: absolute;
@@ -844,29 +846,29 @@ import HireForm from "../components/HireForm.astro";
     pointer-events: none;
   }
   .decision::after {
-    bottom: -60px;
-    right: -60px;
-    background: rgba(var(--violet-rgb), 0.05);
+    top: -60px;
+    left: -60px;
+    background: rgba(var(--violet-rgb), 0.09);
   }
   .cont::after {
     top: -60px;
     right: -60px;
-    background: rgba(var(--violet-rgb), 0.05);
+    background: rgba(var(--violet-rgb), 0.09);
   }
   #raas::after {
-    bottom: -60px;
-    left: -60px;
-    background: rgba(var(--green-rgb), 0.05);
-  }
-  .pillars-section::after {
     top: -60px;
     left: -60px;
-    background: rgba(var(--violet-rgb), 0.05);
+    background: rgba(var(--green-rgb), 0.09);
+  }
+  .pillars-section .raas-when::after {
+    top: -60px;
+    right: -60px;
+    background: rgba(var(--violet-rgb), 0.09);
   }
   .final-cta::after {
     bottom: -60px;
     right: -60px;
-    background: rgba(var(--green-rgb), 0.05);
+    background: rgba(var(--green-rgb), 0.09);
   }
 
   /* FINAL CTA (layout only — form styles in HireForm.astro) */
