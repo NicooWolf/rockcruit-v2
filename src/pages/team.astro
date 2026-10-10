@@ -121,7 +121,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
             format="webp"
             quality={78}
             loading="lazy"
-            style="object-position: 50% 15%"
+            class="photo-agustina"
           />
         </div>
         <div class="member-info">
@@ -594,6 +594,15 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     object-fit: cover;
     filter: brightness(0.85);
     transition: filter 0.4s ease;
+  }
+  .member-photo .photo-agustina {
+    object-position: 50% 15%;
+  }
+  /* On a phone the crop is narrow. Shift it right to center her. */
+  @media (max-width: 47.99em) {
+    .member-photo .photo-agustina {
+      object-position: 64% 15%;
+    }
   }
   .member-card:hover .member-photo img {
     filter: brightness(1);
