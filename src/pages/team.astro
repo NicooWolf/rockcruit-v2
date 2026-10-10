@@ -3,12 +3,11 @@
 // Built in the established design system; copy grounded in v1's AboutUs section
 // ("Specialized Knowledge" + domain list). The typewriter effect is dropped per
 // CLAUDE.md animation non-goals — domains render as a static mono list.
-import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 import HeroWave from "../components/HeroWave.astro";
 import { href } from "../lib/url";
-import profileJulieta from "../assets/images/profile_julieta.jpeg";
-import profileAgustina from "../assets/images/profile_agustina.png";
+import profileJulieta from "../assets/images/profile_julieta.webp";
+import profileAgustina from "../assets/images/profile_agustina.webp";
 ---
 
 <Layout
@@ -87,12 +86,11 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     <div class="members-grid">
       <div class="member-card slide-left soft">
         <div class="member-photo">
-          <Image
-            src={profileJulieta}
+          <img
+            src={profileJulieta.src}
             alt="Julieta Wolf, Co-Founder of Rockcruit"
-            width={720}
-            format="webp"
-            quality={78}
+            width={profileJulieta.width}
+            height={profileJulieta.height}
             loading="lazy"
             style="object-position: 62% 20%"
           />
@@ -114,12 +112,11 @@ import profileAgustina from "../assets/images/profile_agustina.png";
       </div>
       <div class="member-card slide-right soft">
         <div class="member-photo">
-          <Image
-            src={profileAgustina}
+          <img
+            src={profileAgustina.src}
             alt="Agustina Valverde, Co-Founder of Rockcruit"
-            width={720}
-            format="webp"
-            quality={78}
+            width={profileAgustina.width}
+            height={profileAgustina.height}
             loading="lazy"
             class="photo-agustina"
           />
