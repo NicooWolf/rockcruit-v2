@@ -144,7 +144,7 @@ for (const post of latest) {
     <p class="blog-cta-line reveal">
       Hiring for a role like the ones <strong>we write about?</strong>
     </p>
-    <div class="reveal">
+    <div class="reveal blog-cta-btn">
       <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
     </div>
   </section>
@@ -406,6 +406,11 @@ for (const post of latest) {
   .blog-cta-line strong {
     font-weight: 400;
     color: var(--paper);
+  }
+  /* The .reveal box clips paint. That cut the button lift on hover. Release
+     the clip for this box only. */
+  .blog-cta-btn {
+    contain: none;
   }
   .btn-primary {
     display: inline-flex;

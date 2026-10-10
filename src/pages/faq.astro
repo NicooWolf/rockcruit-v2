@@ -83,7 +83,7 @@ const faqs = [
     <p class="faq-cta-line reveal">
       Still deciding?<br /><strong>Twenty minutes usually settles it.</strong>
     </p>
-    <div class="reveal">
+    <div class="reveal faq-cta-btn">
       <a href={href("/#contact")} class="btn-primary">Ask us directly →</a>
     </div>
   </section>
@@ -247,6 +247,11 @@ const faqs = [
   .faq-cta-line strong {
     color: var(--paper);
     font-weight: 400;
+  }
+  /* The .reveal box clips paint. That cut the button lift on hover. Release
+     the clip for this box only. */
+  .faq-cta-btn {
+    contain: none;
   }
   .btn-primary {
     background: var(--green);

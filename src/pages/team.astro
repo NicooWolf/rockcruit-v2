@@ -209,7 +209,7 @@ import profileAgustina from "../assets/images/profile_agustina.png";
     <p class="team-cta-line reveal">
       Want to know who'd run <strong>your</strong> search?
     </p>
-    <div class="reveal">
+    <div class="reveal team-cta-btn">
       <a href={href("/#contact")} class="btn-primary"
         >Start the conversation →</a
       >
@@ -656,6 +656,11 @@ import profileAgustina from "../assets/images/profile_agustina.png";
   .team-cta-line strong {
     color: var(--paper);
     font-weight: 400;
+  }
+  /* The .reveal box clips paint. That cut the button lift on hover. Release
+     the clip for this box only. */
+  .team-cta-btn {
+    contain: none;
   }
   .btn-primary {
     background: var(--green);

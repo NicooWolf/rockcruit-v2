@@ -198,7 +198,10 @@ const steps = [
     color: var(--green);
     font-weight: 400;
   }
+  /* The .reveal box clips paint. That cut the button lift on hover. Release
+     the clip for this box only. */
   .pc-ctas {
+    contain: none;
     display: flex;
     gap: 0.9rem;
     flex-wrap: wrap;
