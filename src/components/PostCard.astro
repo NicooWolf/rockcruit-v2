@@ -53,7 +53,7 @@ const fmt = (d: string) =>
       image?.sourceUrl ? (
         <img
           src={image.sourceUrl}
-          alt={image.altText ?? title}
+          alt={image.altText || title}
           loading={featured ? "eager" : "lazy"}
           fetchpriority={featured ? "high" : undefined}
           decoding="async"

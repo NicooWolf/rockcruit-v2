@@ -3,7 +3,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { getAllPosts, getPostBySlug, type Post } from "../../lib/wp";
 import { href } from "../../lib/url";
-import { decodeEntities } from "../../lib/text";
+import { decodeEntities, truncate } from "../../lib/text";
 
 // Each page gets one other post for the "Read next" card: the next older
 // post, or the newest post when this post is the oldest.
@@ -21,9 +21,17 @@ const post = await getPostBySlug(slug!);
 if (!post) throw new Error(`Post not found at build time: ${slug}`);
 
 const title = decodeEntities(post.title);
-const metaDescription = decodeEntities(post.excerpt.replace(/<[^>]+>/g, ""))
-  .trim()
-  .slice(0, 160);
+const BRAND_SUFFIX = " — Rockcruit";
+const metaTitle = `${truncate(title, 60 - BRAND_SUFFIX.length)}${BRAND_SUFFIX}`;
+// Prefer the ACF description. Fall back to the WordPress excerpt.
+const metaDescription = truncate(
+  decodeEntities(
+    (post.postFields?.description || post.excerpt || "").replace(/<[^>]+>/g, ""),
+  ),
+  160,
+);
+const ogImage = post.postFields?.postImage?.node?.sourceUrl;
+const ogImageAlt = post.postFields?.postImage?.node?.altText || title;
 const dateLabel = new Date(post.date).toLocaleDateString("en-US", {
   dateStyle: "long",
 });
@@ -50,7 +58,22 @@ const fmt = (d: string) =>
   new Date(d).toLocaleDateString("en-US", { dateStyle: "medium" });
 ---
 
-<Layout title={`${title} — Rockcruit`} description={metaDescription}>
+<Layout
+  title={metaTitle}
+  description={metaDescription}
+  type="article"
+  image={ogImage}
+  imageAlt={ogImageAlt}
+  jsonLd={{
+    "@type": "BlogPosting",
+    headline: title,
+    description: metaDescription,
+    datePublished: post.date,
+    ...(ogImage ? { image: ogImage } : {}),
+    ...(authorName ? { author: { "@type": "Person", name: authorName } } : {}),
+    publisher: { "@type": "Organization", name: "Rockcruit" },
+  }}
+>
   <article class="post">
     <header class="post-header">
       <div class="reveal">
