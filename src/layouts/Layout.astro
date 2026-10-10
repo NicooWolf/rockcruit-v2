@@ -39,6 +39,9 @@ const canonical = Astro.site
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <!-- Open the WordPress connection early. The blog loads its post images
+         from this host. -->
+    <link rel="preconnect" href="https://rblog.rockcruit.com" crossorigin />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -177,6 +180,34 @@ const canonical = Astro.site
     <Footer />
 
     <script>
+      import Lenis from "lenis";
+
+      // ── Smooth scroll on every page. A fresh Lenis instance starts on each
+      // entry to a page and stops before the router swaps to the next page.
+      // The Nav and the hash jumps below read window.__lenis.
+      document.addEventListener("astro:page-load", () => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+
+        const lenis = new Lenis({ lerp: 0.1 });
+        (window as { __lenis?: Lenis }).__lenis = lenis;
+
+        let rafId = requestAnimationFrame(function raf(time) {
+          lenis.raf(time);
+          rafId = requestAnimationFrame(raf);
+        });
+
+        document.addEventListener(
+          "astro:before-swap",
+          () => {
+            cancelAnimationFrame(rafId);
+            lenis.destroy();
+            delete (window as { __lenis?: Lenis }).__lenis;
+          },
+          { once: true },
+        );
+      });
+
       // ── Scroll depth and the section hash.
       const END_ZONE = 8; // px, absorbs sub-pixel and elastic scroll values
       const SETTLE_TIME = 900; // ms, the wait for a jump to start
@@ -196,10 +227,9 @@ const canonical = Astro.site
         readerMoved = false;
       };
 
-      // ── Jump to a target. Lenis owns the scroll on a page that runs it, so
-      // hand the jump to Lenis there. Every other page keeps the native jump.
-      // The type below names only the one method this file calls; the Home
-      // page script (src/pages/index.astro) owns the real Lenis instance.
+      // ── Jump to a target. Lenis owns the scroll on every page, so
+      // hand the jump to Lenis there. The reduced-motion path keeps the
+      // native jump. The type below names only the one method this file calls.
       interface LenisLike {
         scrollTo: (
           target: Element | number,

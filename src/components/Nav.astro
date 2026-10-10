@@ -6,8 +6,14 @@ import { href } from "../lib/url";
 import { BLOG_ENABLED } from "../lib/wp";
 import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
 
-const path = Astro.url.pathname;
-const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
+// The pathname holds the site base, for example /rockcruit-v2/dev/team/. Remove
+// the base, so the page paths below match on every deploy.
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const path = Astro.url.pathname.startsWith(base)
+  ? Astro.url.pathname.slice(base.length) || "/"
+  : Astro.url.pathname;
+const isActive = (p: string) =>
+  p === "/" ? path === "/" : path === p || path.startsWith(`${p}/`);
 const showBlog = BLOG_ENABLED;
 ---
 
@@ -26,35 +32,35 @@ const showBlog = BLOG_ENABLED;
   </a>
   <ul class="nav-links">
     <li class="nav-dropdown">
-      <a href={href("/services")} class={isActive("/services") ? "active" : ""}>
+      <a href={href("/services/")} class={isActive("/services") ? "active" : ""}>
         Services <span class="nav-dropdown-arrow">▾</span>
       </a>
       <div class="nav-dropdown-menu">
-        <a class="service-link" href={href("/services#contingency")}
+        <a class="service-link" href={href("/services/#contingency")}
           ><span class="service-index contingency-index">01</span>
           Contingency Recruiting</a
         >
         <div class="nav-dropdown-divider"></div>
-        <a class="service-link" href={href("/services#raas")}
+        <a class="service-link" href={href("/services/#raas")}
           ><span class="service-index">02</span> Recruiting as a Service</a
         >
       </div>
     </li>
     <li>
-      <a href={href("/team")} class={isActive("/team") ? "active" : ""}>Team</a>
+      <a href={href("/team/")} class={isActive("/team") ? "active" : ""}>Team</a>
     </li>
     <li>
-      <a href={href("/process")} class={isActive("/process") ? "active" : ""}
+      <a href={href("/process/")} class={isActive("/process") ? "active" : ""}
         >Process</a
       >
     </li>
     <li>
-      <a href={href("/faq")} class={isActive("/faq") ? "active" : ""}>FAQ</a>
+      <a href={href("/faq/")} class={isActive("/faq") ? "active" : ""}>FAQ</a>
     </li>
     {
       showBlog && (
         <li>
-          <a href={href("/blog")} class={isActive("/blog") ? "active" : ""}>
+          <a href={href("/blog/")} class={isActive("/blog") ? "active" : ""}>
             Blog
           </a>
         </li>
@@ -80,7 +86,7 @@ const showBlog = BLOG_ENABLED;
       <div class="nav-mobile-sheet">
         <ul class="nav-mobile-list">
           <li>
-            <a class="service-link" href={href("/services#contingency")}>
+            <a class="service-link" href={href("/services/#contingency")}>
               <span class="nav-mobile-idx service-index contingency-index"
                 >01</span
               >
@@ -88,20 +94,20 @@ const showBlog = BLOG_ENABLED;
             </a>
           </li>
           <li>
-            <a class="service-link" href={href("/services#raas")}>
+            <a class="service-link" href={href("/services/#raas")}>
               <span class="nav-mobile-idx service-index">02</span>
               <span class="nav-mobile-label">Recruiting as a Service</span>
             </a>
           </li>
           <li>
-            <a href={href("/team")} class={isActive("/team") ? "active" : ""}>
+            <a href={href("/team/")} class={isActive("/team") ? "active" : ""}>
               <span class="nav-mobile-idx">03</span>
               <span class="nav-mobile-label">Team</span>
             </a>
           </li>
           <li>
             <a
-              href={href("/process")}
+              href={href("/process/")}
               class={isActive("/process") ? "active" : ""}
             >
               <span class="nav-mobile-idx">04</span>
@@ -109,7 +115,7 @@ const showBlog = BLOG_ENABLED;
             </a>
           </li>
           <li>
-            <a href={href("/faq")} class={isActive("/faq") ? "active" : ""}>
+            <a href={href("/faq/")} class={isActive("/faq") ? "active" : ""}>
               <span class="nav-mobile-idx">05</span>
               <span class="nav-mobile-label">FAQ</span>
             </a>
@@ -118,7 +124,7 @@ const showBlog = BLOG_ENABLED;
             showBlog && (
               <li>
                 <a
-                  href={href("/blog")}
+                  href={href("/blog/")}
                   class={isActive("/blog") ? "active" : ""}
                 >
                   <span class="nav-mobile-idx">06</span>
