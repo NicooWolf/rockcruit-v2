@@ -6,23 +6,72 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { href } from "../lib/url";
+import { BLOG_ENABLED } from "../lib/wp";
 import bebasUrl from "../assets/fonts/bebas-neue-400.woff2";
 import dmSansUrl from "../assets/fonts/dm-sans.woff2";
 
 interface Props {
   title: string;
   description?: string;
+  /** Absolute URL, or a site path such as "/og-image.png". */
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  noindex?: boolean;
+  /** Extra JSON-LD node for the page, such as a BlogPosting. */
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title,
   description = "Rockcruit offers IT recruiting services to companies in need of tech talent. Contact us to find the best candidates for your company and projects.",
+  image,
+  imageAlt = "Rockcruit — Tech Headhunters · LATAM",
+  type = "website",
+  noindex = false,
+  jsonLd,
 } = Astro.props;
 
 // Requires `site` in astro.config.mjs (Step 3.0); defensive so dev never crashes.
 const canonical = Astro.site
   ? new URL(Astro.url.pathname, Astro.site)
   : Astro.url.pathname;
+
+// Social scrapers need an absolute image URL. The default image is the
+// 1200x630 PNG in public/. WhatsApp does not read SVG.
+const absolute = (value: string) =>
+  /^https?:\/\//.test(value)
+    ? value
+    : Astro.site
+      ? new URL(href(value), Astro.site).toString()
+      : href(value);
+const ogImage = absolute(image ?? "/og-image.png");
+const isDefaultImage = !image;
+// PUBLIC_NOINDEX=true hides the preview deploy (dev) from search engines.
+const hideFromSearch = noindex || import.meta.env.PUBLIC_NOINDEX === "true";
+
+// Structured data. Only facts that the site already shows.
+const siteUrl = Astro.site ? new URL(href("/"), Astro.site).toString() : "";
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Rockcruit",
+    url: siteUrl,
+    logo: absolute("/icon-512.png"),
+    sameAs: [
+      "https://www.linkedin.com/company/rockcruit",
+      "https://www.instagram.com/rockcruit/",
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Rockcruit",
+    url: siteUrl,
+  },
+  ...(jsonLd ? [{ "@context": "https://schema.org", ...jsonLd }] : []),
+];
 ---
 
 <!doctype html>
@@ -45,14 +94,56 @@ const canonical = Astro.site
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Rockcruit" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={imageAlt} />
+    {
+      isDefaultImage && (
+        <>
+          <meta property="og:image:type" content="image/png" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+        </>
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    {hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
 
     <link
       rel="icon"
       type="image/svg+xml"
       href={href("/rockcruit-lila-icon.svg")}
+    />
+    <link rel="icon" type="image/x-icon" href={href("/favicon.ico")} sizes="48x48" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href={href("/favicon-32.png")}
+    />
+    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+    <link rel="manifest" href={href("/manifest.webmanifest")} />
+    {
+      BLOG_ENABLED && (
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Rockcruit Blog"
+          href={href("/blog/rss.xml")}
+        />
+      )
+    }
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(structuredData)}
     />
 
     <!-- The site self-hosts the fonts. See @font-face in global.css. Preload
