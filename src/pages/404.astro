@@ -1,6 +1,6 @@
 ---
-// src/pages/404.astro — port of v1's NotFound. Served by Apache via
-// `ErrorDocument 404 /404.html` in public/.htaccess.
+// src/pages/404.astro — port of v1's NotFound. The host serves /404.html for
+// an unknown path. GitHub Pages serves only the 404.html at the site root.
 // Requires astronaut-not-found.svg in public/ (in the assets zip).
 import Layout from "../layouts/Layout.astro";
 import { href } from "../lib/url";
@@ -8,13 +8,14 @@ import { href } from "../lib/url";
 
 <Layout
   title="Page not found — Rockcruit"
-  description="This page doesn't exist."
+  description="This page does not exist or has moved. Go back to the Rockcruit home page."
+  noindex
 >
   <section class="nf">
     <img
       class="reveal"
       src={href("/astronaut-not-found.svg")}
-      alt=""
+      alt="An astronaut floats in space"
       width="220"
       height="220"
     />
