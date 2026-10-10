@@ -76,6 +76,12 @@ jobs:
             --outDir "${{ steps.config.outputs.out_dir }}"
         env:
           BLOG_ENABLED: "true"
+          # The dev deploy is a preview. Keep it out of search results.
+          PUBLIC_NOINDEX: ${{ github.ref_name == 'dev' && 'true' || 'false' }}
+          # Public EmailJS values. Create these as GitHub repository secrets.
+          PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.PUBLIC_EMAILJS_PUBLIC_KEY }}
+          PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.PUBLIC_EMAILJS_SERVICE_ID }}
+          PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.PUBLIC_EMAILJS_TEMPLATE_ID }}
         working-directory: ${{ env.BUILD_PATH }}
       - name: Restructure artifact for dev branch
         if: github.ref_name == 'dev'
