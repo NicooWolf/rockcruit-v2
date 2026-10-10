@@ -39,6 +39,9 @@ const canonical = Astro.site
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <!-- Open the WordPress connection early. The blog loads its post images
+         from this host. -->
+    <link rel="preconnect" href="https://rblog.rockcruit.com" crossorigin />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

@@ -54,7 +54,13 @@ const fmt = (d: string) =>
   <div class="card-media">
     {
       image?.sourceUrl ? (
-        <img src={image.sourceUrl} alt={image.altText ?? title} loading="lazy" />
+        <img
+          src={image.sourceUrl}
+          alt={image.altText ?? title}
+          loading={featured ? "eager" : "lazy"}
+          fetchpriority={featured ? "high" : undefined}
+          decoding="async"
+        />
       ) : (
         <PostPlaceholder seed={post.slug} />
       )
