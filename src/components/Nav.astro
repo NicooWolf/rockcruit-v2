@@ -6,8 +6,14 @@ import { href } from "../lib/url";
 import { BLOG_ENABLED } from "../lib/wp";
 import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
 
-const path = Astro.url.pathname;
-const isActive = (p: string) => (p === "/" ? path === "/" : path.startsWith(p));
+// The pathname holds the site base, for example /rockcruit-v2/dev/team/. Remove
+// the base, so the page paths below match on every deploy.
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const path = Astro.url.pathname.startsWith(base)
+  ? Astro.url.pathname.slice(base.length) || "/"
+  : Astro.url.pathname;
+const isActive = (p: string) =>
+  p === "/" ? path === "/" : path === p || path.startsWith(`${p}/`);
 const showBlog = BLOG_ENABLED;
 ---
 
