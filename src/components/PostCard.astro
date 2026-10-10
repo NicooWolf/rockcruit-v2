@@ -26,9 +26,7 @@ const category = categories[0];
 
 // The author relation returns a list. Take the first author.
 const author = f?.author?.nodes?.[0]?.authorFields;
-const authorName = [author?.name, author?.lastName]
-  .filter(Boolean)
-  .join(" ");
+const authorName = [author?.name, author?.lastName].filter(Boolean).join(" ");
 
 const image = f?.postImage?.node;
 const photo = author?.profilePhoto?.node;
@@ -50,7 +48,6 @@ const fmt = (d: string) =>
   data-categories={categories.map((c) => c.slug).join(" ")}
   data-accent={accent}
 >
-  {featured && <span class="card-ghost" aria-hidden="true">01</span>}
   <div class="card-media">
     {
       image?.sourceUrl ? (
@@ -92,7 +89,9 @@ const fmt = (d: string) =>
           )}
           <span class="card-author-text">
             <span class="card-author-name">{authorName}</span>
-            {author?.role && <span class="card-author-role">{author.role}</span>}
+            {author?.role && (
+              <span class="card-author-role">{author.role}</span>
+            )}
           </span>
         </div>
       )
@@ -280,9 +279,7 @@ const fmt = (d: string) =>
   .card--featured:hover .card-media::after {
     opacity: 0;
   }
-  .card-ghost {
-    display: none;
-  }
+
   .card--featured .card-body {
     position: relative;
     z-index: 1;
@@ -329,20 +326,6 @@ const fmt = (d: string) =>
       justify-content: center;
       gap: 0.9rem;
       padding: 2.5rem;
-    }
-    /* The large number behind the text. */
-    .card-ghost {
-      position: absolute;
-      right: 1.5rem;
-      bottom: -0.15em;
-      z-index: 0;
-      display: block;
-      font-family: var(--bebas);
-      font-weight: 400;
-      font-size: 11rem;
-      line-height: 1;
-      color: color-mix(in srgb, var(--paper) 5%, transparent);
-      pointer-events: none;
     }
   }
 
