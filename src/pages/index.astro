@@ -1622,37 +1622,6 @@ import { brands } from "../lib/brands";
 </style>
 
 <script>
-  import Lenis from "lenis";
-
-  // Lenis smooth scroll — Home page only. A fresh Lenis instance starts on
-  // each entry to this page and stops before the router swaps to another
-  // page, so every other page keeps native scroll untouched. Layout.astro
-  // reads window.__lenis to route hash jumps through it when it is running.
-  document.addEventListener("astro:page-load", () => {
-    // This listener stays after the router leaves Home. Start Lenis only on
-    // the Home page, which is the only page with the testimonial track.
-    if (!document.querySelector(".testi-track")) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const lenis = new Lenis({ lerp: 0.1 });
-    (window as { __lenis?: Lenis }).__lenis = lenis;
-
-    let rafId = requestAnimationFrame(function raf(time) {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    });
-
-    document.addEventListener(
-      "astro:before-swap",
-      () => {
-        cancelAnimationFrame(rafId);
-        lenis.destroy();
-        delete (window as { __lenis?: Lenis }).__lenis;
-      },
-      { once: true },
-    );
-  });
-
   // Accordion — event delegation (survives ClientRouter navigations, never double-binds).
   // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
   document.addEventListener("click", (e) => {
