@@ -74,6 +74,8 @@ async function gql<T>(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
+    // A hung WordPress host must fail the build, not stall it.
+    signal: AbortSignal.timeout(30_000),
   });
   if (!res.ok) {
     // Fail the BUILD loudly: a failed deploy you get notified about beats a

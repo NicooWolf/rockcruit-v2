@@ -840,6 +840,7 @@ const categories = [
       }
 
       if (!publicKey || !serviceId || !templateId) {
+        console.error("HireForm: the PUBLIC_EMAILJS_* build variables are missing.");
         status.textContent = "An error occurred. Email jwolf@rockcruit.com.";
         status.classList.add("err");
         return;
@@ -857,7 +858,8 @@ const categories = [
         setTimeout(() => {
           status.classList.add("vanish");
         }, 5000);
-      } catch {
+      } catch (error) {
+        console.error("HireForm: EmailJS send failed.", error);
         status.textContent =
           "Something went wrong. Try again, or email jwolf@rockcruit.com.";
         status.classList.add("err");
