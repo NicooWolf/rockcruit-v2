@@ -250,6 +250,12 @@ body::after {
   transition-delay: calc(var(--reveal-index, 0) * 100ms);
 }
 
+/* Paint containment clips at the box edge. It cuts the descenders that a
+   .mask-line lets fall below a title. The .mask-line clips its own paint. */
+.reveal:has(.mask-line) {
+  contain: layout style;
+}
+
 .reveal.on {
   opacity: 1;
   transform: translateY(0);
@@ -272,12 +278,17 @@ body::after {
    .mask-line node joins the same .reveal engine in Layout.astro: the JS adds
    .on and sets --reveal-index the same way for both classes. */
 .mask-line {
+  /* The serif titles use a line height under 1.2. Italic descenders then
+     fall below the line box. The clip-path extends the clip area down by
+     --mask-pad and keeps the layout the same. overflow: hidden cut them. */
+  --mask-pad: 0.3em;
   display: block;
-  overflow: hidden;
+  clip-path: inset(0 0 calc(-1 * var(--mask-pad)) 0);
 }
 .mask-inner {
   display: block;
-  transform: translateY(110%);
+  /* Add --mask-pad so the line starts fully below the larger clip area. */
+  transform: translateY(calc(110% + var(--mask-pad)));
   transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
   transition-delay: calc(var(--reveal-index, 0) * 90ms);
   will-change: transform;
