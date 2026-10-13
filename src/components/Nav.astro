@@ -431,6 +431,11 @@ const showBlog = BLOG_ENABLED;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     touch-action: pan-y;
+    /* The sheet still scrolls on a short screen. Hide only the bar. */
+    scrollbar-width: none;
+  }
+  .nav-mobile-sheet::-webkit-scrollbar {
+    display: none;
   }
   .nav-mobile-panel[hidden] {
     display: none;
