@@ -491,7 +491,7 @@ const testimonials = [
             ><path d="M19 6H1M6 1 1 6l5 5"></path></svg
           ></button
         >
-        <div class="testi-dots">
+        <div class="testi-dots" style={`--dots: ${testimonials.length}`}>
           {
             testimonials.map((_, i) => (
               <button
@@ -1721,10 +1721,17 @@ const testimonials = [
   .testi-btn:hover svg {
     stroke-width: 2.6;
   }
+  /* The row has the width of the dots at rest: one 18px dot, the other dots
+     at 6px, and the gaps. A fast second click interrupts the width
+     transition, and the two dot widths then do not add up to the same sum.
+     A row that follows the dots then moves the arrows under the cursor. */
   .testi-dots {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    justify-content: center;
+    flex: none;
+    width: calc(18px + (var(--dots) - 1) * (6px + 0.5rem));
   }
   .testi-dot {
     width: 6px;
