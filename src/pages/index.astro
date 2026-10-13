@@ -9,6 +9,64 @@ import Signal from "../assets/icons/signal.svg";
 
 import { href } from "../lib/url";
 import { brands } from "../lib/brands";
+
+// Background of the testimonials section. Fixed values keep the layout the
+// same on each build. x and y are percentages of the section. d is the delay
+// in seconds, and t is the duration in seconds.
+const testiStars = [
+  { x: 6, y: 14, d: 0, t: 3.4, s: 2 },
+  { x: 14, y: 72, d: 1.2, t: 4.6, s: 1 },
+  { x: 23, y: 34, d: 2.1, t: 3.8, s: 1 },
+  { x: 31, y: 88, d: 0.6, t: 5.2, s: 2 },
+  { x: 42, y: 9, d: 2.8, t: 4.2, s: 1 },
+  { x: 55, y: 92, d: 1.6, t: 3.6, s: 1 },
+  { x: 63, y: 22, d: 0.3, t: 5.6, s: 2 },
+  { x: 71, y: 64, d: 2.4, t: 4.0, s: 1 },
+  { x: 79, y: 11, d: 1.0, t: 4.8, s: 1 },
+  { x: 86, y: 46, d: 3.0, t: 3.2, s: 2 },
+  { x: 93, y: 82, d: 1.8, t: 5.0, s: 1 },
+  { x: 97, y: 28, d: 0.9, t: 4.4, s: 1 },
+];
+const testiRockets = [
+  { x: 9, d: -3, t: 16 },
+  { x: 48, d: -11, t: 21 },
+  { x: 88, d: -7, t: 18 },
+];
+const testiRocks = [
+  { y: 8, d: -2, t: 19 },
+  { y: 46, d: -12, t: 24 },
+];
+
+// The carousel slides and the dots come from this list.
+// TODO: "John Doe" and "CEO" are placeholders. Replace them with the real
+// name and role of each client before the release.
+const testimonials = [
+  {
+    company: "BIZLAND",
+    quote:
+      "Rockcruit combines agility, warmth, and a remarkable ability to adapt. They accurately understand hiring managers’ needs and connect them with talent that fits immediately, both technically and culturally. We achieve results in record time while maintaining quality in every process. Rockcruit is our strategic partner, a natural extension of our People team.",
+  },
+  {
+    company: "S1",
+    quote:
+      "Rockcruit took the time to understand our needs and the cultural context of the challenge. They understood the profile we needed: skills and experience, but also alignment with our values and way of working. They were always present, professional, approachable, and highly proactive. The process moved quickly, and their support was key to closing the search. I highly recommend Rockcruit.",
+  },
+  {
+    company: "Eureka Labs",
+    quote:
+      "Working with Rockcruit is seamless. They are remarkably quick in presenting candidates, but what truly sets them apart is their deep understanding of our needs. They consistently provide candidates who are a perfect technical fit and align with our company culture. Their insight and reliability make them a trusted partner.",
+  },
+  {
+    company: "TGN",
+    quote:
+      "It was a true pleasure working with the Rockcruit team. They were committed from day one, taking the time to deeply understand our needs and supporting us throughout every stage of the process with professionalism and warmth. Without a doubt, they are strategic recruiting partners.",
+  },
+  {
+    company: "Tower28",
+    quote:
+      "Rockcruit delivered quality candidates quickly, impressing the client with their speed and candidate quality. Their organized approach, timeliness, and responsiveness to feedback ensured a smooth process. Overall, the team met expectations and requirements effectively.",
+  },
+].map((t) => ({ ...t, name: "John Doe", role: "CEO", initials: "JD" }));
 ---
 
 <Layout
@@ -351,19 +409,53 @@ import { brands } from "../lib/brands";
 
   <!-- ═══════ TESTIMONIALS (carousel) ═══════ -->
   <section class="testimonials">
-    <div class="testi-top">
-      <div>
-        <div class="testi-eyebrow reveal">Client reviews</div>
-        <h2 class="testi-h2 reveal">
-          <span class="mask-line"
-            ><span class="mask-inner">What our<br /><em>clients say.</em></span
-            ></span
+    <!-- Decoration only. CSS moves each item with transform and opacity, so
+         the compositor does the work. The script pauses it off screen. -->
+    <div class="testi-space" aria-hidden="true">
+      <svg class="testi-defs" width="0" height="0">
+        <symbol id="testi-rocket" viewBox="0 0 10 20">
+          <!-- Inline fills: a scoped class does not reach the copy of <use>. -->
+          <path
+            style="fill: var(--paper)"
+            d="M5 0C8 3 8.4 8 8 13H2C1.6 8 2 3 5 0Z"></path>
+          <circle style="fill: var(--violet)" cx="5" cy="7" r="1.3"></circle>
+          <path style="fill: var(--violet)" d="M2 10 0 15 2 14ZM8 10l2 5-2-1Z"
+          ></path>
+        </symbol>
+      </svg>
+      {
+        testiStars.map((s) => (
+          <span
+            class="ts-star"
+            style={`left:${s.x}%;top:${s.y}%;--d:${s.d}s;--t:${s.t}s;--s:${s.s}px`}
+          />
+        ))
+      }
+      {
+        testiRockets.map((r) => (
+          <span
+            class="ts-rocket"
+            style={`left:${r.x}%;--d:${r.d}s;--t:${r.t}s`}
           >
-        </h2>
-      </div>
-      <p class="testi-sub reveal">
-        Real feedback from leaders hiring digital talent under pressure.
-      </p>
+            <svg viewBox="0 0 10 20">
+              <use href="#testi-rocket" />
+            </svg>
+          </span>
+        ))
+      }
+      {
+        testiRocks.map((a) => (
+          <span class="ts-rock" style={`top:${a.y}%;--d:${a.d}s;--t:${a.t}s`} />
+        ))
+      }
+    </div>
+    <div class="testi-top">
+      <div class="testi-eyebrow reveal">Client reviews</div>
+      <h2 class="testi-h2 reveal">
+        <span class="mask-line"
+          ><span class="mask-inner">What our <em>clients say.</em></span></span
+        >
+      </h2>
     </div>
     <div class="testi-grid reveal">
       <!-- The card is the frame. It never moves. Only the track inside it
@@ -371,74 +463,49 @@ import { brands } from "../lib/brands";
       <div class="testi-card">
         <div class="testi-viewport">
           <div class="testi-track">
-            <div class="testi-slide">
-              <span class="testi-qmark">"</span><p class="testi-text">
-                The quality of profiles was completely different from what we
-                were used to. They clearly understood our team dynamics — not
-                just the job description.
-              </p><div class="testi-author">
-                <div class="testi-av">
-                  <span class="testi-initials">MR</span>
-                </div><div>
-                  <div class="testi-name">M. Rodriguez</div><div
-                    class="testi-role"
-                  >
-                    Head of People · Magoya
+            {
+              testimonials.map((t) => (
+                <div class="testi-slide">
+                  <span class="testi-qmark">"</span>
+                  <p class="testi-text">{t.quote}</p>
+                  <div class="testi-author">
+                    <div class="testi-av">
+                      <span class="testi-initials">{t.initials}</span>
+                    </div>
+                    <div>
+                      <div class="testi-name">{t.name}</div>
+                      <div class="testi-role">
+                        {t.role} · {t.company}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div class="testi-slide">
-              <span class="testi-qmark">"</span><p class="testi-text">
-                We'd been trying to fill a senior DevOps role for months.
-                Rockcruit sent 4 candidates in 3 days. We hired one — he's still
-                with us two years later.
-              </p><div class="testi-author">
-                <div class="testi-av">
-                  <span class="testi-initials">AL</span>
-                </div><div>
-                  <div class="testi-name">A. Lopez</div><div class="testi-role">
-                    CTO · Patagonian
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="testi-slide">
-              <span class="testi-qmark">"</span><p class="testi-text">
-                What I value most is that they push back when something doesn't
-                feel right. They're not just closing placements — they actually
-                care about the fit.
-              </p><div class="testi-author">
-                <div class="testi-av">
-                  <span class="testi-initials">JP</span>
-                </div><div>
-                  <div class="testi-name">J. Pereyra</div><div
-                    class="testi-role"
-                  >
-                    Talent Acquisition · Hiberus
-                  </div>
-                </div>
-              </div>
-            </div>
+              ))
+            }
           </div>
         </div>
       </div>
       <div class="testi-controls">
         <button class="testi-btn" id="tPrev" aria-label="Previous testimonial"
-          >←</button
+          ><svg viewBox="0 0 20 12" aria-hidden="true"
+            ><path d="M19 6H1M6 1 1 6l5 5"></path></svg
+          ></button
         >
-        <div class="testi-dots">
-          <button class="testi-dot active" data-i="0" aria-label="Testimonial 1"
-          ></button><button
-            class="testi-dot"
-            data-i="1"
-            aria-label="Testimonial 2"></button><button
-            class="testi-dot"
-            data-i="2"
-            aria-label="Testimonial 3"></button>
+        <div class="testi-dots" style={`--dots: ${testimonials.length}`}>
+          {
+            testimonials.map((_, i) => (
+              <button
+                class:list={["testi-dot", { active: i === 0 }]}
+                data-i={i}
+                aria-label={`Testimonial ${i + 1}`}
+              />
+            ))
+          }
         </div>
         <button class="testi-btn" id="tNext" aria-label="Next testimonial"
-          >→</button
+          ><svg viewBox="0 0 20 12" aria-hidden="true"
+            ><path d="M1 6h18M14 1l5 5-5 5"></path></svg
+          ></button
         >
       </div>
     </div>
@@ -1286,56 +1353,225 @@ import { brands } from "../lib/brands";
 
   /* TESTIMONIALS */
   .testimonials {
-    padding: 2rem 5%;
-    border-bottom: 1px solid var(--border);
-    background: var(--paper);
-    color: var(--ink);
+    /* The color of the asteroid fire. The site palette has no warm color.
+       Keep this value only in this section. */
+    --ember-rgb: 255, 146, 72;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: clamp(3rem, 7vw, 5rem) 5%;
+    border-top: 1px solid var(--bdark);
+    border-bottom: 1px solid var(--bdark);
+    /* A muted grey, a small step above the ink of the next sections. */
+    background:
+      radial-gradient(
+        ellipse 70% 60% at 50% 0%,
+        rgba(var(--violet-rgb), 0.05),
+        transparent 70%
+      ),
+      linear-gradient(rgba(240, 237, 227, 0.035), rgba(240, 237, 227, 0.035)),
+      var(--ink);
+    color: var(--paper);
   }
+  /* The decoration layer. The container units (cqw, cqh) give the travel
+     distance of each item, so each item stays a small layer. */
+  .testi-space {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    container-type: size;
+  }
+  /* The grain. The browser draws the noise tile one time and repeats it. */
+  .testi-space::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .testi-defs {
+    position: absolute;
+  }
+  .ts-star,
+  .ts-rocket,
+  .ts-rock {
+    position: absolute;
+    animation-delay: var(--d);
+    animation-duration: var(--t);
+    animation-iteration-count: infinite;
+  }
+  .testimonials.is-paused .ts-star,
+  .testimonials.is-paused .ts-rocket,
+  .testimonials.is-paused .ts-rock {
+    animation-play-state: paused;
+  }
+  .ts-star {
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 0 4px rgba(240, 237, 227, 0.5);
+    opacity: 0.2;
+    animation-name: ts-twinkle;
+    animation-timing-function: ease-in-out;
+  }
+  .ts-star:nth-of-type(3n) {
+    background: var(--violet-light);
+    box-shadow: 0 0 4px rgba(var(--violet-light-rgb), 0.6);
+  }
+  .ts-rocket {
+    bottom: -40px;
+    width: 8px;
+    height: 16px;
+    opacity: 0.5;
+    animation-name: ts-rise;
+    animation-timing-function: linear;
+  }
+  .ts-rocket svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  /* The exhaust flame under the rocket. */
+  .ts-rocket::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 2px;
+    height: 14px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: linear-gradient(rgba(var(--green-rgb), 0.9), transparent);
+  }
+  .ts-rock {
+    left: -200px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 0 6px 2px rgba(var(--ember-rgb), 0.75);
+    opacity: 0;
+    animation-name: ts-fall;
+    animation-timing-function: linear;
+  }
+  /* The fire tail. The angle matches the path in ts-fall: atan(0.26). */
+  .ts-rock::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    width: 90px;
+    height: 2px;
+    border-radius: 1px;
+    transform: translateY(-50%) rotate(14.57deg);
+    transform-origin: 100% 50%;
+    background: linear-gradient(
+      to left,
+      rgba(var(--ember-rgb), 0.85),
+      rgba(var(--ember-rgb), 0)
+    );
+  }
+  @keyframes ts-twinkle {
+    0%,
+    100% {
+      opacity: 0.15;
+      transform: scale(0.7);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+  }
+  @keyframes ts-rise {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, calc(-100cqh - 80px), 0);
+    }
+  }
+  /* The asteroid crosses in the first 40% of the time. It waits off screen
+     for the remaining time. The y travel is 0.26 of the x travel. */
+  @keyframes ts-fall {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0);
+    }
+    4%,
+    36% {
+      opacity: 0.9;
+    }
+    40%,
+    100% {
+      opacity: 0;
+      transform: translate3d(calc(100cqw + 400px), calc(26cqw + 104px), 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ts-star {
+      animation: none;
+      opacity: 0.4;
+    }
+    .ts-rocket,
+    .ts-rock {
+      display: none;
+    }
+  }
+
   .testi-top {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: end;
-    margin-bottom: 3rem;
+    text-align: center;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
   }
   .testi-eyebrow {
     font-family: var(--mono);
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--violet);
+    color: var(--violet-light);
     margin-bottom: 1rem;
   }
+  /* One line on every screen. 10.5vw keeps the full title inside 320px. */
   .testi-h2 {
     font-family: var(--serif);
     font-style: italic;
     font-weight: 400;
-    font-size: clamp(2.2rem, 4.5vw, 4rem);
-    line-height: 0.95;
+    font-size: clamp(1.6rem, 10.5vw, 4rem);
+    line-height: 1.05;
     letter-spacing: -0.02em;
-    color: var(--ink);
+    white-space: nowrap;
+    color: var(--paper);
   }
   .testi-h2 em {
     font-style: normal;
-    color: var(--violet);
+    color: var(--violet-light);
   }
-  .testi-sub {
-    font-size: 0.88rem;
-    color: var(--muted);
-    line-height: 1.8;
-    max-width: 320px;
-  }
+  /* A narrow column keeps the quote short in width and easy to read. */
   .testi-grid {
     position: relative;
+    max-width: 1024px;
+    margin: 0 auto;
   }
   /* The frame of the carousel. It holds the border, the round corners and the
      background, and it never moves. The browser draws it one time only, so the
-     corners keep their shape while the text moves. */
+     corners keep their shape while the text moves. The background is opaque,
+     so the decoration does not show through the text. */
   .testi-card {
-    background: var(--paper2);
-    border: 1px solid var(--border);
+    background:
+      radial-gradient(
+        circle at 0 0,
+        rgba(var(--violet-rgb), 0.08),
+        transparent 45%
+      ),
+      linear-gradient(rgba(240, 237, 227, 0.055), rgba(240, 237, 227, 0.055)),
+      var(--ink);
+    border: 1px solid rgba(240, 237, 227, 0.09);
     border-radius: 12px;
-    padding: 2.2rem;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    box-shadow:
+      inset 0 1px 0 rgba(240, 237, 227, 0.05),
+      0 24px 60px -30px rgba(0, 0, 0, 0.7);
   }
   /* The window that hides the text on the two sides of the visible one. It
      sits inside the frame, so the clip edge touches no border and no corner. */
@@ -1344,6 +1580,11 @@ import { brands } from "../lib/brands";
     /* The browser keeps the vertical direction and gives the script the
        horizontal one. The page still scrolls under a finger on a card. */
     touch-action: pan-y;
+    /* A mouse can drag the track. The cursor tells the user. */
+    cursor: grab;
+  }
+  .testi-viewport:has(.is-dragging) {
+    cursor: grabbing;
   }
   .testi-track {
     display: flex;
@@ -1373,99 +1614,130 @@ import { brands } from "../lib/brands";
   .testi-track.is-ready .testi-slide.is-active {
     opacity: 1;
   }
-  /* A finger holds the track. Each text must follow the finger, and each text
-     must stay visible. This rule comes last, so it wins. */
+  /* A hand holds the track. The script sets the opacity of each text from
+     its distance, so the opacity must follow the hand with no delay. This
+     rule comes last, so it wins. */
   .testi-track.is-dragging .testi-slide {
-    opacity: 1;
     transition: none;
   }
   .testi-qmark {
     font-family: var(--serif);
-    font-size: 3rem;
+    font-size: clamp(2.25rem, 3vw, 2.75rem);
     line-height: 0.8;
-    color: var(--violet);
-    opacity: 0.4;
+    color: var(--violet-light);
+    opacity: 0.5;
     display: block;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.4rem;
   }
+  /* 20px on a wide screen (root 17px), 16px at 320px. */
   .testi-text {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.75;
-    color: var(--ink2);
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 300;
+    font-size: clamp(1rem, 0.9rem + 0.45vw, 1.1765rem);
+    line-height: 1.65;
+    color: rgba(240, 237, 227, 0.88);
     flex: 1;
-    margin-bottom: 1.8rem;
+    margin-bottom: 1.5rem;
   }
   .testi-author {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 1rem;
   }
   .testi-av {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     flex-shrink: 0;
-    background: var(--paper3);
-    border: 1px solid var(--border);
+    background: rgba(var(--violet-rgb), 0.1);
+    border: 1px solid rgba(var(--violet-light-rgb), 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .testi-initials {
     font-family: var(--mono);
-    font-size: 0.68rem;
-    color: var(--muted);
+    font-size: 0.75rem;
+    color: var(--violet-light);
   }
   .testi-name {
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 500;
-    color: var(--ink);
+    color: var(--paper);
   }
   .testi-role {
     font-family: var(--mono);
-    font-size: 0.6rem;
-    color: var(--muted);
-    margin-top: 0.1rem;
+    font-size: 0.7rem;
+    color: rgba(240, 237, 227, 0.45);
+    margin-top: 0.2rem;
   }
   .testi-controls {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
+    gap: 1.5rem;
     margin-top: 2rem;
   }
+  /* The arrow has no frame. It is lighter than a dot, so it stands out from
+     the background. The button is as large as the arrow, so only the arrow
+     answers to the mouse. */
   .testi-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
+    border: none;
     background: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 0.85rem;
-    transition:
-      border-color 0.2s,
-      color 0.2s;
+    display: block;
+    padding: 0;
+    line-height: 0;
+    color: rgba(240, 237, 227, 0.42);
+    transition: color 0.2s;
   }
+  /* A finger needs a larger target. A touch screen has no hover, so the
+     padding has no visible effect. */
+  @media (pointer: coarse) {
+    .testi-btn {
+      padding: 16px 12px;
+    }
+    .testi-controls {
+      gap: 0.25rem;
+    }
+  }
+  .testi-btn svg {
+    display: block;
+    width: 20px;
+    height: 12px;
+    overflow: visible;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke-width 0.2s;
+  }
+  /* The hover gives the arrow the weight of the active dot. */
   .testi-btn:hover {
-    border-color: var(--ink);
-    color: var(--ink);
+    color: var(--paper);
   }
+  .testi-btn:hover svg {
+    stroke-width: 2.6;
+  }
+  /* The row has the width of the dots at rest: one 18px dot, the other dots
+     at 6px, and the gaps. A fast second click interrupts the width
+     transition, and the two dot widths then do not add up to the same sum.
+     A row that follows the dots then moves the arrows under the cursor. */
   .testi-dots {
     display: flex;
     gap: 0.5rem;
     align-items: center;
+    justify-content: center;
+    flex: none;
+    width: calc(18px + (var(--dots) - 1) * (6px + 0.5rem));
   }
   .testi-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--border);
+    background: rgba(240, 237, 227, 0.18);
     transition:
       background 0.2s,
       width 0.2s;
@@ -1474,7 +1746,7 @@ import { brands } from "../lib/brands";
     padding: 0;
   }
   .testi-dot.active {
-    background: var(--ink);
+    background: var(--violet-light);
     width: 18px;
     border-radius: 3px;
   }
@@ -1587,9 +1859,6 @@ import { brands } from "../lib/brands";
     .st-cards {
       grid-template-columns: 1fr;
     }
-    .testi-top {
-      grid-template-columns: 1fr;
-    }
     .fcta-inner {
       grid-template-columns: 1fr;
       gap: 3rem;
@@ -1623,7 +1892,13 @@ import { brands } from "../lib/brands";
 
 <script>
   // Accordion — event delegation (survives ClientRouter navigations, never double-binds).
-  // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
+  // A tap on a row button opens or closes that row. A tap anywhere else closes
+  // every row that is on screen. A row off screen stays open: its close
+  // changes the page height above the reader, and the page then moves.
+  const onScreen = (el: Element) => {
+    const r = el.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight;
+  };
   document.addEventListener("click", (e) => {
     const target = e.target as Element;
     const btn = target.closest?.(".diff-item-btn");
@@ -1637,9 +1912,9 @@ import { brands } from "../lib/brands";
       return;
     }
     if (target.closest?.(".diff-item.open")) return;
-    document
-      .querySelectorAll(".diff-item.open")
-      .forEach((i) => i.classList.remove("open"));
+    document.querySelectorAll(".diff-item.open").forEach((i) => {
+      if (onScreen(i)) i.classList.remove("open");
+    });
   });
 
   // Carousel — fresh state per page entry (astro:page-load pattern).
@@ -1682,28 +1957,54 @@ import { brands } from "../lib/brands";
     track.classList.add("is-ready");
     paint();
 
+    // An arrow or a dot uses the CSS timing. A release after a drag sets its
+    // own timing, so clear that value first.
+    const pick = (i: number) => {
+      track.style.transition = "";
+      goTo(i);
+    };
     document
       .getElementById("tNext")
-      ?.addEventListener("click", () => goTo(idx + 1));
+      ?.addEventListener("click", () => pick(idx + 1));
     document
       .getElementById("tPrev")
-      ?.addEventListener("click", () => goTo(idx - 1));
+      ?.addEventListener("click", () => pick(idx - 1));
     dots.forEach((d) =>
-      d.addEventListener("click", () => goTo(Number(d.dataset.i))),
+      d.addEventListener("click", () => pick(Number(d.dataset.i))),
     );
 
-    // ── Touch swipe.
-    // A finger or a pen drags the track. A mouse does not: a mouse drag selects
-    // the text of the card. CSS gives the browser the vertical direction with
-    // touch-action: pan-y, so the page still scrolls under the finger.
+    // ── Swipe.
+    // A finger, a pen or a mouse drags the track. CSS gives the browser the
+    // vertical direction with touch-action: pan-y, so the page still scrolls
+    // under the finger.
     const SLOP = 10; // px, the movement that names the direction of the drag
     let pointer: number | null = null;
     let startX = 0;
     let startY = 0;
     let axis = "";
+    let steps: number[] = [];
+    // The release continues the motion of the hand, so it eases out.
+    const RELEASE = "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)";
+
+    // During a drag, each text fades with its distance from the window. The
+    // visible text fades out while the next text fades in.
+    const fade = (px: number) => {
+      const width = steps[1] || view.clientWidth;
+      cards.forEach((c, j) => {
+        const t = Math.min(1, Math.abs(steps[j] - px) / width);
+        const near = 1 - t;
+        c.style.opacity = String(near * near * (3 - 2 * near));
+      });
+    };
 
     view.addEventListener("pointerdown", (e) => {
-      if (e.pointerType === "mouse" || pointer !== null) return;
+      if (pointer !== null) return;
+      if (e.pointerType === "mouse") {
+        // Only the main button drags. The default action of a mouse press
+        // starts a text selection, so stop it.
+        if (e.button !== 0) return;
+        e.preventDefault();
+      }
       pointer = e.pointerId;
       startX = e.clientX;
       startY = e.clientY;
@@ -1720,23 +2021,33 @@ import { brands } from "../lib/brands";
         if (axis !== "x") return;
         track.style.transition = "none";
         track.classList.add("is-dragging");
-        view.setPointerCapture(e.pointerId);
+        // Measure one time per drag, not on each move.
+        steps = cards.map((_, j) => stepOf(j));
+        try {
+          view.setPointerCapture(e.pointerId);
+        } catch {
+          // The pointer is gone. The drag still works inside the card.
+        }
       }
       if (axis !== "x") return;
       // The first card and the last card resist. The track holds no card
       // outside them, and a free drag shows an empty space.
-      let px = stepOf(idx) - dx;
-      const last = stepOf(count - 1);
+      let px = steps[idx] - dx;
+      const last = steps[count - 1];
       if (px < 0) px /= 3;
       else if (px > last) px = last + (px - last) / 3;
       move(px);
+      fade(px);
     });
 
     const endDrag = (e: PointerEvent) => {
       if (e.pointerId !== pointer) return;
       pointer = null;
-      track.style.transition = "";
+      // The class and the inline opacity go in the same frame. The CSS fade
+      // then starts from the opacity of the drag, so no text jumps.
+      track.style.transition = axis === "x" ? RELEASE : "";
       track.classList.remove("is-dragging");
+      cards.forEach((c) => (c.style.opacity = ""));
       if (axis !== "x") return;
       axis = "";
       const dx = e.clientX - startX;
@@ -1764,5 +2075,19 @@ import { brands } from "../lib/brands";
       () => window.removeEventListener("resize", onResize),
       { once: true },
     );
+  });
+
+  // Testimonials background — stop the CSS animations off screen. The
+  // animations run without a script, so this is a saving, not a switch.
+  document.addEventListener("astro:page-load", () => {
+    const section = document.querySelector<HTMLElement>(".testimonials");
+    if (!section || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(([entry]) =>
+      section.classList.toggle("is-paused", !entry.isIntersecting),
+    );
+    io.observe(section);
+    document.addEventListener("astro:before-swap", () => io.disconnect(), {
+      once: true,
+    });
   });
 </script>
