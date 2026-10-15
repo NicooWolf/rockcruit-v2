@@ -38,35 +38,43 @@ const testiRocks = [
 ];
 
 // The carousel slides and the dots come from this list.
-// TODO: "John Doe" and "CEO" are placeholders. Replace them with the real
-// name and role of each client before the release.
 const testimonials = [
   {
-    company: "BIZLAND",
     quote:
-      "Rockcruit combines agility, warmth, and a remarkable ability to adapt. They accurately understand hiring managers’ needs and connect them with talent that fits immediately, both technically and culturally. We achieve results in record time while maintaining quality in every process. Rockcruit is our strategic partner, a natural extension of our People team.",
-  },
-  {
+      "Working with Rockcruit was an excellent experience. They quickly understood our needs, company culture, and the profile we were looking for. Their proactive support and professionalism were key to successfully closing the search.",
+    name: "Marina I.",
+    role: "Chief People Officer",
     company: "S1",
-    quote:
-      "Rockcruit took the time to understand our needs and the cultural context of the challenge. They understood the profile we needed: skills and experience, but also alignment with our values and way of working. They were always present, professional, approachable, and highly proactive. The process moved quickly, and their support was key to closing the search. I highly recommend Rockcruit.",
   },
   {
-    company: "Eureka Labs",
     quote:
-      "Working with Rockcruit is seamless. They are remarkably quick in presenting candidates, but what truly sets them apart is their deep understanding of our needs. They consistently provide candidates who are a perfect technical fit and align with our company culture. Their insight and reliability make them a trusted partner.",
-  },
-  {
+      "It was a pleasure working with Rockcruit. They took the time to understand our needs and supported us throughout the process with professionalism and care. A true strategic recruiting partner.",
+    name: "Carolina I.",
+    role: "Analista de empleos",
     company: "TGN",
-    quote:
-      "It was a true pleasure working with the Rockcruit team. They were committed from day one, taking the time to deeply understand our needs and supporting us throughout every stage of the process with professionalism and warmth. Without a doubt, they are strategic recruiting partners.",
   },
   {
-    company: "Tower28",
     quote:
       "Rockcruit delivered quality candidates quickly, impressing the client with their speed and candidate quality. Their organized approach, timeliness, and responsiveness to feedback ensured a smooth process. Overall, the team met expectations and requirements effectively.",
+    name: "Patrick S.",
+    role: "Chief Technical Officer",
+    company: "Tower28",
   },
-].map((t) => ({ ...t, name: "John Doe", role: "CEO", initials: "JD" }));
+  {
+    quote:
+      "Rockcruit combines agility and a deep understanding of our hiring needs to find talent that fits both technically and culturally. They deliver fast results without compromising quality. Their team is a true extension of our People team and a strategic recruiting partner.",
+    name: "Heliana P.",
+    role: "Chief People Officer",
+    company: "Bizland",
+  },
+].map((t) => ({
+  ...t,
+  // "Marina I." gives "MI".
+  initials: t.name
+    .split(" ")
+    .map((part) => part[0])
+    .join(""),
+}));
 ---
 
 <Layout
@@ -1627,7 +1635,6 @@ const testimonials = [
     color: var(--violet-light);
     opacity: 0.5;
     display: block;
-    margin-bottom: 0.4rem;
   }
   /* 20px on a wide screen (root 17px), 16px at 320px. */
   .testi-text {
