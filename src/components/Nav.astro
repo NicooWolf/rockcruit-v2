@@ -1,7 +1,7 @@
 ---
 // src/components/Nav.astro — one canonical nav (prototypes drifted; normalized here).
 // Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
-// "Open Positions" → /#contact until its real destination is decided (open ledger).
+// "Open Positions" → https://rockcruit.breezy.hr/ (_blank) until its real destination is decided (open ledger).
 import { href } from "../lib/url";
 import { BLOG_ENABLED } from "../lib/wp";
 import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
@@ -72,7 +72,9 @@ const showBlog = BLOG_ENABLED;
     }
   </ul>
   <div class="nav-actions">
-    <a href={href("/#contact")} class="nav-open">Open Positions</a>
+    <a href={"https://rockcruit.breezy.hr/"} target="_blank" class="nav-open"
+      >Open Positions</a
+    >
     <a href={href("/#contact")} class="nav-cta">Hire With Us</a>
   </div>
   <div class="nav-mobile">
@@ -139,7 +141,11 @@ const showBlog = BLOG_ENABLED;
           }
         </ul>
         <div class="nav-mobile-cta">
-          <a href={href("/#contact")} class="nav-mobile-open">
+          <a
+            href={"https://rockcruit.breezy.hr/"}
+            target="_blank"
+            class="nav-mobile-open"
+          >
             Open Positions
             <svg
               class="nav-mobile-arrow"
