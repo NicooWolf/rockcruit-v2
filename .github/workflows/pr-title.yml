@@ -1,0 +1,42 @@
+# Checks that the PR title is a Conventional Commit.
+# A squash merge uses the PR title as the commit message.
+# release-please reads these commit messages to set the version and the CHANGELOG.
+# The rulesets on dev and main require the "PR title" check.
+name: PR title
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+    branches: ["main", "dev"]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  pr-title:
+    name: PR title
+    runs-on: ubuntu-latest
+    steps:
+      # This job reads only the PR title. It does not check out the PR code.
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            refactor
+            style
+            docs
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false
+          # The subject must not start with an upper-case letter.
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" in the title "{title}" starts with an upper-case letter.
+            Start the subject with a lower-case letter.
