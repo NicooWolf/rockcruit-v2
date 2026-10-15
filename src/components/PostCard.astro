@@ -96,7 +96,13 @@ const fmt = (d: string) =>
         </div>
       )
     }
-    {featured && <span class="card-more">Read the post →</span>}
+    {
+      featured && (
+        <span class="card-more">
+          Read the post <span class="arr" aria-hidden="true" />
+        </span>
+      )
+    }
   </div>
 </a>
 

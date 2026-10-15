@@ -180,6 +180,28 @@ body {
   overflow-x: hidden;
 }
 
+/* ── The button arrow ──
+   The DM fonts have no arrow glyph. Each system then draws the → from a
+   different fallback font, and its height changes from one system to the next.
+   This span draws one arrow from a mask, so it looks the same everywhere. The
+   box is 1em high. Its foot sits on the baseline, and top: 0.26em then moves
+   it down. Its center is 0.24em above the baseline, which is the middle of a
+   lower-case letter. A button that uses flex ignores vertical-align, so
+   align-self: baseline gives the same result there. */
+.arr {
+  display: inline-block;
+  align-self: baseline;
+  position: relative;
+  top: 0.26em;
+  width: 1em;
+  height: 1em;
+  vertical-align: baseline;
+  background-color: currentColor;
+  -webkit-mask: var(--arr-icon) center / contain no-repeat;
+  mask: var(--arr-icon) center / contain no-repeat;
+  --arr-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8h11M9 4l4 4-4 4' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
 html,
 body {
   -webkit-font-smoothing: antialiased;
