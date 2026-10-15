@@ -6,23 +6,72 @@ import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 import { href } from "../lib/url";
+import { BLOG_ENABLED } from "../lib/wp";
 import bebasUrl from "../assets/fonts/bebas-neue-400.woff2";
 import dmSansUrl from "../assets/fonts/dm-sans.woff2";
 
 interface Props {
   title: string;
   description?: string;
+  /** Absolute URL, or a site path such as "/og-image.png". */
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  noindex?: boolean;
+  /** Extra JSON-LD node for the page, such as a BlogPosting. */
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title,
   description = "Rockcruit offers IT recruiting services to companies in need of tech talent. Contact us to find the best candidates for your company and projects.",
+  image,
+  imageAlt = "Rockcruit — Tech Headhunters · LATAM",
+  type = "website",
+  noindex = false,
+  jsonLd,
 } = Astro.props;
 
 // Requires `site` in astro.config.mjs (Step 3.0); defensive so dev never crashes.
 const canonical = Astro.site
   ? new URL(Astro.url.pathname, Astro.site)
   : Astro.url.pathname;
+
+// Social scrapers need an absolute image URL. The default image is the
+// 1200x630 PNG in public/. WhatsApp does not read SVG.
+const absolute = (value: string) =>
+  /^https?:\/\//.test(value)
+    ? value
+    : Astro.site
+      ? new URL(href(value), Astro.site).toString()
+      : href(value);
+const ogImage = absolute(image ?? "/og-image.png");
+const isDefaultImage = !image;
+// PUBLIC_NOINDEX=true hides the preview deploy (dev) from search engines.
+const hideFromSearch = noindex || import.meta.env.PUBLIC_NOINDEX === "true";
+
+// Structured data. Only facts that the site already shows.
+const siteUrl = Astro.site ? new URL(href("/"), Astro.site).toString() : "";
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Rockcruit",
+    url: siteUrl,
+    logo: absolute("/icon-512.png"),
+    sameAs: [
+      "https://www.linkedin.com/company/rockcruit",
+      "https://www.instagram.com/rockcruit/",
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Rockcruit",
+    url: siteUrl,
+  },
+  ...(jsonLd ? [{ "@context": "https://schema.org", ...jsonLd }] : []),
+];
 ---
 
 <!doctype html>
@@ -39,17 +88,62 @@ const canonical = Astro.site
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <!-- Open the WordPress connection early. The blog loads its post images
+         from this host. -->
+    <link rel="preconnect" href="https://rblog.rockcruit.com" crossorigin />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Rockcruit" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={imageAlt} />
+    {
+      isDefaultImage && (
+        <>
+          <meta property="og:image:type" content="image/png" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+        </>
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    {hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
 
     <link
       rel="icon"
       type="image/svg+xml"
       href={href("/rockcruit-lila-icon.svg")}
+    />
+    <link rel="icon" type="image/x-icon" href={href("/favicon.ico")} sizes="48x48" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href={href("/favicon-32.png")}
+    />
+    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+    <link rel="manifest" href={href("/manifest.webmanifest")} />
+    {
+      BLOG_ENABLED && (
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Rockcruit Blog"
+          href={href("/blog/rss.xml")}
+        />
+      )
+    }
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(structuredData)}
     />
 
     <!-- The site self-hosts the fonts. See @font-face in global.css. Preload
@@ -69,35 +163,100 @@ const canonical = Astro.site
       crossorigin
     />
 
-    <!-- Show the first screen at once.
-         A .reveal element hides at opacity 0 until the observer below adds
-         .on. The observer runs from a deferred module. On a phone that
-         module loads late, so the first screen stayed grey for about one
-         second, on load and after every navigation. This inline script runs
-         early. It shows the elements that the reader sees first. The observer
-         still animates the rest of the page on scroll.
-         astro:after-swap fires right after a navigation swaps the DOM and
-         before the new page paints, so the logo link no longer flashes grey. -->
+    <!-- Above-The-Fold Reveal & WebKit View Transition Sync -->
     <script is:inline>
       (function () {
-        function revealInView() {
-          var vh = window.innerHeight;
-          var els = document.querySelectorAll(".reveal:not(.on)");
-          for (var i = 0; i < els.length; i++) {
-            if (els[i].getBoundingClientRect().top < vh) {
+        let activeTransition = null;
+
+        function revealATF(doc) {
+          const vh = window.innerHeight;
+          const els = doc.querySelectorAll(
+            ".reveal:not(.on), .mask-line:not(.on), .slide-left:not(.on), .slide-right:not(.on), .cascade-in:not(.on)",
+          );
+          let revealIndex = 0;
+          for (let i = 0; i < els.length; i++) {
+            const rect = els[i].getBoundingClientRect();
+            if (rect.bottom > 0 && rect.top < vh) {
+              els[i].style.setProperty("--reveal-index", revealIndex);
               els[i].classList.add("on");
+              revealIndex++;
             }
           }
         }
+
         if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", revealInView);
+          document.addEventListener("DOMContentLoaded", function () {
+            revealATF(document);
+          });
         } else {
-          revealInView();
+          revealATF(document);
         }
-        document.addEventListener("astro:after-swap", revealInView);
+
+        document.addEventListener("astro:before-swap", function (event) {
+          const transition = event.viewTransition;
+          activeTransition = transition;
+
+          const finishTransition = function () {
+            if (activeTransition === transition) {
+              activeTransition = null;
+            }
+            requestAnimationFrame(function () {
+              document.dispatchEvent(
+                new CustomEvent("rockcruit:transition-end"),
+              );
+            });
+          };
+
+          transition.finished.then(finishTransition, finishTransition);
+        });
+
+        function stopSnapshotForInteraction() {
+          if (activeTransition) {
+            activeTransition.skipTransition();
+          }
+        }
+
+        window.addEventListener("touchstart", stopSnapshotForInteraction, {
+          passive: true,
+        });
+        window.addEventListener("wheel", stopSnapshotForInteraction, {
+          passive: true,
+        });
+
+        // Reveal the above-the-fold content of the new page after the page
+        // fade ends. The transition gate stops all reveal motion during the
+        // swap, so a reveal during the swap shows the titles with no motion.
+        document.addEventListener("astro:after-swap", function () {
+          document.addEventListener(
+            "rockcruit:transition-end",
+            function () {
+              revealATF(document);
+            },
+            { once: true },
+          );
+
+          // Force a WebKit compositor pass after the DOM swap.
+          const root = document.documentElement;
+          root.style.transform = "translateZ(0)";
+          void root.offsetHeight;
+          root.style.transform = "";
+        });
       })();
     </script>
 
+    <!-- Use the router fallback fade on every browser. WebKit paints broken
+         frames while it takes the native View Transition snapshot: the old
+         page, a stale image of the mobile menu, and the new page alternate
+         for a few frames. The router checks this API once, when it loads, so
+         this script must run before <ClientRouter />. -->
+    <script is:inline>
+      try {
+        Object.defineProperty(document, "startViewTransition", {
+          value: undefined,
+          configurable: true,
+        });
+      } catch (e) {}
+    </script>
     <ClientRouter />
   </head>
   <body>
@@ -112,11 +271,35 @@ const canonical = Astro.site
     <Footer />
 
     <script>
+      import Lenis from "lenis";
+
+      // ── Smooth scroll on every page. A fresh Lenis instance starts on each
+      // entry to a page and stops before the router swaps to the next page.
+      // The Nav and the hash jumps below read window.__lenis.
+      document.addEventListener("astro:page-load", () => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+
+        const lenis = new Lenis({ lerp: 0.1 });
+        (window as { __lenis?: Lenis }).__lenis = lenis;
+
+        let rafId = requestAnimationFrame(function raf(time) {
+          lenis.raf(time);
+          rafId = requestAnimationFrame(raf);
+        });
+
+        document.addEventListener(
+          "astro:before-swap",
+          () => {
+            cancelAnimationFrame(rafId);
+            lenis.destroy();
+            delete (window as { __lenis?: Lenis }).__lenis;
+          },
+          { once: true },
+        );
+      });
+
       // ── Scroll depth and the section hash.
-      // A hash jump moves the page by itself. Only a move that the reader
-      // makes may drop the hash, so the code waits for the jump to settle and
-      // then for a real change of the scroll depth. Touch and mouse raise the
-      // same scroll event, so one rule serves mobile and desktop.
       const END_ZONE = 8; // px, absorbs sub-pixel and elastic scroll values
       const SETTLE_TIME = 900; // ms, the wait for a jump to start
       const IDLE_TIME = 250; // ms without a scroll event ends a jump
@@ -124,6 +307,10 @@ const canonical = Astro.site
       let settleUntil = 0;
       let landingDepth = 0;
       let readerMoved = false;
+      let revealObserver: IntersectionObserver | null = null;
+
+      const REVEAL_SELECTOR =
+        ".reveal, .mask-line, .slide-left, .slide-right, .cascade-in";
 
       const startJump = () => {
         settleUntil = performance.now() + SETTLE_TIME;
@@ -131,23 +318,26 @@ const canonical = Astro.site
         readerMoved = false;
       };
 
-      // ── Instant reveal for a jump target.
-      // A .reveal element sits at opacity 0 until the IntersectionObserver
-      // adds .on, and the observer only fires once the scroll reaches it. A
-      // jump to a far section (e.g. /#contact from the top of a long page)
-      // therefore left its text and form blank until the scroll arrived —
-      // seconds later. When a section is the jump target, show its content
-      // now, so it renders the instant we land rather than at scroll's end.
-      const revealSection = (id: string) => {
-        if (!id) return null;
-        const target = document.getElementById(id);
-        if (!target) return null;
-        if (target.classList.contains("reveal")) target.classList.add("on");
-        target
-          .querySelectorAll(".reveal:not(.on)")
-          .forEach((el) => el.classList.add("on"));
-        return target;
+      // ── Jump to a target. Lenis owns the scroll on every page, so
+      // hand the jump to Lenis there. The reduced-motion path keeps the
+      // native jump. The type below names only the one method this file calls.
+      interface LenisLike {
+        scrollTo: (
+          target: Element | number,
+          opts?: { immediate?: boolean },
+        ) => void;
+      }
+      const jumpToTarget = (target: Element) => {
+        const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+        if (lenis) lenis.scrollTo(target, { immediate: true });
+        else target.scrollIntoView({ behavior: "instant", block: "start" });
       };
+
+      // ── The target of a jump. Do not reveal the section here. The observer
+      // reveals it after the landing, in the same staggered order as a
+      // scroll. After a page change the observer waits for the page fade.
+      const findSection = (id: string) =>
+        id ? document.getElementById(id) : null;
 
       // ClientRouter owns scroll restoration, so the browser does not jump to
       // the section on a reload. Do that jump here.
@@ -157,20 +347,17 @@ const canonical = Astro.site
         const id = decodeURIComponent(window.location.hash.slice(1));
         if (!id) return;
 
-        const target = revealSection(id);
+        const target = findSection(id);
         if (!target) return;
 
         requestAnimationFrame(() => {
-          target.scrollIntoView({ behavior: "instant", block: "start" });
+          window.dispatchEvent(new Event("rockcruit:show-bar"));
+          jumpToTarget(target);
           startJump();
         });
       });
 
-      // Same-page hash links (the CTAs, "Hire With Us", "Open Positions") are
-      // plain anchors: the browser jumps natively and CSS scroll-behavior makes
-      // that a multi-second smooth glide down the page, with the target only
-      // revealing at the end. Intercept them — reveal the target and jump to it
-      // instantly — so any navigation lands rendered in one frame.
+      // Intercept same-page hash links for instant rendered jumps.
       document.addEventListener("click", (event) => {
         if (event.defaultPrevented) return;
         if (
@@ -182,9 +369,9 @@ const canonical = Astro.site
         )
           return;
 
-        const link = (event.target as Element)?.closest?.("a[href]") as
-          | HTMLAnchorElement
-          | null;
+        const link = (event.target as Element)?.closest?.(
+          "a[href]",
+        ) as HTMLAnchorElement | null;
         if (!link || link.target === "_blank") return;
 
         let url: URL;
@@ -194,34 +381,47 @@ const canonical = Astro.site
           return;
         }
         if (url.origin !== window.location.origin) return;
-        if (url.pathname !== window.location.pathname) return; // cross-page: let the router handle it
-        if (!url.hash || url.hash === "#") return;
+        if (url.pathname !== window.location.pathname) return; // cross-page: let router handle
+        if (url.search !== window.location.search) return;
+
+        if (!url.hash || url.hash === "#") {
+          event.preventDefault();
+          if (window.location.hash) {
+            history.pushState(history.state, "", url.pathname + url.search);
+          }
+          window.dispatchEvent(new Event("rockcruit:show-bar"));
+          const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+          if (lenis) lenis.scrollTo(0, { immediate: true });
+          else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          resetBelowFoldReveals();
+          startJump();
+          return;
+        }
 
         const id = decodeURIComponent(url.hash.slice(1));
-        const target = revealSection(id);
+        const target = findSection(id);
         if (!target) return;
 
         event.preventDefault();
         if (window.location.hash !== url.hash) {
-          history.pushState(history.state, "", url.pathname + url.search + url.hash);
+          history.pushState(
+            history.state,
+            "",
+            url.pathname + url.search + url.hash,
+          );
         }
-        target.scrollIntoView({ behavior: "instant", block: "start" });
+        window.dispatchEvent(new Event("rockcruit:show-bar"));
+        jumpToTarget(target);
         startJump();
       });
 
-      // A click on a same-page link also jumps, and CSS makes that jump smooth.
-      window.addEventListener("hashchange", () => {
-        revealSection(decodeURIComponent(window.location.hash.slice(1)));
-        startJump();
-      });
+      window.addEventListener("hashchange", startJump);
 
       const trimHashAtEnds = () => {
         if (!window.location.hash) return;
 
         const depth = window.scrollY;
 
-        // The jump still runs: it owns every move, and it sets the landing.
-        // A smooth jump takes many frames, so each move holds the jump open.
         const now = performance.now();
         if (now < settleUntil) {
           landingDepth = depth;
@@ -261,23 +461,74 @@ const canonical = Astro.site
         { passive: true },
       );
 
-      // ── Scroll reveals: fresh observer per page entry.
-      // astro:page-load fires on initial load AND after every navigation.
-      document.addEventListener("astro:page-load", () => {
-        const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry, i) => {
-              if (entry.isIntersecting) {
-                setTimeout(() => entry.target.classList.add("on"), i * 70);
-                io.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.06 },
-        );
+      const observePendingReveals = () => {
         document
-          .querySelectorAll(".reveal:not(.on)")
-          .forEach((el) => io.observe(el));
+          .querySelectorAll<HTMLElement>(REVEAL_SELECTOR)
+          .forEach((el) => {
+            if (!el.classList.contains("on")) revealObserver?.observe(el);
+          });
+      };
+
+      const resetBelowFoldReveals = () => {
+        const fold = window.innerHeight;
+        document
+          .querySelectorAll<HTMLElement>(REVEAL_SELECTOR)
+          .forEach((el) => {
+            const documentTop = el.getBoundingClientRect().top + window.scrollY;
+            if (documentTop < fold) return;
+            el.classList.remove("on");
+            el.style.removeProperty("--reveal-index");
+          });
+        observePendingReveals();
+      };
+
+      // Create one observer for each page entry.
+      document.addEventListener("astro:page-load", () => {
+        revealObserver?.disconnect();
+        revealObserver = new IntersectionObserver(
+          (entries) => {
+            const visible = entries
+              .filter((entry) => entry.isIntersecting)
+              // Top to bottom. Blocks on one row keep the page order, left
+              // to right, because the observer gives no order for them.
+              .sort(
+                (a, b) =>
+                  a.boundingClientRect.top - b.boundingClientRect.top ||
+                  (a.target.compareDocumentPosition(b.target) &
+                  Node.DOCUMENT_POSITION_FOLLOWING
+                    ? -1
+                    : 1),
+              );
+
+            visible.forEach((entry) => {
+              revealObserver?.unobserve(entry.target);
+            });
+
+            const revealVisible = () => {
+              visible.forEach((entry, i) => {
+                (entry.target as HTMLElement).style.setProperty(
+                  "--reveal-index",
+                  String(i),
+                );
+                entry.target.classList.add("on");
+              });
+            };
+
+            if (
+              document.documentElement.hasAttribute("data-astro-transition")
+            ) {
+              document.addEventListener(
+                "rockcruit:transition-end",
+                revealVisible,
+                { once: true },
+              );
+            } else {
+              revealVisible();
+            }
+          },
+          { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
+        );
+        observePendingReveals();
       });
     </script>
   </body>

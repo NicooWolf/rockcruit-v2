@@ -3,6 +3,7 @@
 // Reuses the home page's accordion pattern with faq-* classes. Every answer is
 // grounded in facts already published on the prototypes — nothing invented.
 import Layout from "../layouts/Layout.astro";
+import HeroWave from "../components/HeroWave.astro";
 import { href } from "../lib/url";
 
 const faqs = [
@@ -45,14 +46,15 @@ const faqs = [
   title="FAQ — Rockcruit"
   description="Common questions about working with Rockcruit: speed to first candidate, Contingency vs RaaS, pricing model, roles covered, and how to start."
 >
-  <div class="page-hero reveal">
+  <div class="page-hero">
+    <HeroWave first="violet-dark" second="violet" />
     <div class="page-hero-glow"></div>
-    <div class="page-hero-label">Questions, answered straight</div>
-    <h1 class="page-hero-h">
-      <span>BEFORE YOU</span>
-      <span class="dim">ASK.</span>
+    <div class="page-hero-label reveal">Questions, answered straight</div>
+    <h1 class="page-hero-h reveal">
+      <span class="mask-line"><span class="mask-inner">BEFORE YOU</span></span>
+      <span class="mask-line"><span class="mask-inner g">ASK.</span></span>
     </h1>
-    <p class="page-hero-sub">
+    <p class="page-hero-sub reveal">
       The things every company asks in the first call — answered here so your
       first call can go deeper. <strong
         >Anything missing? The first conversation is free.</strong
@@ -77,11 +79,13 @@ const faqs = [
     }
   </section>
 
-  <section class="faq-cta reveal">
-    <p class="faq-cta-line">
+  <section class="faq-cta">
+    <p class="faq-cta-line reveal">
       Still deciding?<br /><strong>Twenty minutes usually settles it.</strong>
     </p>
-    <a href={href("/#contact")} class="btn-primary">Ask us directly →</a>
+    <div class="reveal faq-cta-btn">
+      <a href={href("/#contact")} class="btn-primary">Ask us directly →</a>
+    </div>
   </section>
 </Layout>
 
@@ -123,8 +127,8 @@ const faqs = [
   .page-hero-h span {
     display: block;
   }
-  .page-hero-h .dim {
-    color: rgba(240, 237, 227, 0.2);
+  .page-hero-h .g {
+    color: var(--green);
   }
   .page-hero-sub {
     font-size: 0.95rem;
@@ -149,7 +153,7 @@ const faqs = [
   }
   .faq-btn {
     width: 100%;
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     display: grid;
@@ -159,9 +163,13 @@ const faqs = [
     padding: 2rem 5%;
     text-align: left;
     transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .faq-btn:hover {
-    background: rgba(255, 255, 255, 0.03);
+  /* Touch keeps :hover after a tap. Hover paint is for a fine pointer only. */
+  @media (hover: hover) and (pointer: fine) {
+    .faq-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
   .faq-item.open .faq-btn {
     background: rgba(255, 255, 255, 0.04);
@@ -209,7 +217,7 @@ const faqs = [
   .faq-body {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.45s ease;
+    transition: max-height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .faq-body-inner {
     padding: 0.5rem 5% 2rem calc(5% + 80px + 2rem);
@@ -240,6 +248,11 @@ const faqs = [
     color: var(--paper);
     font-weight: 400;
   }
+  /* The .reveal box clips paint. That cut the button lift on hover. Release
+     the clip for this box only. */
+  .faq-cta-btn {
+    contain: none;
+  }
   .btn-primary {
     background: var(--green);
     color: var(--ink);
@@ -248,6 +261,9 @@ const faqs = [
     padding: 0.85rem 2rem;
     border-radius: 4px;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     transition:
       background 0.2s,
       transform 0.2s;
@@ -271,14 +287,22 @@ const faqs = [
 
 <script>
   // FAQ accordion — same delegation pattern as the home page (ClientRouter-safe).
+  // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
   document.addEventListener("click", (e) => {
-    const btn = (e.target as Element).closest?.(".faq-btn");
-    if (!btn) return;
-    const item = btn.closest(".faq-item");
-    const wasOpen = item?.classList.contains("open");
+    const target = e.target as Element;
+    const btn = target.closest?.(".faq-btn");
+    if (btn) {
+      const item = btn.closest(".faq-item");
+      const wasOpen = item?.classList.contains("open");
+      document
+        .querySelectorAll(".faq-item")
+        .forEach((i) => i.classList.remove("open"));
+      if (!wasOpen) item?.classList.add("open");
+      return;
+    }
+    if (target.closest?.(".faq-item.open")) return;
     document
-      .querySelectorAll(".faq-item")
+      .querySelectorAll(".faq-item.open")
       .forEach((i) => i.classList.remove("open"));
-    if (!wasOpen) item?.classList.add("open");
   });
 </script>

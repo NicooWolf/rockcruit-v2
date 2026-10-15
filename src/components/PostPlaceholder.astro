@@ -1,0 +1,605 @@
+---
+// src/components/PostPlaceholder.astro — the default image for a post with
+// no WordPress photo. The Rockcruit rocket flies through deep space past a
+// ringed planet, a moon, meteors, and asteroids.
+// - The rocket is the brand path from src/assets/icons/rocket-white-icon.svg.
+// - Every color comes from a brand token through a CSS class. No SVG
+//   attribute holds a color.
+// - The `seed` prop (the post slug) moves the stars and the rocks, so two
+//   posts without a photo do not look the same.
+// - The element ids get the same seed as a prefix. A page can show more
+//   than one placeholder, and an id must be unique on the page.
+
+interface Props {
+  seed: string;
+}
+
+const { seed } = Astro.props;
+
+// A small seeded random generator (mulberry32), so each build gives the
+// same picture for the same post.
+let h = 2166136261;
+for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+let state = h >>> 0;
+const rand = () => {
+  state = (state + 0x6d2b79f5) >>> 0;
+  let t = state;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+const between = (a: number, b: number) => a + rand() * (b - a);
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+const id = `pp${(h >>> 0).toString(36)}`;
+const ref = (name: string) => `url(#${id}-${name})`;
+
+// ── Stars ── Most are small and dim. A few carry a color. A few twinkle.
+const stars = Array.from({ length: 170 }, () => {
+  const tint = rand();
+  const size = rand();
+  return {
+    x: r1(between(0, 1600)),
+    y: r1(between(0, 900)),
+    r: r1(size < 0.7 ? between(0.5, 1.1) : size < 0.95 ? between(1.1, 1.7) : between(1.7, 2.4)),
+    o: r1(between(0.25, 0.9)),
+    tone: tint < 0.1 ? "violet" : tint < 0.17 ? "green" : "paper",
+    twinkle: rand() < 0.12,
+    delay: r1(between(0, 5)),
+  };
+});
+
+// Bright stars get a thin four-point flare. The flare is thin, not a glow.
+const flares = Array.from({ length: 6 }, () => ({
+  x: r1(between(80, 1520)),
+  y: r1(between(60, 840)),
+  s: r1(between(7, 14)),
+}));
+
+// ── Rocks ── An irregular closed shape: points around a center with a
+// random radius, joined by smooth curves through the mid points.
+const rock = (cx: number, cy: number, r: number) => {
+  const n = 9;
+  const pts = Array.from({ length: n }, (_, i) => {
+    const a = (i / n) * Math.PI * 2 + between(-0.2, 0.2);
+    const d = r * between(0.72, 1.08);
+    return [cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.86];
+  });
+  const mid = (p: number[], q: number[]) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+  const start = mid(pts[n - 1], pts[0]);
+  let d = `M${r1(start[0])} ${r1(start[1])}`;
+  pts.forEach((p, i) => {
+    const m = mid(p, pts[(i + 1) % n]);
+    d += ` Q${r1(p[0])} ${r1(p[1])} ${r1(m[0])} ${r1(m[1])}`;
+  });
+  const craters = Array.from({ length: r > 18 ? 3 : 1 }, () => ({
+    x: r1(cx + between(-0.4, 0.4) * r),
+    y: r1(cy + between(-0.35, 0.35) * r),
+    r: r1(r * between(0.1, 0.2)),
+  }));
+  return { d: `${d} Z`, craters };
+};
+
+const asteroids = [
+  rock(between(1400, 1480), between(720, 790), 24),
+  rock(between(120, 170), between(360, 420), 15),
+  rock(between(740, 800), between(800, 840), 11),
+  rock(between(1020, 1080), between(560, 600), 7),
+];
+
+// The meteor heads are rocks too. Each tail points back along its path.
+const meteors = [
+  { head: rock(520, 232, 13), tail: "M512 226 L742 78 L746 86 L527 240 Z" },
+  { head: rock(1372, 648, 9), tail: "M1366 643 L1540 522 L1543 528 L1378 654 Z" },
+  { head: rock(985, 762, 4), tail: "M982 760 L1086 694 L1088 698 L988 765 Z" },
+];
+
+// The brand rocket (rocket-white-icon.svg, 50 x 29 units). The even-odd rule
+// cuts the three portholes out of the body.
+const ROCKET =
+  "M31.2211 8.36928C37.6182 8.36928 43.8779 10.1419 49.24 13.4719C49.6524 13.7278 49.6524 14.3316 49.24 14.5876C43.8779 17.9175 37.6182 19.6902 31.2211 19.6902H19.0817C16.7718 21.8965 10.3963 28.0598 10.3963 28.0598H2.4427L8.07757 19.0757L4.82279 18.1336V9.92591L7.9717 9.01457L2.31743 0H10.271C10.271 0 16.6465 6.16328 18.9565 8.36928H31.2211ZM18.4147 13.9832C18.389 15.3747 19.5177 16.5081 20.9034 16.4823C22.2097 16.4577 23.2754 15.3876 23.2995 14.0763C23.3252 12.6847 22.1965 11.5514 20.8107 11.5772C19.5045 11.6017 18.4388 12.6719 18.4147 13.9832ZM25.5236 13.9832C25.4979 15.3747 26.6266 16.5081 28.0124 16.4823C29.3186 16.4577 30.3843 15.3876 30.4085 14.0763C30.4341 12.6847 29.3055 11.5514 27.9197 11.5772C26.6135 11.6017 25.5477 12.6719 25.5236 13.9832ZM32.6326 13.9832C32.6069 15.3747 33.7356 16.5081 35.1213 16.4823C36.4276 16.4577 37.4933 15.3876 37.5174 14.0763C37.5431 12.6847 36.4144 11.5514 35.0286 11.5772C33.7224 11.6017 32.6567 12.6719 32.6326 13.9832ZM1.94165 9.14005L3.88331 9.89477V18.1653L1.94165 18.92H0V9.14005H1.94165Z";
+const PORTHOLES = [20.86, 27.97, 35.08];
+
+// Planet geometry. The ring is drawn in two halves: the back half before
+// the planet, the front half after it.
+const P = { x: 1210, y: 300, r: 165 };
+const RINGS = [
+  { rx: 238, ry: 56, w: 6, tone: "paper", o: 0.14 },
+  { rx: 262, ry: 62, w: 16, tone: "violet-light", o: 0.3 },
+  { rx: 286, ry: 68, w: 7, tone: "paper", o: 0.22 },
+  { rx: 304, ry: 72, w: 3, tone: "violet-light", o: 0.2 },
+  { rx: 322, ry: 76, w: 9, tone: "paper", o: 0.1 },
+];
+const BANDS = [
+  { y: -110, h: 22, tone: "violet-light", o: 0.12 },
+  { y: -70, h: 14, tone: "violet-dark", o: 0.35 },
+  { y: -40, h: 30, tone: "violet-light", o: 0.08 },
+  { y: 5, h: 18, tone: "violet-dark", o: 0.3 },
+  { y: 40, h: 10, tone: "paper", o: 0.06 },
+  { y: 70, h: 26, tone: "violet-dark", o: 0.28 },
+  { y: 112, h: 12, tone: "violet-light", o: 0.1 },
+];
+---
+
+<svg
+  class="pp"
+  viewBox="0 0 1600 900"
+  preserveAspectRatio="xMidYMid slice"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <radialGradient id={`${id}-space`} cx="0.5" cy="0.45" r="0.75">
+      <stop class="s-surface" offset="0"></stop>
+      <stop class="s-base" offset="1"></stop>
+    </radialGradient>
+    <radialGradient id={`${id}-nebula-v`} cx="0.72" cy="0.3" r="0.5">
+      <stop class="s-violet-dark" offset="0" stop-opacity="0.32"></stop>
+      <stop class="s-violet-dark" offset="0.55" stop-opacity="0.1"></stop>
+      <stop class="s-violet-dark" offset="1" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id={`${id}-nebula-g`} cx="0.15" cy="0.85" r="0.45">
+      <stop class="s-green" offset="0" stop-opacity="0.08"></stop>
+      <stop class="s-green" offset="1" stop-opacity="0"></stop>
+    </radialGradient>
+    <linearGradient id={`${id}-band`} x1="0" y1="0" x2="1" y2="1">
+      <stop class="s-paper" offset="0" stop-opacity="0"></stop>
+      <stop class="s-paper" offset="0.5" stop-opacity="0.035"></stop>
+      <stop class="s-paper" offset="1" stop-opacity="0"></stop>
+    </linearGradient>
+    <radialGradient id={`${id}-galaxy`}>
+      <stop class="s-paper" offset="0" stop-opacity="0.4"></stop>
+      <stop class="s-violet-light" offset="0.4" stop-opacity="0.12"></stop>
+      <stop class="s-violet-light" offset="1" stop-opacity="0"></stop>
+    </radialGradient>
+
+    <!-- Planet: the light comes from the upper left. -->
+    <radialGradient id={`${id}-planet`} cx="0.34" cy="0.3" r="0.78">
+      <stop class="s-violet-light" offset="0"></stop>
+      <stop class="s-violet" offset="0.38"></stop>
+      <stop class="s-violet-dark" offset="0.78"></stop>
+      <stop class="s-base" offset="1"></stop>
+    </radialGradient>
+    <radialGradient id={`${id}-night`} cx="0.78" cy="0.8" r="0.75">
+      <stop class="s-base" offset="0" stop-opacity="0.92"></stop>
+      <stop class="s-base" offset="0.55" stop-opacity="0.55"></stop>
+      <stop class="s-base" offset="1" stop-opacity="0"></stop>
+    </radialGradient>
+    <clipPath id={`${id}-planet-clip`}>
+      <circle cx={P.x} cy={P.y} r={P.r}></circle>
+    </clipPath>
+    <!-- These two clips live in the tilted ring frame. -->
+    <clipPath id={`${id}-ring-back`}>
+      <rect x={P.x - 400} y={P.y - 120} width="800" height="120"></rect>
+    </clipPath>
+    <clipPath id={`${id}-ring-front`}>
+      <rect x={P.x - 400} y={P.y} width="800" height="120"></rect>
+    </clipPath>
+
+    <!-- Moon: the light comes from the upper right. -->
+    <radialGradient id={`${id}-moon`} cx="0.66" cy="0.3" r="0.8">
+      <stop class="s-green-light" offset="0"></stop>
+      <stop class="s-green" offset="0.4"></stop>
+      <stop class="s-surface" offset="0.95"></stop>
+    </radialGradient>
+    <radialGradient id={`${id}-dwarf`} cx="0.35" cy="0.3" r="0.8">
+      <stop class="s-violet-light" offset="0"></stop>
+      <stop class="s-base" offset="1"></stop>
+    </radialGradient>
+
+    <linearGradient id={`${id}-rock`} x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop class="s-paper3" offset="0"></stop>
+      <stop class="s-muted" offset="0.45"></stop>
+      <stop class="s-ink2" offset="1"></stop>
+    </linearGradient>
+    <linearGradient id={`${id}-tail`} x1="0" y1="1" x2="1" y2="0">
+      <stop class="s-paper" offset="0" stop-opacity="0.55"></stop>
+      <stop class="s-violet-light" offset="0.35" stop-opacity="0.2"></stop>
+      <stop class="s-violet-light" offset="1" stop-opacity="0"></stop>
+    </linearGradient>
+
+    <!-- Rocket body: lit on top, shaded below, for volume. -->
+    <linearGradient id={`${id}-hull`} x1="0" y1="0" x2="0" y2="1">
+      <stop class="s-paper" offset="0"></stop>
+      <stop class="s-paper" offset="0.42"></stop>
+      <stop class="s-paper3" offset="0.68"></stop>
+      <stop class="s-muted" offset="1"></stop>
+    </linearGradient>
+    <radialGradient id={`${id}-window`} cx="0.35" cy="0.35" r="0.7">
+      <stop class="s-green-light" offset="0"></stop>
+      <stop class="s-green" offset="0.6"></stop>
+      <stop class="s-violet-dark" offset="1"></stop>
+    </radialGradient>
+    <linearGradient id={`${id}-flame-out`} x1="1" y1="0" x2="0" y2="0">
+      <stop class="s-violet" offset="0" stop-opacity="0.8"></stop>
+      <stop class="s-violet" offset="1" stop-opacity="0"></stop>
+    </linearGradient>
+    <linearGradient id={`${id}-flame-mid`} x1="1" y1="0" x2="0" y2="0">
+      <stop class="s-green" offset="0"></stop>
+      <stop class="s-green" offset="1" stop-opacity="0"></stop>
+    </linearGradient>
+    <linearGradient id={`${id}-flame-core`} x1="1" y1="0" x2="0" y2="0">
+      <stop class="s-paper" offset="0"></stop>
+      <stop class="s-green-light" offset="0.5"></stop>
+      <stop class="s-green-light" offset="1" stop-opacity="0"></stop>
+    </linearGradient>
+    <linearGradient id={`${id}-trail`} x1="1" y1="0" x2="0" y2="0">
+      <stop class="s-paper" offset="0" stop-opacity="0.22"></stop>
+      <stop class="s-paper" offset="1" stop-opacity="0"></stop>
+    </linearGradient>
+
+    <radialGradient id={`${id}-vignette`} cx="0.5" cy="0.5" r="0.72">
+      <stop class="s-base" offset="0.55" stop-opacity="0"></stop>
+      <stop class="s-base" offset="1" stop-opacity="0.65"></stop>
+    </radialGradient>
+  </defs>
+
+  <!-- Deep space -->
+  <rect width="1600" height="900" fill={ref("space")}></rect>
+  <rect width="1600" height="900" fill={ref("nebula-v")}></rect>
+  <rect width="1600" height="900" fill={ref("nebula-g")}></rect>
+  <ellipse
+    cx="800"
+    cy="450"
+    rx="1000"
+    ry="150"
+    transform="rotate(-24 800 450)"
+    fill={ref("band")}></ellipse>
+  <ellipse
+    cx="410"
+    cy="160"
+    rx="46"
+    ry="12"
+    transform="rotate(-20 410 160)"
+    fill={ref("galaxy")}></ellipse>
+
+  <g class="stars">
+    {
+      stars.map((s) => (
+        <circle
+          class:list={[`f-${s.tone}`, { twinkle: s.twinkle }]}
+          cx={s.x}
+          cy={s.y}
+          r={s.r}
+          opacity={s.o}
+          style={s.twinkle ? `animation-delay:-${s.delay}s` : undefined}
+        />
+      ))
+    }
+    {
+      flares.map((f) => (
+        <path
+          class="f-paper"
+          opacity="0.75"
+          d={`M${f.x} ${f.y - f.s} L${f.x + 0.8} ${f.y - 0.8} L${f.x + f.s} ${f.y} L${f.x + 0.8} ${f.y + 0.8} L${f.x} ${f.y + f.s} L${f.x - 0.8} ${f.y + 0.8} L${f.x - f.s} ${f.y} L${f.x - 0.8} ${f.y - 0.8} Z`}
+        />
+      ))
+    }
+  </g>
+
+  <!-- Far dwarf planet -->
+  <circle cx="868" cy="150" r="13" fill={ref("dwarf")}></circle>
+
+  <!-- Ringed planet: back ring, planet, front ring -->
+  <g transform={`rotate(-18 ${P.x} ${P.y})`}>
+    <g clip-path={ref("ring-back")}>
+      {
+        RINGS.map((ring) => (
+          <ellipse
+            class={`k-${ring.tone}`}
+            cx={P.x}
+            cy={P.y}
+            rx={ring.rx}
+            ry={ring.ry}
+            fill="none"
+            stroke-width={ring.w}
+            stroke-opacity={ring.o * 0.7}
+          />
+        ))
+      }
+    </g>
+  </g>
+  <circle cx={P.x} cy={P.y} r={P.r} fill={ref("planet")}></circle>
+  <g clip-path={ref("planet-clip")}>
+    <g transform={`rotate(-18 ${P.x} ${P.y})`}>
+      {
+        BANDS.map((b) => (
+          <rect
+            class={`f-${b.tone}`}
+            x={P.x - P.r - 10}
+            y={P.y + b.y}
+            width={P.r * 2 + 20}
+            height={b.h}
+            opacity={b.o}
+          />
+        ))
+      }
+      <ellipse
+        class="f-violet-light"
+        cx={P.x + 52}
+        cy={P.y + 50}
+        rx="26"
+        ry="11"
+        opacity="0.22"></ellipse>
+      <ellipse
+        class="f-violet-dark"
+        cx={P.x + 52}
+        cy={P.y + 50}
+        rx="15"
+        ry="6"
+        opacity="0.5"></ellipse>
+      <!-- The ring casts a thin shadow on the planet. -->
+      <ellipse
+        class="k-base"
+        cx={P.x}
+        cy={P.y + 14}
+        rx="262"
+        ry="62"
+        fill="none"
+        stroke-width="10"
+        stroke-opacity="0.45"></ellipse>
+    </g>
+    <circle cx={P.x} cy={P.y} r={P.r} fill={ref("night")}></circle>
+  </g>
+  <circle
+    class="k-violet-light"
+    cx={P.x}
+    cy={P.y}
+    r={P.r - 0.5}
+    fill="none"
+    stroke-width="1.5"
+    stroke-opacity="0.35"></circle>
+  <g transform={`rotate(-18 ${P.x} ${P.y})`}>
+    <g clip-path={ref("ring-front")}>
+      {
+        RINGS.map((ring) => (
+          <ellipse
+            class={`k-${ring.tone}`}
+            cx={P.x}
+            cy={P.y}
+            rx={ring.rx}
+            ry={ring.ry}
+            fill="none"
+            stroke-width={ring.w}
+            stroke-opacity={ring.o}
+          />
+        ))
+      }
+    </g>
+  </g>
+
+  <!-- Green moon with craters -->
+  <g>
+    <circle cx="300" cy="700" r="58" fill={ref("moon")}></circle>
+    <circle class="f-base" cx="318" cy="684" r="9" opacity="0.22"></circle>
+    <circle class="f-base" cx="282" cy="712" r="13" opacity="0.2"></circle>
+    <circle class="f-base" cx="322" cy="728" r="6" opacity="0.25"></circle>
+    <circle class="f-green-light" cx="279" cy="709" r="13" opacity="0.08"></circle>
+    <circle
+      class="k-green-light"
+      cx="300"
+      cy="700"
+      r="57.5"
+      fill="none"
+      stroke-width="1"
+      stroke-opacity="0.3"></circle>
+  </g>
+
+  <!-- Meteors -->
+  {
+    meteors.map((m) => (
+      <g>
+        <path d={m.tail} fill={ref("tail")} />
+        <path d={m.head.d} fill={ref("rock")} />
+        {m.head.craters.map((c) => (
+          <circle class="f-ink2" cx={c.x} cy={c.y} r={c.r} opacity="0.6" />
+        ))}
+      </g>
+    ))
+  }
+
+  <!-- Asteroids -->
+  {
+    asteroids.map((a) => (
+      <g>
+        <path d={a.d} fill={ref("rock")} />
+        {a.craters.map((c) => (
+          <circle class="f-ink2" cx={c.x} cy={c.y} r={c.r} opacity="0.55" />
+        ))}
+      </g>
+    ))
+  }
+
+  <!-- The Rockcruit rocket, nose up and to the right -->
+  <g transform="translate(470 452) rotate(-14) scale(5.4)">
+    <g class="rocket">
+      <!-- Exhaust trail -->
+      <g opacity="0.9">
+        <rect x="-70" y="12.6" width="62" height="0.5" fill={ref("trail")}></rect>
+        <rect x="-58" y="15.6" width="50" height="0.4" fill={ref("trail")}></rect>
+        <rect x="-46" y="10.2" width="34" height="0.3" fill={ref("trail")}></rect>
+        <rect x="-40" y="18.4" width="28" height="0.3" fill={ref("trail")}></rect>
+        <circle class="f-paper" cx="-30" cy="14.2" r="2.6" opacity="0.04"></circle>
+        <circle class="f-paper" cx="-42" cy="13.4" r="3.4" opacity="0.03"></circle>
+      </g>
+      <!-- Flame -->
+      <g class="flame">
+        <path
+          d="M0 9.4C-6 9.9-16 12.4-27 14.5C-16 16.6-6 19.1 0 19.6Z"
+          fill={ref("flame-out")}></path>
+        <path
+          d="M0 11C-5 11.5-11 13.2-17.5 14.5C-11 15.8-5 17.5 0 18Z"
+          fill={ref("flame-mid")}></path>
+        <path
+          d="M0 12.6C-3 13-6.2 14-9.5 14.5C-6.2 15-3 16 0 16.4Z"
+          fill={ref("flame-core")}></path>
+      </g>
+      <!-- Lit portholes behind the cut-outs -->
+      {
+        PORTHOLES.map((x) => (
+          <circle cx={x} cy="14.03" r="2.5" fill={ref("window")} />
+        ))
+      }
+      <path d={ROCKET} fill={ref("hull")} fill-rule="evenodd"></path>
+      <!-- Panel seams: where the fins join, the cabin ends, and the nose cap starts -->
+      <path
+        class="k-muted"
+        d="M19.3 8.7V19.4M31.6 8.7V19.4M43.6 11.2Q44.9 14.03 43.6 16.9"
+        fill="none"
+        stroke-width="0.22"
+        stroke-opacity="0.55"></path>
+      <!-- A thin edge light along the top of the hull -->
+      <path
+        class="k-paper"
+        d="M19.2 8.6H31.2C37.4 8.6 43.5 10.3 48.8 13.5"
+        fill="none"
+        stroke-width="0.25"
+        stroke-opacity="0.9"></path>
+      {
+        PORTHOLES.map((x) => (
+          <circle
+            class="f-paper"
+            cx={x - 0.8}
+            cy="13.2"
+            r="0.45"
+            opacity="0.7"
+          />
+        ))
+      }
+    </g>
+  </g>
+
+  <rect width="1600" height="900" fill={ref("vignette")}></rect>
+</svg>
+
+<style>
+  .pp {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Gradient stops */
+  .s-base {
+    stop-color: var(--bg-base);
+  }
+  .s-surface {
+    stop-color: var(--bg-surface);
+  }
+  .s-paper {
+    stop-color: var(--paper);
+  }
+  .s-paper3 {
+    stop-color: var(--paper3);
+  }
+  .s-muted {
+    stop-color: var(--muted);
+  }
+  .s-ink2 {
+    stop-color: var(--ink2);
+  }
+  .s-green {
+    stop-color: var(--green);
+  }
+  .s-green-light {
+    stop-color: var(--green-light);
+  }
+  .s-violet {
+    stop-color: var(--violet);
+  }
+  .s-violet-light {
+    stop-color: var(--violet-light);
+  }
+  .s-violet-dark {
+    stop-color: var(--violet-dark);
+  }
+
+  /* Fills */
+  .f-base {
+    fill: var(--bg-base);
+  }
+  .f-paper {
+    fill: var(--paper);
+  }
+  .f-ink2 {
+    fill: var(--ink2);
+  }
+  .f-green {
+    fill: var(--green-light);
+  }
+  .f-green-light {
+    fill: var(--green-light);
+  }
+  .f-violet {
+    fill: var(--violet-light);
+  }
+  .f-violet-light {
+    fill: var(--violet-light);
+  }
+  .f-violet-dark {
+    fill: var(--violet-dark);
+  }
+
+  /* Strokes */
+  .k-base {
+    stroke: var(--bg-base);
+  }
+  .k-paper {
+    stroke: var(--paper);
+  }
+  .k-muted {
+    stroke: var(--muted);
+  }
+  .k-green-light {
+    stroke: var(--green-light);
+  }
+  .k-violet-light {
+    stroke: var(--violet-light);
+  }
+
+  /* ── Motion ── slow and small. The rocket drifts, the flame breathes, a
+     few stars twinkle. */
+  .rocket {
+    animation: pp-drift 7s ease-in-out infinite;
+  }
+  .flame {
+    transform-box: fill-box;
+    transform-origin: 100% 50%;
+    animation: pp-flame 0.9s ease-in-out infinite alternate;
+  }
+  .twinkle {
+    animation: pp-twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes pp-drift {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(1.2px, -1.4px);
+    }
+  }
+  @keyframes pp-flame {
+    from {
+      transform: scaleX(0.9);
+    }
+    to {
+      transform: scaleX(1.06);
+    }
+  }
+  @keyframes pp-twinkle {
+    from {
+      opacity: 0.2;
+    }
+    to {
+      opacity: 0.95;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rocket,
+    .flame,
+    .twinkle {
+      animation: none;
+    }
+  }
+</style>

@@ -4,10 +4,10 @@
 const ENDPOINT =
   import.meta.env.WP_GRAPHQL_ENDPOINT ?? "https://rblog.rockcruit.com/graphql";
 
-// Build-time kill switch. Set WP_ENABLED=false to build without WordPress:
+// Build-time kill switch. Set BLOG_ENABLED=false to build without WordPress:
 // blog list renders its empty state, zero post pages generate, RSS is empty.
 // Any other value (or unset) = WP required, and failures still kill the build loudly.
-export const WP_ENABLED = import.meta.env.WP_ENABLED !== "false";
+export const BLOG_ENABLED = import.meta.env.BLOG_ENABLED !== "false";
 
 // ── Types ────────────────────────────────────────────────────────────────
 // The owner confirmed these ACF groups on rblog.rockcruit.com:
@@ -16,8 +16,16 @@ export const WP_ENABLED = import.meta.env.WP_ENABLED !== "false";
 //   Author group = authorFields (firstName, lastName, profilePhoto,
 //                               role, linkedin, email)
 // WPGraphQL-for-ACF exposes each snake_case field as camelCase.
-// TODO(ACF): the field list is still not final. Confirm categories, tags,
-// and media subfields (altText) before you rely on them.
+// Categories are the core WordPress taxonomy, not an ACF field. The owner
+// approved them for the blog filters on 2026-10-08.
+// TODO(ACF): the field list is still not final. Confirm tags and media
+// subfields (altText) before you rely on them.
+
+// One core WordPress category.
+export interface Category {
+  name: string;
+  slug: string;
+}
 
 // A WPGraphQL media field returns one connected node.
 export interface MediaField {
@@ -53,6 +61,7 @@ export interface Post {
   date: string; // ISO string from WP
   excerpt: string; // HTML
   content?: string; // HTML — fetched only for single posts
+  categories?: { nodes: Category[] } | null;
   postFields?: PostFields;
 }
 
@@ -65,6 +74,8 @@ async function gql<T>(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
+    // A hung WordPress host must fail the build, not stall it.
+    signal: AbortSignal.timeout(30_000),
   });
   if (!res.ok) {
     // Fail the BUILD loudly: a failed deploy you get notified about beats a
@@ -81,6 +92,7 @@ async function gql<T>(
 // One place holds the ACF selection. Both queries reuse it. A field change
 // happens here one time. (See the old Apollo GET_ALL_POSTS query for the shape.)
 const POST_FIELDS_SELECTION = `
+  categories { nodes { name slug } }
   postFields {
     subtitle
     description
@@ -105,7 +117,7 @@ const POST_FIELDS_SELECTION = `
 
 // ── Public API ───────────────────────────────────────────────────────────
 export async function getAllPosts(): Promise<Post[]> {
-  if (!WP_ENABLED) return [];
+  if (!BLOG_ENABLED) return [];
   const data = await gql<{ posts: { nodes: Post[] } }>(`
     query AllPosts {
       posts(where: { status: PUBLISH }, first: 100) {
@@ -125,7 +137,7 @@ export async function getAllPosts(): Promise<Post[]> {
 // when the post count approaches it. Not before (speculative abstraction).
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  if (!WP_ENABLED) return null;
+  if (!BLOG_ENABLED) return null;
   const data = await gql<{ post: Post | null }>(
     `
     query PostBySlug($slug: ID!) {

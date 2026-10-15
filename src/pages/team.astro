@@ -3,24 +3,31 @@
 // Built in the established design system; copy grounded in v1's AboutUs section
 // ("Specialized Knowledge" + domain list). The typewriter effect is dropped per
 // CLAUDE.md animation non-goals — domains render as a static mono list.
-// TODO(team): add the photos of the members. The names and the roles are real.
 import Layout from "../layouts/Layout.astro";
+import HeroWave from "../components/HeroWave.astro";
 import { href } from "../lib/url";
+import profileJulieta from "../assets/images/profile_julieta.webp";
+import profileAgustina from "../assets/images/profile_agustina.webp";
 ---
 
 <Layout
   title="Team — Rockcruit"
   description="The people behind Rockcruit — tech headhunters with years of experience identifying and attracting top technical talent across LATAM."
 >
-  <div class="page-hero reveal">
+  <div class="page-hero">
+    <HeroWave first="green-light" second="violet-light" />
     <div class="page-hero-glow"></div>
-    <div class="page-hero-label">Who you'll work with</div>
-    <h1 class="page-hero-h">
-      <span>RECRUITERS WHO</span>
-      <span>ACTUALLY KNOW</span>
-      <span class="dim">TECH.</span>
+    <div class="page-hero-label reveal">Who you'll work with</div>
+    <h1 class="page-hero-h reveal">
+      <span class="mask-line"
+        ><span class="mask-inner">RECRUITERS WHO</span></span
+      >
+      <span class="mask-line"
+        ><span class="mask-inner">ACTUALLY KNOW</span></span
+      >
+      <span class="mask-line"><span class="mask-inner v">TECH.</span></span>
     </h1>
-    <p class="page-hero-sub">
+    <p class="page-hero-sub reveal">
       With years of experience in the tech industry, we have honed our expertise
       in identifying and attracting top technical talent across various domains. <strong
         >Small team, senior judgment, zero hand-offs to juniors.</strong
@@ -33,7 +40,12 @@ import { href } from "../lib/url";
     <div class="domains-header reveal">
       <div class="d-eyebrow">Specialized knowledge</div>
       <h2 class="d-h2">
-        We recruit across<br /><em>every digital domain.</em>
+        <span class="mask-line"
+          ><span class="mask-inner">We recruit across</span></span
+        >
+        <span class="mask-line"
+          ><span class="mask-inner"><em>every digital domain.</em></span></span
+        >
       </h2>
     </div>
     <!-- The track holds the list two times. The animation moves it by one half,
@@ -60,11 +72,80 @@ import { href } from "../lib/url";
     </div>
   </section>
 
+  <!-- Members -->
+  <section class="members">
+    <div class="members-glow"></div>
+    <div class="members-header reveal">
+      <div class="d-eyebrow">The team</div>
+      <h2 class="d-h2">
+        <span class="mask-line"
+          ><span class="mask-inner">People, not <em>pipelines.</em></span></span
+        >
+      </h2>
+    </div>
+    <div class="members-grid">
+      <div class="member-card slide-left soft">
+        <div class="member-photo">
+          <img
+            src={profileJulieta.src}
+            alt="Julieta Wolf, Co-Founder of Rockcruit"
+            width={profileJulieta.width}
+            height={profileJulieta.height}
+            loading="lazy"
+            style="object-position: 62% 20%"
+          />
+        </div>
+        <div class="member-info">
+          <div class="member-name">Julieta Wolf</div>
+          <div class="member-role">Co-Founder</div>
+          <p class="member-bio">
+            Julieta is an expert in client partnership, search strategy, and
+            talent positioning. She leads commercial strategy, discovery, role
+            definition, and sourcing direction.
+          </p>
+          <p class="member-bio">
+            She works closely with clients to understand what they truly need,
+            what will work, and how to design a search process that attracts the
+            right talent.
+          </p>
+        </div>
+      </div>
+      <div class="member-card slide-right soft">
+        <div class="member-photo">
+          <img
+            src={profileAgustina.src}
+            alt="Agustina Valverde, Co-Founder of Rockcruit"
+            width={profileAgustina.width}
+            height={profileAgustina.height}
+            loading="lazy"
+            class="photo-agustina"
+          />
+        </div>
+        <div class="member-info">
+          <div class="member-name">Agustina Valverde</div>
+          <div class="member-role">Co-Founder</div>
+          <p class="member-bio">
+            Agustina specializes in strategic recruiting for commercial,
+            technical, and leadership roles. She has experience building teams
+            for startups and tech companies across multiple markets.
+          </p>
+          <p class="member-bio">
+            Within Rockcruit, she leads operations, process design, quality, and
+            candidate experience, ensuring every search runs with structure,
+            clarity, and consistency.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Who we are — accordion, mirrors the Home "diff" section -->
   <section class="story">
     <div class="story-header">
       <h2 class="story-h2 reveal">
-        Who we <em>are.</em>
+        <span class="mask-line"
+          ><span class="mask-inner">Who we <em>are.</em></span></span
+        >
       </h2>
       <p class="story-sub reveal">
         Two founders. Senior judgment. Zero hand-offs.
@@ -127,55 +208,16 @@ import { href } from "../lib/url";
     </div>
   </section>
 
-  <!-- Members -->
-  <section class="members">
-    <div class="members-glow"></div>
-    <div class="members-header reveal">
-      <div class="d-eyebrow">The team</div>
-      <h2 class="d-h2">People, not <em>pipelines.</em></h2>
-    </div>
-    <!-- TODO(team): photos. Swap the .member-av span for
-       <img src="/team/<name>.webp" alt="" /> when the photos exist. -->
-    <div class="members-grid">
-      <div class="member-card reveal">
-        <div class="member-av"><span>JW</span></div>
-        <div class="member-name">Julieta Wolf</div>
-        <div class="member-role">Co-Founder</div>
-        <p class="member-bio">
-          Julieta is an expert in client partnership, search strategy, and
-          talent positioning. She leads commercial strategy, discovery, role
-          definition, and sourcing direction.
-        </p>
-        <p class="member-bio">
-          She works closely with clients to understand what they truly need,
-          what will work, and how to design a search process that attracts the
-          right talent.
-        </p>
-      </div>
-      <div class="member-card reveal">
-        <div class="member-av"><span>AV</span></div>
-        <div class="member-name">Agustina Valverde</div>
-        <div class="member-role">Co-Founder</div>
-        <p class="member-bio">
-          Agustina specializes in strategic recruiting for commercial,
-          technical, and leadership roles. She has experience building teams for
-          startups and tech companies across multiple markets.
-        </p>
-        <p class="member-bio">
-          Within Rockcruit, she leads operations, process design, quality, and
-          candidate experience, ensuring every search runs with structure,
-          clarity, and consistency.
-        </p>
-      </div>
-    </div>
-  </section>
-
   <!-- CTA -->
-  <section class="team-cta reveal">
-    <p class="team-cta-line">
+  <section class="team-cta">
+    <p class="team-cta-line reveal">
       Want to know who'd run <strong>your</strong> search?
     </p>
-    <a href={href("/#contact")} class="btn-primary">Start the conversation →</a>
+    <div class="reveal team-cta-btn">
+      <a href={href("/#contact")} class="btn-primary"
+        >Start the conversation →</a
+      >
+    </div>
   </section>
 </Layout>
 
@@ -217,8 +259,8 @@ import { href } from "../lib/url";
   .page-hero-h span {
     display: block;
   }
-  .page-hero-h .dim {
-    color: rgba(240, 237, 227, 0.2);
+  .page-hero-h .v {
+    color: var(--violet);
   }
   .page-hero-sub {
     font-size: 0.95rem;
@@ -358,7 +400,7 @@ import { href } from "../lib/url";
   }
   .story-item-btn {
     width: 100%;
-    background: none;
+    background: transparent;
     border: none;
     cursor: pointer;
     display: grid;
@@ -368,9 +410,13 @@ import { href } from "../lib/url";
     padding: 2rem 5%;
     text-align: left;
     transition: background 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .story-item-btn:hover {
-    background: rgba(255, 255, 255, 0.03);
+  /* Touch keeps :hover after a tap. Hover paint is for a fine pointer only. */
+  @media (hover: hover) and (pointer: fine) {
+    .story-item-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
   .story-item.open .story-item-btn {
     background: rgba(255, 255, 255, 0.04);
@@ -502,47 +548,75 @@ import { href } from "../lib/url";
   }
   .members-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  @media (max-width: 768px) {
-    .members-grid {
-      grid-template-columns: 1fr;
-    }
-  }
   .member-card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1.5rem;
+    /* stretch: the photo takes the height of the text block, so its top edge
+       lines up with the name and its bottom edge with the last bio line. */
+    align-items: stretch;
     border: 1px solid var(--bdark);
     border-radius: 12px;
-    padding: 1.5rem 1.8rem;
+    padding: 1.25rem;
+    /* This scoped rule beats the global .slide-left.soft rule, so the reveal
+       transition (opacity, translate) must live here too. */
     transition:
       border-color 0.3s,
-      transform 0.3s;
+      transform 0.3s,
+      opacity 1.4s cubic-bezier(0.25, 1, 0.5, 1),
+      translate 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay:
+      0s, 0s, calc(var(--reveal-index, 0) * 100ms),
+      calc(var(--reveal-index, 0) * 100ms);
   }
   .member-card:hover {
     border-color: rgba(var(--violet-light-rgb), 0.3);
     transform: translateY(-4px);
   }
-  .member-av {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(var(--violet-light-rgb), 0.1);
-    border: 1px solid rgba(var(--violet-light-rgb), 0.25);
+  .member-photo {
+    height: 100%;
+    min-height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(var(--violet-light-rgb), 0.2);
+    background: var(--bg-card);
+  }
+  .member-photo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    filter: brightness(0.85);
+    transition: filter 0.4s ease;
+  }
+  .member-photo .photo-agustina {
+    object-position: 50% 15%;
+  }
+  /* On a phone the crop is narrow. Shift it right to center her. */
+  @media (max-width: 47.99em) {
+    .member-photo .photo-agustina {
+      object-position: 64% 15%;
+    }
+  }
+  .member-card:hover .member-photo img {
+    filter: brightness(1);
+  }
+  .member-info {
+    min-width: 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    margin-bottom: 1rem;
   }
-  .member-av span {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--violet-light);
-  }
+
   .member-name {
     font-family: var(--bebas);
     font-weight: 400;
     font-size: 1.5rem;
     letter-spacing: 0.03em;
+    line-height: 1;
     color: var(--paper);
   }
   .member-role {
@@ -551,7 +625,7 @@ import { href } from "../lib/url";
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--violet-light);
-    margin: 0.3rem 0 1rem;
+    margin: 0.4rem 0 0.9rem;
   }
   .member-bio {
     font-size: 0.84rem;
@@ -559,7 +633,24 @@ import { href } from "../lib/url";
     line-height: 1.75;
   }
   .member-bio + .member-bio {
-    margin-top: 0.9rem;
+    margin-top: 0.7rem;
+  }
+  /* Trims the half-leading under the last line so the text ends on the
+     photo's bottom edge. */
+  .member-bio:last-child {
+    margin-bottom: -0.3em;
+  }
+
+  @media (min-width: 48em) {
+    .member-card {
+      grid-template-columns: 150px 1fr;
+      padding: 1.5rem;
+    }
+  }
+  @media (min-width: 64em) {
+    .members-grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   .team-cta {
@@ -578,6 +669,11 @@ import { href } from "../lib/url";
   .team-cta-line strong {
     color: var(--paper);
     font-weight: 400;
+  }
+  /* The .reveal box clips paint. That cut the button lift on hover. Release
+     the clip for this box only. */
+  .team-cta-btn {
+    contain: none;
   }
   .btn-primary {
     background: var(--green);
@@ -608,14 +704,22 @@ import { href } from "../lib/url";
 
 <script>
   // Accordion — event delegation. It mirrors the Home "diff" section.
+  // A tap on a row button opens or closes that row. A tap anywhere else closes every row.
   document.addEventListener("click", (e) => {
-    const btn = (e.target as Element).closest?.(".story-item-btn");
-    if (!btn) return;
-    const item = btn.closest(".story-item");
-    const wasOpen = item?.classList.contains("open");
+    const target = e.target as Element;
+    const btn = target.closest?.(".story-item-btn");
+    if (btn) {
+      const item = btn.closest(".story-item");
+      const wasOpen = item?.classList.contains("open");
+      document
+        .querySelectorAll(".story-item")
+        .forEach((i) => i.classList.remove("open"));
+      if (!wasOpen) item?.classList.add("open");
+      return;
+    }
+    if (target.closest?.(".story-item.open")) return;
     document
-      .querySelectorAll(".story-item")
+      .querySelectorAll(".story-item.open")
       .forEach((i) => i.classList.remove("open"));
-    if (!wasOpen) item?.classList.add("open");
   });
 </script>
