@@ -1902,6 +1902,31 @@ const testimonials = [
     }
   }
 </style>
+    /* The two hero buttons share one row. Each has the same width and the
+       same height. The font shrinks a little on the narrowest screens, so the
+       longer text still fits in half of the row at 320px. */
+    .subhero-ctas {
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+    .subhero-ctas a {
+      flex: 1 1 0;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.7rem 0.5rem;
+      font-size: clamp(0.74rem, 3.5vw, 0.82rem);
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    /* The ghost button has a 1px border. This invisible border gives the
+       green button the same box, so the two widths match to the pixel. */
+    .subhero-ctas .btn-primary {
+      border: 1px solid transparent;
+    }
 
 <script>
   // Accordion — event delegation (survives ClientRouter navigations, never double-binds).
