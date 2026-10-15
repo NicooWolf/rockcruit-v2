@@ -222,14 +222,18 @@ const faqs = [
     transition: max-height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .faq-body-inner {
-    padding: 0.5rem 5% 2rem calc(5% + 80px + 2rem);
+    /* The right padding keeps the text clear of the icon column. The wide box
+       and text-wrap: balance give two even lines on a desktop screen. */
+    padding: 0.5rem calc(5% + 36px + 2rem) 2rem calc(5% + 80px + 2rem);
     font-size: 0.88rem;
     color: rgba(240, 237, 227, 0.45);
     line-height: 1.85;
-    max-width: 640px;
+    max-width: 1100px;
+    text-wrap: balance;
   }
   .faq-item.open .faq-body {
-    max-height: 300px;
+    /* The narrow text box on a phone needs more lines than before. */
+    max-height: 420px;
   }
 
   .faq-cta {
@@ -282,7 +286,9 @@ const faqs = [
       padding: 1.5rem 5%;
     }
     .faq-body-inner {
+      /* The right edge of the text meets the right edge of the icon. */
       padding: 0.5rem 5% 1.5rem calc(5% + 50px + 1rem);
+      text-wrap: pretty;
     }
   }
 </style>
