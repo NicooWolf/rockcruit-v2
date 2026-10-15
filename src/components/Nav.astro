@@ -998,11 +998,15 @@ const showBlog = BLOG_ENABLED;
       const target = document.getElementById(
         decodeURIComponent(url.hash.slice(1)),
       );
-      // Land instantly — a jump must not wait out a multi-second smooth
-      // scroll. The reveal observer in Layout.astro then reveals the section
-      // in the same staggered order as a scroll.
+      // The jump is smooth, through the sections on the way. Layout.astro
+      // gives the smooth jump. The reveal observer there shows each section
+      // in passing. Without it (reduced motion), the jump is instant.
+      const smoothJump = (
+        window as unknown as { __smoothJump?: (target: Element) => void }
+      ).__smoothJump;
       if (target) {
-        target.scrollIntoView({ behavior: "instant", block: "start" });
+        if (smoothJump) smoothJump(target);
+        else target.scrollIntoView({ behavior: "instant", block: "start" });
       }
 
       return true;

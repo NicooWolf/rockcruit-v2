@@ -331,7 +331,11 @@ const structuredData = [
       interface LenisLike {
         scrollTo: (
           target: Element | number,
-          opts?: { immediate?: boolean },
+          opts?: {
+            immediate?: boolean;
+            duration?: number;
+            easing?: (t: number) => number;
+          },
         ) => void;
       }
       const jumpToTarget = (target: Element) => {
@@ -339,6 +343,55 @@ const structuredData = [
         if (lenis) lenis.scrollTo(target, { immediate: true });
         else target.scrollIntoView({ behavior: "instant", block: "start" });
       };
+
+      // ── A smooth jump. The page scrolls through every section on the way,
+      // so the reveal observer shows each one in passing. The time grows with
+      // the distance, but stays between 0.9 and 2.4 seconds. A reader who asks
+      // for less motion has no Lenis, and gets the instant jump.
+      const SMOOTH_MIN = 0.9; // s
+      const SMOOTH_MAX = 2.4; // s
+      const SMOOTH_SPEED = 2200; // px per second, the pace of a long jump
+      // A jump after a page change starts fast and slows down until the form.
+      // The reader waited for the page, so the start is as quick as a short
+      // jump. The long tail of the curve gives the slow end.
+      const QUICK_MIN = 1.0; // s
+      const QUICK_MAX = 2.2; // s
+      const QUICK_SPEED = 3000; // px per second
+      const easeInOut = (t: number) =>
+        t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      // Exponential ease-out. The scale term makes it end exactly at 1.
+      const easeOutExpo = (t: number) =>
+        (1 - Math.pow(2, -10 * t)) / (1 - Math.pow(2, -10));
+
+      const smoothJumpToTarget = (target: Element, quick = false) => {
+        const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+        if (!lenis) {
+          target.scrollIntoView({ behavior: "instant", block: "start" });
+          return;
+        }
+        const distance = Math.abs(target.getBoundingClientRect().top);
+        const duration = quick
+          ? Math.min(QUICK_MAX, Math.max(QUICK_MIN, distance / QUICK_SPEED))
+          : Math.min(SMOOTH_MAX, Math.max(SMOOTH_MIN, distance / SMOOTH_SPEED));
+        lenis.scrollTo(target, {
+          duration,
+          easing: quick ? easeOutExpo : easeInOut,
+        });
+      };
+      // The Nav calls this for a link in the mobile menu.
+      (
+        window as unknown as { __smoothJump?: (target: Element) => void }
+      ).__smoothJump = smoothJumpToTarget;
+
+      // A page change that the router makes. A link to /#contact on another
+      // page then opens the new page at the top and scrolls down smoothly.
+      // A link to one of these sections, from another page, opens the new
+      // page at the top and scrolls down to it.
+      const SMOOTH_ARRIVAL_IDS = ["contact", "contingency", "raas"];
+      let arrivedByRouter = false;
+      document.addEventListener("astro:before-swap", () => {
+        arrivedByRouter = true;
+      });
 
       // ── The target of a jump. Do not reveal the section here. The observer
       // reveals it after the landing, in the same staggered order as a
@@ -351,11 +404,28 @@ const structuredData = [
       document.addEventListener("astro:page-load", () => {
         startJump();
 
+        const smoothArrival = arrivedByRouter;
+        arrivedByRouter = false;
+
         const id = decodeURIComponent(window.location.hash.slice(1));
         if (!id) return;
 
         const target = findSection(id);
         if (!target) return;
+
+        if (smoothArrival && SMOOTH_ARRIVAL_IDS.includes(id)) {
+          // The router has jumped to the hash. Go back to the top in the same
+          // task, so no frame shows the form. Then start the scroll at once,
+          // while the new page fades in. A wait for the end of the fade left
+          // a still page on screen for the length of that fade.
+          window.dispatchEvent(new Event("rockcruit:show-bar"));
+          const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+          if (lenis) lenis.scrollTo(0, { immediate: true });
+          else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          smoothJumpToTarget(target, true);
+          startJump();
+          return;
+        }
 
         requestAnimationFrame(() => {
           window.dispatchEvent(new Event("rockcruit:show-bar"));
@@ -364,9 +434,13 @@ const structuredData = [
         });
       });
 
-      // Intercept same-page hash links for instant rendered jumps.
-      document.addEventListener("click", (event) => {
-        if (event.defaultPrevented) return;
+      // The link to a same-page section. The reader at a section link gets a
+      // smooth jump. This listener runs in the capture phase, before the
+      // router. The router reads the same click, calls preventDefault, and
+      // jumps to the hash at once, so a listener that runs later never sees it.
+      // The Nav owns the links of its service menu and the open mobile menu.
+      const sameDocumentLink = (event: MouseEvent) => {
+        if (event.defaultPrevented) return null;
         if (
           event.button ||
           event.metaKey ||
@@ -374,51 +448,70 @@ const structuredData = [
           event.shiftKey ||
           event.altKey
         )
-          return;
+          return null;
 
         const link = (event.target as Element)?.closest?.(
           "a[href]",
         ) as HTMLAnchorElement | null;
-        if (!link || link.target === "_blank") return;
+        if (!link || link.target === "_blank") return null;
 
         let url: URL;
         try {
           url = new URL(link.href);
         } catch {
-          return;
+          return null;
         }
-        if (url.origin !== window.location.origin) return;
-        if (url.pathname !== window.location.pathname) return; // cross-page: let router handle
-        if (url.search !== window.location.search) return;
+        if (url.origin !== window.location.origin) return null;
+        if (url.pathname !== window.location.pathname) return null; // cross-page: let router handle
+        if (url.search !== window.location.search) return null;
+        return { link, url };
+      };
 
-        if (!url.hash || url.hash === "#") {
+      document.addEventListener(
+        "click",
+        (event) => {
+          const found = sameDocumentLink(event);
+          if (!found) return;
+          const { link, url } = found;
+          if (!url.hash || url.hash === "#") return;
+          if (link.closest(".service-link")) return;
+          if (document.documentElement.hasAttribute("data-nav-open")) return;
+
+          const id = decodeURIComponent(url.hash.slice(1));
+          const target = findSection(id);
+          if (!target) return;
+
           event.preventDefault();
-          if (window.location.hash) {
-            history.pushState(history.state, "", url.pathname + url.search);
+          if (window.location.hash !== url.hash) {
+            history.pushState(
+              history.state,
+              "",
+              url.pathname + url.search + url.hash,
+            );
           }
           window.dispatchEvent(new Event("rockcruit:show-bar"));
-          const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
-          if (lenis) lenis.scrollTo(0, { immediate: true });
-          else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-          resetBelowFoldReveals();
+          smoothJumpToTarget(target);
           startJump();
-          return;
-        }
+        },
+        true,
+      );
 
-        const id = decodeURIComponent(url.hash.slice(1));
-        const target = findSection(id);
-        if (!target) return;
+      // A link to the top of the same page.
+      document.addEventListener("click", (event) => {
+        const found = sameDocumentLink(event);
+        if (!found) return;
+        const { url } = found;
+        if (url.hash && url.hash !== "#") return;
 
         event.preventDefault();
-        if (window.location.hash !== url.hash) {
-          history.pushState(
-            history.state,
-            "",
-            url.pathname + url.search + url.hash,
-          );
+        if (window.location.hash) {
+          history.pushState(history.state, "", url.pathname + url.search);
         }
         window.dispatchEvent(new Event("rockcruit:show-bar"));
-        jumpToTarget(target);
+        const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
+        if (lenis) lenis.scrollTo(0, { immediate: true });
+        else window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        resetBelowFoldReveals();
         startJump();
       });
 
