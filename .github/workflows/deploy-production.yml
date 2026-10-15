@@ -1,0 +1,74 @@
+# Production pipeline.
+# 1. Build the site for https://rockcruit.com from a release tag.
+# 2. Attach the build to the GitHub Release.
+# 3. Push dist/ to the release branch. Hostinger pulls that branch into public_html.
+# release-please.yml calls this workflow. Run it by hand to redeploy or roll back a tag.
+# The production environment needs the approval of a reviewer.
+name: Deploy production
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Tag to deploy"
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Tag to deploy (example: v1.0.0)"
+        required: true
+        type: string
+
+concurrency:
+  group: "deploy-production"
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  SITE_URL: "https://rockcruit.com"
+
+jobs:
+  deploy:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://rockcruit.com
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npx --no-install astro build --site "$SITE_URL" --base "/"
+        env:
+          # The repository variable BLOG_ENABLED controls the blog. The default is false.
+          BLOG_ENABLED: ${{ vars.BLOG_ENABLED || 'false' }}
+          PUBLIC_NOINDEX: "false"
+          PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.PUBLIC_EMAILJS_PUBLIC_KEY }}
+          PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.PUBLIC_EMAILJS_SERVICE_ID }}
+          PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.PUBLIC_EMAILJS_TEMPLATE_ID }}
+      - name: Package build for the release
+        run: tar -czf "rockcruit-site-${{ inputs.ref }}.tar.gz" -C dist .
+      - name: Attach build to the GitHub Release
+        run: gh release upload "${{ inputs.ref }}" "rockcruit-site-${{ inputs.ref }}.tar.gz" --clobber --repo "${{ github.repository }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Push dist to the release branch
+        run: |
+          cd dist
+          git init -b release
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: ${{ inputs.ref }}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" release
+        env:
+          GH_TOKEN: ${{ github.token }}

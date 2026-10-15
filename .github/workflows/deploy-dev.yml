@@ -1,0 +1,99 @@
+# Development pipeline.
+# 1. A PR merges into dev.
+# 2. This workflow builds the site for the /dev path.
+# 3. The deploy job publishes it to GitHub Pages (environment: development).
+# 4. The prerelease job makes a GitHub pre-release dev-<run_number> with the build attached.
+name: Deploy dev
+
+on:
+  push:
+    branches: ["dev"]
+  workflow_dispatch:
+
+concurrency:
+  group: "deploy-dev"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  SITE_URL: "https://nicoowolf.github.io"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: npm
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - run: npm ci
+      - name: Build with Astro
+        run: |
+          npx --no-install astro build \
+            --site "$SITE_URL" \
+            --base "${{ steps.pages.outputs.base_path }}/dev" \
+            --outDir dist/dev
+        env:
+          BLOG_ENABLED: "true"
+          # The dev deploy is a preview. Keep it out of search results.
+          PUBLIC_NOINDEX: "true"
+          PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.PUBLIC_EMAILJS_PUBLIC_KEY }}
+          PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.PUBLIC_EMAILJS_SERVICE_ID }}
+          PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.PUBLIC_EMAILJS_TEMPLATE_ID }}
+      - name: Package build for the pre-release
+        run: tar -czf "rockcruit-dev-${{ github.run_number }}.tar.gz" -C dist/dev .
+      - name: Keep the package for the prerelease job
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-build
+          path: rockcruit-dev-${{ github.run_number }}.tar.gz
+          retention-days: 7
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # dist/ holds only dist/dev, so the site lives under /dev.
+          path: dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: ${{ steps.deployment.outputs.page_url }}dev/
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+  prerelease:
+    name: Make pre-release
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dev-build
+      - name: Create pre-release dev-${{ github.run_number }}
+        run: |
+          gh release create "dev-${{ github.run_number }}" \
+            "rockcruit-dev-${{ github.run_number }}.tar.gz" \
+            --repo "${{ github.repository }}" \
+            --target "${{ github.sha }}" \
+            --title "dev-${{ github.run_number }}" \
+            --notes "Development build of ${{ github.sha }}. Preview: https://nicoowolf.github.io/rockcruit-v2/dev/" \
+            --prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
