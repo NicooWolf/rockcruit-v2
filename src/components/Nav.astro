@@ -32,7 +32,10 @@ const showBlog = BLOG_ENABLED;
   </a>
   <ul class="nav-links">
     <li class="nav-dropdown">
-      <a href={href("/services/")} class={isActive("/services") ? "active" : ""}>
+      <a
+        href={href("/services/")}
+        class={isActive("/services") ? "active" : ""}
+      >
         Services <span class="nav-dropdown-arrow">▾</span>
       </a>
       <div class="nav-dropdown-menu">
@@ -47,7 +50,8 @@ const showBlog = BLOG_ENABLED;
       </div>
     </li>
     <li>
-      <a href={href("/team/")} class={isActive("/team") ? "active" : ""}>Team</a>
+      <a href={href("/team/")} class={isActive("/team") ? "active" : ""}>Team</a
+      >
     </li>
     <li>
       <a href={href("/process/")} class={isActive("/process") ? "active" : ""}

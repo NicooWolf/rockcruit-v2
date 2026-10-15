@@ -3,8 +3,7 @@
 // only when the browser cannot move a canvas to a worker.
 
 export type WaveContext =
-  | CanvasRenderingContext2D
-  | OffscreenCanvasRenderingContext2D;
+  CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 
 // The wave draws with two colors. The split sets the share of each color.
 // Zero gives about half of the particles to each color. A negative value
