@@ -109,7 +109,17 @@ const categories = [
         /* --in-step gives each row its place in the cascade. The list is
       static, so the value comes from the build, not from a script. */
       }
-      <div class="f-menu" id="fc-role-menu" data-role-menu hidden>
+      {
+        /* data-lenis-prevent makes Lenis ignore wheel and touch events here.
+      The browser then scrolls the panel itself. */
+      }
+      <div
+        class="f-menu"
+        id="fc-role-menu"
+        data-role-menu
+        data-lenis-prevent
+        hidden
+      >
         {
           categories.map((category, index) => (
             <button
@@ -298,6 +308,26 @@ const categories = [
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+    /* macOS hides an overlay scrollbar until the reader scrolls. The
+       ::-webkit-scrollbar rules below make the bar stay in view. */
+  }
+  /* Firefox ignores ::-webkit-scrollbar. Chrome would let the standard
+     properties win over it, so only Firefox reads them. */
+  @supports not selector(::-webkit-scrollbar) {
+    .f-menu {
+      scrollbar-width: thin;
+      scrollbar-color: #3f3f46 transparent;
+    }
+  }
+  .f-menu::-webkit-scrollbar {
+    width: 8px;
+  }
+  .f-menu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .f-menu::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+    border-radius: 4px;
   .f-menu[hidden] {
     display: none;
   }
