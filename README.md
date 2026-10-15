@@ -34,14 +34,14 @@ This repository contains the public website of the company.
 
 ## 3. KEY FILES
 
-| File                      | Purpose                                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------ |
-| `AGENTS.md`               | AI-Agents context & architecture rules. Read this file first.                              |
-| `CLAUDE.md`               | Claude-scoped architecture rules.                                                          |
-| `astro.config.mjs`        | Astro configuration. Contains `site` and `base`. Do not remove `site`.                     |
+| File                      | Purpose                                                                                      |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| `AGENTS.md`               | AI-Agents context & architecture rules. Read this file first.                                |
+| `CLAUDE.md`               | Claude-scoped architecture rules.                                                            |
+| `astro.config.mjs`        | Astro configuration. Contains `site` and `base`. Do not remove `site`.                       |
 | `src/lib/wp.ts`           | WordPress data layer. Contains the `BLOG_ENABLED` kill switch. Contains `TODO(ACF)` markers. |
-| `src/lib/url.ts`          | Base-aware `href()` helper. Use it for all internal links.                                 |
-| `.env`                    | Secret keys (EmailJS). Never commit this file.                                             |
+| `src/lib/url.ts`          | Base-aware `href()` helper. Use it for all internal links.                                   |
+| `.env`                    | Secret keys (EmailJS). Never commit this file.                                               |
 | `.github/workflows/*.yml` | CI pipeline. `BLOG_ENABLED` must be under `env:`.                                            |
 
 ---
@@ -65,7 +65,7 @@ This repository contains the public website of the company.
 | Technology             | Role                     | Notes                                                |
 | ---------------------- | ------------------------ | ---------------------------------------------------- |
 | Astro v2               | Static site generator    | All pages build to static HTML.                      |
-| WPGraphQL              | Blog content API         | Only active when `BLOG_ENABLED=true`.                  |
+| WPGraphQL              | Blog content API         | Only active when `BLOG_ENABLED=true`.                |
 | WPGraphQL-for-ACF      | Custom fields API        | Field list is not final. See `TODO(ACF)` in `wp.ts`. |
 | EmailJS                | Contact and hire forms   | Keys live in `.env`. A domain allowlist is active.   |
 | IntersectionObserver   | Scroll reveal animations | Lightweight. No animation library is required.       |
@@ -82,7 +82,7 @@ This repository contains the public website of the company.
 | `src/pages/index.astro`    | Home page. Main entry for users. Contains the shared `HireForm`.              |
 | `src/pages/services.astro` | Services page. Anchors: `#contingency`, `#raas`, `#contact`.                  |
 | `astro.config.mjs`         | Main entry for the build. Sets `site` and `base`.                             |
-| `.github/workflows/*.yml`  | Main entry for CI. Sets `BLOG_ENABLED` under `env:`.                            |
+| `.github/workflows/*.yml`  | Main entry for CI. Sets `BLOG_ENABLED` under `env:`.                          |
 | `src/lib/wp.ts`            | Single entry for all WordPress data. Do not query WordPress from other files. |
 
 ---

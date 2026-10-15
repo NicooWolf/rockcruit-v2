@@ -121,7 +121,12 @@ const structuredData = [
       type="image/svg+xml"
       href={href("/rockcruit-lila-icon.svg")}
     />
-    <link rel="icon" type="image/x-icon" href={href("/favicon.ico")} sizes="48x48" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href={href("/favicon.ico")}
+      sizes="48x48"
+    />
     <link
       rel="icon"
       type="image/png"
@@ -255,7 +260,9 @@ const structuredData = [
           value: undefined,
           configurable: true,
         });
-      } catch (e) {}
+      } catch {
+        // The property is locked in this browser. Keep the native transitions.
+      }
     </script>
     <ClientRouter />
   </head>

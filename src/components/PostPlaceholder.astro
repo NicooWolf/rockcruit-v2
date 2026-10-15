@@ -41,7 +41,13 @@ const stars = Array.from({ length: 170 }, () => {
   return {
     x: r1(between(0, 1600)),
     y: r1(between(0, 900)),
-    r: r1(size < 0.7 ? between(0.5, 1.1) : size < 0.95 ? between(1.1, 1.7) : between(1.7, 2.4)),
+    r: r1(
+      size < 0.7
+        ? between(0.5, 1.1)
+        : size < 0.95
+          ? between(1.1, 1.7)
+          : between(1.7, 2.4),
+    ),
     o: r1(between(0.25, 0.9)),
     tone: tint < 0.1 ? "violet" : tint < 0.17 ? "green" : "paper",
     twinkle: rand() < 0.12,
@@ -65,7 +71,10 @@ const rock = (cx: number, cy: number, r: number) => {
     const d = r * between(0.72, 1.08);
     return [cx + Math.cos(a) * d, cy + Math.sin(a) * d * 0.86];
   });
-  const mid = (p: number[], q: number[]) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+  const mid = (p: number[], q: number[]) => [
+    (p[0] + q[0]) / 2,
+    (p[1] + q[1]) / 2,
+  ];
   const start = mid(pts[n - 1], pts[0]);
   let d = `M${r1(start[0])} ${r1(start[1])}`;
   pts.forEach((p, i) => {
@@ -90,7 +99,10 @@ const asteroids = [
 // The meteor heads are rocks too. Each tail points back along its path.
 const meteors = [
   { head: rock(520, 232, 13), tail: "M512 226 L742 78 L746 86 L527 240 Z" },
-  { head: rock(1372, 648, 9), tail: "M1366 643 L1540 522 L1543 528 L1378 654 Z" },
+  {
+    head: rock(1372, 648, 9),
+    tail: "M1366 643 L1540 522 L1543 528 L1378 654 Z",
+  },
   { head: rock(985, 762, 4), tail: "M982 760 L1086 694 L1088 698 L988 765 Z" },
 ];
 
@@ -374,7 +386,8 @@ const BANDS = [
     <circle class="f-base" cx="318" cy="684" r="9" opacity="0.22"></circle>
     <circle class="f-base" cx="282" cy="712" r="13" opacity="0.2"></circle>
     <circle class="f-base" cx="322" cy="728" r="6" opacity="0.25"></circle>
-    <circle class="f-green-light" cx="279" cy="709" r="13" opacity="0.08"></circle>
+    <circle class="f-green-light" cx="279" cy="709" r="13" opacity="0.08"
+    ></circle>
     <circle
       class="k-green-light"
       cx="300"
@@ -415,12 +428,18 @@ const BANDS = [
     <g class="rocket">
       <!-- Exhaust trail -->
       <g opacity="0.9">
-        <rect x="-70" y="12.6" width="62" height="0.5" fill={ref("trail")}></rect>
-        <rect x="-58" y="15.6" width="50" height="0.4" fill={ref("trail")}></rect>
-        <rect x="-46" y="10.2" width="34" height="0.3" fill={ref("trail")}></rect>
-        <rect x="-40" y="18.4" width="28" height="0.3" fill={ref("trail")}></rect>
-        <circle class="f-paper" cx="-30" cy="14.2" r="2.6" opacity="0.04"></circle>
-        <circle class="f-paper" cx="-42" cy="13.4" r="3.4" opacity="0.03"></circle>
+        <rect x="-70" y="12.6" width="62" height="0.5" fill={ref("trail")}
+        ></rect>
+        <rect x="-58" y="15.6" width="50" height="0.4" fill={ref("trail")}
+        ></rect>
+        <rect x="-46" y="10.2" width="34" height="0.3" fill={ref("trail")}
+        ></rect>
+        <rect x="-40" y="18.4" width="28" height="0.3" fill={ref("trail")}
+        ></rect>
+        <circle class="f-paper" cx="-30" cy="14.2" r="2.6" opacity="0.04"
+        ></circle>
+        <circle class="f-paper" cx="-42" cy="13.4" r="3.4" opacity="0.03"
+        ></circle>
       </g>
       <!-- Flame -->
       <g class="flame">

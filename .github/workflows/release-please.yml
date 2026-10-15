@@ -1,0 +1,42 @@
+# Release flow for production.
+# 1. A PR from dev merges into main.
+# 2. release-please opens or updates a release PR (version and CHANGELOG).
+# 3. The owner merges the release PR. release-please makes the tag and the GitHub Release.
+# 4. The deploy job builds the site and pushes it to the release branch.
+# 5. Hostinger pulls the release branch into public_html.
+name: Release
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release PR and tag
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          # A personal token lets CI run on the release PR. GITHUB_TOKEN cannot start other workflows.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  deploy:
+    name: Deploy production
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/deploy-production.yml
+    with:
+      ref: ${{ needs.release-please.outputs.tag_name }}
+    secrets: inherit
+    permissions:
+      contents: write
