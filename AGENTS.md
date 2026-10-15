@@ -76,9 +76,10 @@ Do these steps in this order for every task:
 1. Read the files that relate to the task.
 2. Make the change.
 3. Run `npx astro check`.
-4. Run `npm run build` with `BLOG_ENABLED=false`.
-5. Run `npm run build` with `BLOG_ENABLED=true` if you changed `src/lib/wp.ts`.
-6. Report the result. Give the command output if an error occurs.
+4. Run `npm run lint`. CI runs it on every pull request.
+5. Run `npm run build` with `BLOG_ENABLED=false`.
+6. Run `npm run build` with `BLOG_ENABLED=true` if you changed `src/lib/wp.ts`.
+7. Report the result. Give the command output if an error occurs.
 
 The build must pass with `BLOG_ENABLED=false` and no network access.
 This rule has no exception.
@@ -99,7 +100,13 @@ import { href } from "../lib/url";
 <a href={href("/services")}>Services</a>
 ```
 
-Do not write a hard-coded internal path. GitHub Pages uses `BASE_URL=/rockcruit-v2/`.
+Do not write a hard-coded internal path. The base path changes for each environment:
+
+| Environment | URL                                           | `BASE_URL`           |
+| ----------- | --------------------------------------------- | -------------------- |
+| development | https://nicoowolf.github.io/rockcruit-v2/dev/ | `/rockcruit-v2/dev/` |
+| production  | https://rockcruit.com                         | `/`                  |
+
 A hard-coded path breaks the navigation on GitHub Pages.
 
 ### 5.2 WordPress data
@@ -166,9 +173,40 @@ Do not write new marketing copy. Ask the owner for the text.
 
 ## 6. CI/CD RULES
 
-The workflow files are in `.github/workflows/`.
-Put `BLOG_ENABLED` under `env:`. Do not put it directly on the step.
-A wrong position causes an invalid YAML file.
+`CONTRIBUTING.md` gives the full branch, merge, and release rules. Obey it.
+
+### 6.1 Workflows
+
+| File                    | Trigger               | Job                                                    |
+| ----------------------- | --------------------- | ------------------------------------------------------ |
+| `ci.yml`                | PR to `dev` or `main` | `Check and build`: astro check, lint, build (no blog). |
+| `pr-title.yml`          | PR to `dev` or `main` | `PR title`: Conventional Commit title check.           |
+| `deploy-dev.yml`        | Push to `dev`         | Pages deploy to `/dev`. Pre-release `dev-N`.           |
+| `release-please.yml`    | Push to `main`        | Release PR, tag `vX.Y.Z`, GitHub Release.              |
+| `deploy-production.yml` | Release or manual run | Build a tag. Push `dist/` to the `release` branch.     |
+
+### 6.2 Rules
+
+- Put `BLOG_ENABLED` under `env:`. Do not put it directly on the step. A wrong position causes an invalid YAML file.
+- Production reads `BLOG_ENABLED` from the repository variable `vars.BLOG_ENABLED`. Do not hard-code it.
+- Do not rename the jobs `Check and build` and `PR title`. The rulesets require these names.
+- Do not change `environment: production`. A reviewer must approve each production deploy.
+- Never edit, commit to, or protect the `release` branch. CI force-pushes the built site to it. Hostinger pulls it.
+- Do not edit `CHANGELOG.md`, `.release-please-manifest.json`, or the `version` in `package.json`. release-please owns them.
+- Read a secret only with `${{ secrets.NAME }}`. Never echo a secret.
+
+### 6.3 Branches and merge methods
+
+| Pull request                | Merge method          |
+| --------------------------- | --------------------- |
+| `feature/*` → `dev`         | Squash and merge      |
+| `dev` → `main`              | Create a merge commit |
+| `main` → `dev` (back-merge) | Create a merge commit |
+| release-please PR → `main`  | Squash and merge      |
+
+- Create each work branch from `dev`. Use the prefix `feat/`, `fix/`, `chore/`, or `docs/`.
+- Never push to `dev` or `main` directly.
+- Never use "Rebase and merge".
 
 ---
 
@@ -219,6 +257,8 @@ A wrong guess is worse than an open question.
 | `public/`            | You can edit. Never add a secret.                |
 | `astro.config.mjs`   | You can edit. Keep `site` and `base`.            |
 | `.github/workflows/` | You can edit. Obey section 6.                    |
+| `CONTRIBUTING.md`    | You can edit. Keep it equal to section 6.        |
+| `CHANGELOG.md`       | Never edit. release-please writes this file.     |
 | `.env`               | Never edit. Never read the values aloud.         |
 | `CLAUDE.md`          | Never edit. The owner updates this file by hand. |
 
@@ -238,9 +278,12 @@ chore(ci): move BLOG_ENABLED under env
 Rules:
 
 - Write one logical change for each commit.
+- Write the pull request title as a Conventional Commit. The `PR title` check fails if it is not.
+- Start the subject with a lower-case letter.
+- Write one logical change for each pull request. A squash merge makes one CHANGELOG line from it.
 - Write the subject line in the imperative form. Use 72 characters or less.
 - Do not commit `dist/` or `node_modules/`.
-- Give this information in the pull request body:
+- Use `.github/pull_request_template.md`. Give this information in the pull request body:
   1. What changed.
   2. Why it changed.
   3. The build result.
