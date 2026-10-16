@@ -56,7 +56,7 @@ jobs:
           path: rockcruit-dev-${{ github.run_number }}.tar.gz
           retention-days: 7
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # dist/ holds only dist/dev, so the site lives under /dev.
           path: dist
