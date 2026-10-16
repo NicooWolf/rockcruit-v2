@@ -131,8 +131,11 @@ const testimonials = [
           without increasing fixed recruiting headcount.
         </p>
         <div class="subhero-ctas">
-          <a href={href("/#contact")} class="btn-primary">Start hiring →</a>
-          <a href={href("/services")} class="btn-ghost-sub">See how we work →</a
+          <a href={href("/#contact")} class="btn-primary"
+            >Start hiring <span class="arr" aria-hidden="true"></span></a
+          >
+          <a href={href("/services")} class="btn-ghost-sub"
+            >How we work <span class="arr" aria-hidden="true"></span></a
           >
         </div>
       </div>
@@ -296,7 +299,8 @@ const testimonials = [
         >
       </p>
       <a href={href("/services")} class="pos-cta"
-        >Explore our delivery models →</a
+        >Explore our delivery models <span class="arr" aria-hidden="true"
+        ></span></a
       >
     </div>
   </section>
@@ -324,9 +328,13 @@ const testimonials = [
       >
       <div class="di-body">
         <div class="di-body-inner">
-          In 85% of our searches, we present the first candidate within the
-          first 5 business days. No waiting weeks for inbound applicants. No
-          empty progress updates.
+          <span class="di-line"
+            >In 85% of our searches, we present the first candidate within the
+            first 5 business days.</span
+          >
+          <span class="di-line"
+            >No waiting weeks for inbound applicants. No empty progress updates.</span
+          >
         </div>
       </div>
     </div>
@@ -347,14 +355,18 @@ const testimonials = [
     <div class="diff-item reveal">
       <button class="diff-item-btn"
         ><span class="di-num">03</span><span class="di-title"
-          >Culture fit matters as much as <em>technical fit</em></span
+          >Culture fit matters, so does <em>technical fit</em></span
         ><span class="di-icon">+</span></button
       >
       <div class="di-body">
         <div class="di-body-inner">
-          Strong technical profiles fail all the time for cultural reasons. We
-          evaluate both from the first conversation — not just at the offer
-          stage.
+          <span class="di-line"
+            >Strong technical profiles fail all the time for cultural reasons.</span
+          >
+          <span class="di-line"
+            >We evaluate both from the first conversation — not just at the
+            offer stage.</span
+          >
         </div>
       </div>
     </div>
@@ -366,8 +378,13 @@ const testimonials = [
       >
       <div class="di-body">
         <div class="di-body-inner">
-          No black boxes. No disappearing recruiters. You always know pipeline
-          status, market feedback, and where searches stand.
+          <span class="di-line"
+            >No black boxes. No disappearing recruiters.</span
+          >
+          <span class="di-line"
+            >You always know pipeline status, market feedback, and where
+            searches stand.</span
+          >
         </div>
       </div>
     </div>
@@ -397,7 +414,9 @@ const testimonials = [
           digital hires per year. Continuous sourcing, accumulated context, and
           flexible monthly engagement without per-hire fees.
         </p>
-        <a href={href("/services#raas")} class="st-card-link">See RaaS →</a>
+        <a href={href("/services#raas")} class="st-card-link"
+          >See RaaS <span class="arr" aria-hidden="true"></span></a
+        >
         <div class="st-card-bg">01</div>
       </div>
       <div class="st-card slide-right">
@@ -408,7 +427,7 @@ const testimonials = [
           precision, speed, and deep vetting matter most.
         </p>
         <a href={href("/services#contingency")} class="st-card-link"
-          >See Contingency →</a
+          >See Contingency <span class="arr" aria-hidden="true"></span></a
         >
         <div class="st-card-bg">02</div>
       </div>
@@ -1205,14 +1224,22 @@ const testimonials = [
     transition: max-height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .di-body-inner {
-    padding: 0.5rem 5% 2rem calc(5% + 80px + 2rem);
+    /* The right padding keeps the text clear of the icon column. */
+    padding: 0.5rem calc(5% + 36px + 2rem) 2rem calc(5% + 80px + 2rem);
     font-size: 0.88rem;
     color: rgba(240, 237, 227, 0.45);
     line-height: 1.85;
-    max-width: 580px;
+    max-width: 900px;
+    text-wrap: balance;
+  }
+  /* One sentence group for each line. A long group breaks into even lines. */
+  .di-line {
+    display: block;
+    text-wrap: balance;
   }
   .diff-item.open .di-body {
-    max-height: 200px;
+    /* The narrow text box on a phone needs more lines than before. */
+    max-height: 320px;
   }
 
   .diff-closing {
@@ -1875,6 +1902,31 @@ const testimonials = [
     h1 {
       font-size: clamp(4.5rem, 16vw, 8rem);
     }
+    /* The two hero buttons share one row. Each has the same width and the
+       same height. The font shrinks a little on the narrowest screens, so the
+       longer text still fits in half of the row at 320px. */
+    .subhero-ctas {
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+    .subhero-ctas a {
+      flex: 1 1 0;
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.7rem 0.5rem;
+      font-size: clamp(0.74rem, 3.5vw, 0.82rem);
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    /* The ghost button has a 1px border. This invisible border gives the
+       green button the same box, so the two widths match to the pixel. */
+    .subhero-ctas .btn-primary {
+      border: 1px solid transparent;
+    }
     .hero-stats {
       grid-template-columns: 1fr;
     }
@@ -1892,7 +1944,7 @@ const testimonials = [
       padding: 1.5rem 5%;
     }
     .di-body-inner {
-      padding: 0.5rem 5% 1.5rem calc(5% + 50px + 1rem);
+      padding: 0.5rem calc(5% + 34px + 1rem) 1.5rem calc(5% + 50px + 1rem);
     }
   }
 </style>
