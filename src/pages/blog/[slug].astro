@@ -26,7 +26,10 @@ const metaTitle = `${truncate(title, 60 - BRAND_SUFFIX.length)}${BRAND_SUFFIX}`;
 // Prefer the ACF description. Fall back to the WordPress excerpt.
 const metaDescription = truncate(
   decodeEntities(
-    (post.postFields?.description || post.excerpt || "").replace(/<[^>]+>/g, ""),
+    (post.postFields?.description || post.excerpt || "").replace(
+      /<[^>]+>/g,
+      "",
+    ),
   ),
   160,
 );
@@ -87,12 +90,14 @@ const fmt = (d: string) =>
         <p class="post-meta">
           <time datetime={post.date}>{dateLabel}</time>
           {readingTime && <span> · {readingTime} min read</span>}
-          {category && (
-            <>
-              {" · "}
-              <span class="post-cat">{category.name}</span>
-            </>
-          )}
+          {
+            category && (
+              <>
+                {" · "}
+                <span class="post-cat">{category.name}</span>
+              </>
+            )
+          }
         </p>
         {
           authorName && (
@@ -145,7 +150,9 @@ const fmt = (d: string) =>
     <footer class="post-footer">
       <p class="post-cta-line reveal">Hiring for a role like this?</p>
       <div class="reveal">
-        <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+        <a href={href("/#contact")} class="btn-primary"
+          >Talk to us <span class="arr" aria-hidden="true"></span></a
+        >
       </div>
     </footer>
   </article>

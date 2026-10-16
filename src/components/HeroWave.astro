@@ -3,11 +3,7 @@
 // variables of global.css. The split sets the share of each color. See
 // WaveColors in src/lib/heroWave.ts. The defaults give the Home wave.
 type WaveTone =
-  | "green"
-  | "green-light"
-  | "violet"
-  | "violet-light"
-  | "violet-dark";
+  "green" | "green-light" | "violet" | "violet-light" | "violet-dark";
 
 interface Props {
   first?: WaveTone;
@@ -221,7 +217,9 @@ const { first = "green", second = "violet", split = 0 } = Astro.props;
       if (!stats || !supportLeft || !supportRight) return hero!.offsetHeight;
       const stacked = supportRight.offsetTop > supportLeft.offsetTop;
       if (!stacked) return stats.offsetTop;
-      return support!.offsetTop + supportLeft.offsetTop + supportLeft.offsetHeight;
+      return (
+        support!.offsetTop + supportLeft.offsetTop + supportLeft.offsetHeight
+      );
     }
 
     function resize() {

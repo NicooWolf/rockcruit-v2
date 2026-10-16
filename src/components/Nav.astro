@@ -1,7 +1,7 @@
 ---
 // src/components/Nav.astro — one canonical nav (prototypes drifted; normalized here).
 // Canonical decisions: dropdown order = 01 RaaS / 02 Contingency; Blog link added.
-// "Open Positions" → /#contact until its real destination is decided (open ledger).
+// "Open Positions" → https://rockcruit.breezy.hr/ (_blank) until its real destination is decided (open ledger).
 import { href } from "../lib/url";
 import { BLOG_ENABLED } from "../lib/wp";
 import RockcruitWordmark from "../assets/icons/rockcruit-white-title.svg";
@@ -32,7 +32,10 @@ const showBlog = BLOG_ENABLED;
   </a>
   <ul class="nav-links">
     <li class="nav-dropdown">
-      <a href={href("/services/")} class={isActive("/services") ? "active" : ""}>
+      <a
+        href={href("/services/")}
+        class={isActive("/services") ? "active" : ""}
+      >
         Services <span class="nav-dropdown-arrow">▾</span>
       </a>
       <div class="nav-dropdown-menu">
@@ -47,7 +50,8 @@ const showBlog = BLOG_ENABLED;
       </div>
     </li>
     <li>
-      <a href={href("/team/")} class={isActive("/team") ? "active" : ""}>Team</a>
+      <a href={href("/team/")} class={isActive("/team") ? "active" : ""}>Team</a
+      >
     </li>
     <li>
       <a href={href("/process/")} class={isActive("/process") ? "active" : ""}
@@ -68,7 +72,9 @@ const showBlog = BLOG_ENABLED;
     }
   </ul>
   <div class="nav-actions">
-    <a href={href("/#contact")} class="nav-open">Open Positions</a>
+    <a href={"https://rockcruit.breezy.hr/"} target="_blank" class="nav-open"
+      >Open Positions</a
+    >
     <a href={href("/#contact")} class="nav-cta">Hire With Us</a>
   </div>
   <div class="nav-mobile">
@@ -135,7 +141,11 @@ const showBlog = BLOG_ENABLED;
           }
         </ul>
         <div class="nav-mobile-cta">
-          <a href={href("/#contact")} class="nav-mobile-open">
+          <a
+            href={"https://rockcruit.breezy.hr/"}
+            target="_blank"
+            class="nav-mobile-open"
+          >
             Open Positions
             <svg
               class="nav-mobile-arrow"
@@ -988,11 +998,15 @@ const showBlog = BLOG_ENABLED;
       const target = document.getElementById(
         decodeURIComponent(url.hash.slice(1)),
       );
-      // Land instantly — a jump must not wait out a multi-second smooth
-      // scroll. The reveal observer in Layout.astro then reveals the section
-      // in the same staggered order as a scroll.
+      // The jump is smooth, through the sections on the way. Layout.astro
+      // gives the smooth jump. The reveal observer there shows each section
+      // in passing. Without it (reduced motion), the jump is instant.
+      const smoothJump = (
+        window as unknown as { __smoothJump?: (target: Element) => void }
+      ).__smoothJump;
       if (target) {
-        target.scrollIntoView({ behavior: "instant", block: "start" });
+        if (smoothJump) smoothJump(target);
+        else target.scrollIntoView({ behavior: "instant", block: "start" });
       }
 
       return true;

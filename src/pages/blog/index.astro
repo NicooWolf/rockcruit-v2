@@ -76,7 +76,7 @@ for (const post of latest) {
         )
       }
       <a class="hero-aside-rss" href={href("/blog/rss.xml")}>
-        Follow via RSS →
+        Follow via RSS <span class="arr" aria-hidden="true"></span>
       </a>
     </aside>
   </div>
@@ -145,7 +145,9 @@ for (const post of latest) {
       Hiring for a role like the ones <strong>we write about?</strong>
     </p>
     <div class="reveal blog-cta-btn">
-      <a href={href("/#contact")} class="btn-primary">Talk to us →</a>
+      <a href={href("/#contact")} class="btn-primary"
+        >Talk to us <span class="arr" aria-hidden="true"></span></a
+      >
     </div>
   </section>
 </Layout>
