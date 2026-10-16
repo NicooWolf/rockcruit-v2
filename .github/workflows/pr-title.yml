@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # This job reads only the PR title. It does not check out the PR code.
-      - uses: amannn/action-semantic-pull-request@v5
+      - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
